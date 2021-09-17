@@ -1,5 +1,7 @@
 # ealing-schools
 
+A quick hack to allow me to view Ealing high schools and their intake radius with data from 2019-2021
+
 ## Project setup
 ```
 yarn install
