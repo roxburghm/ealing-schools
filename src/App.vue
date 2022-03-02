@@ -44,7 +44,7 @@
                         <a target="_blank" href="https://view.joomag.com/high-school-prospectus-ec8682-high-school-prospectus-2020-final/0315251001567583240?short">Starting High School 2020</a>
                     </p>
 
-                    <p>The distance used to show the "intake areas" is from the "School Statistics" table on page 6/7 of the above in the column <em>"The distance and criterion of the last person to be offered on 1 March 2021"</em></p>
+                    <p>The distance used to show the "intake areas" is from the "School Statistics" table on page 6/7 of the above in the column <em>"The distance and criterion of the last person to be offered on 1 March 2022"</em></p>
 
                     <p>Where all applicants were offered a space an arbitary 3 miles intake zone is shown.</p>
 
@@ -78,6 +78,13 @@
                         <v-col cols="8">
                             <a target="_blank" :href="currentSchool.website">{{ currentSchool.website }}</a>
                         </v-col>
+                        <v-col cols="4" class="text-right">
+                            Distance for {{ year }}
+                        </v-col>
+                        <v-col cols="8">
+                            {{ currentSchool.intakeDist[year] === 'null' ? 'All applicants accepted' : currentSchool.intakeDist[year] + 'mi'}}<br/>
+                            {{ currentSchool.notes }}
+                        </v-col>
                         <v-col cols="12">
                             {{ currentSchool.description }}
                         </v-col>
@@ -108,8 +115,8 @@ export default {
             currentSchool: null,
             showSchoolInfo: false,
             showHelp: false,
-            year: "2021",
-            years: ['average', "2019", "2020", "2021"]
+            year: "2022",
+            years: ['average', "2019", "2020", "2021", "2022"]
         }
     },
     methods: {

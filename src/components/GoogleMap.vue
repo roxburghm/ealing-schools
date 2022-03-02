@@ -20,7 +20,7 @@
                 />
                 <GmapCircle
                     :key="'r-' + index"
-                    v-for="(school, index) in visibleSchools"
+                    v-for="(school, index) in visibleSchoolsCircles"
                     :center="school.centre" :radius="circleRadius(school)" :options="circleOptions(school)"/>
             </GmapMap>
         </v-col>
@@ -56,7 +56,7 @@ export default {
             });
         },
         circleRadius(school) {
-            if (null === school.intakeDist[this.year]) return 3 * 1609;
+            if (null === school.intakeDist[this.year]) return 5 * 1609;
 
             return 1609 * school.intakeDist[this.year];
         },
@@ -64,10 +64,10 @@ export default {
 
             return {
                 strokeColor: school.colour,
-                strokeOpacity: 1,
+                strokeOpacity: school.intakeDist[this.year] == null ? 0.4 : null,
                 strokeWeight: 0.6,
                 fillColor: school.colour,
-                fillOpacity: school.intakeDist[this.year] == 5 ? 0.05 : 0.2
+                fillOpacity: school.intakeDist[this.year] == null ? 0.05 : 0.2
             }
 
         },
@@ -95,6 +95,9 @@ export default {
     computed: {
         visibleSchools() {
             return this.schools.filter(school => school.visible)
+        },
+        visibleSchoolsCircles() {
+            return this.schools.filter(school => school.visible && school.radius)
         }
     }
 };
