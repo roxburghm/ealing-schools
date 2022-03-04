@@ -92,7 +92,7 @@ const schoolsList = [
         notes: null,
 
         rating: 'good',
-        centre: {lat: 51.4959126, lng: -0.314284},
+        centre: {lat: 51.49674021027868, lng: -0.3120331259658251},
         description: '',
         website: 'https://ealingfields.org.uk/',
         colour: '#f2a900'
@@ -107,7 +107,7 @@ const schoolsList = [
         notes: null,
 
         rating: 'outstanding',
-        centre: {lat: 51.500134, lng: -0.332443},
+        centre: {lat: 51.50009170525974, lng: -0.3304224095820846},
         description: '',
         website: 'http://www.ephs.ealing.sch.uk/',
         colour: '#8d2424'
