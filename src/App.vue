@@ -81,8 +81,10 @@
                             Rating
                         </v-col>
                         <v-col cols="8">
-                            {{ currentSchool.rating.toUpperCase() }}
-                            <a target="_blank" class="ml-4 text-decoration-none" :href="currentSchool.perf"><v-btn elevation="0" color="primary" x-small>Compare</v-btn></a>
+                            <v-chip small :color="ratingColour(currentSchool.rating)" class="white--text">{{ currentSchool.rating }}</v-chip>
+                            <a target="_blank" class="ml-4 text-decoration-none" :href="currentSchool.perf">
+                                <v-btn elevation="0" color="primary" x-small>Compare</v-btn>
+                            </a>
                         </v-col>
                         <v-col cols="4" class="text-right">
                             Website
@@ -123,15 +125,17 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                            <tr dense v-for="(intakeDist, year) in currentSchool.intakeDist" :key="year">
-                                <td class="text-right">
-                                    {{ year }}
-                                </td>
-                                <td>
-                                    {{ currentSchool.intakeDist[year] === 'null' ? 'All applicants accepted' : currentSchool.intakeDist[year].toFixed(3) + ' mi' }}<br/>
-                                    {{ currentSchool.notes }}
-                                </td>
-                            </tr>
+                                <tr dense v-for="(intakeDist, year) in currentSchool.intakeDist" :key="year">
+                                    <td class="text-right">
+                                        {{ year }}
+                                    </td>
+                                    <td>
+                                        {{
+                                            currentSchool.intakeDist[year] === null ? 'All applicants accepted' : currentSchool.intakeDist[year].toFixed(3) + ' mi'
+                                        }}<br/>
+                                        {{ currentSchool.notes }}
+                                    </td>
+                                </tr>
                                 </tbody>
                             </v-simple-table>
                         </v-col>
@@ -169,6 +173,18 @@ export default {
         }
     },
     methods: {
+        ratingColour(rating) {
+            switch (rating) {
+                case 'outstanding':
+                    return 'gold';
+                case 'good':
+                    return 'green';
+                case 'inadequate':
+                    return 'red';
+                default:
+                    return 'grey'
+            }
+        },
         showSchool(school) {
             this.currentSchool = school;
             this.showSchoolInfo = true;
@@ -176,3 +192,11 @@ export default {
     }
 }
 </script>
+
+<style>
+
+.gold {
+    background-color: gold !important;
+}
+
+</style>
