@@ -2,7 +2,7 @@
 
 A quick hack to allow me to view Ealing high schools and their intake radius with data from 2019-2021
 
-Preview https://roxburghm.com/ealingschools/
+Preview https://schools.roxb.in
 
 ## Your own data? 
 
