@@ -9,7 +9,7 @@ Preview https://schools.roxb.in
 Modify schools.js
 
 ```
-const schoolsList = [
+const schoolsList = [ 
     {
         name: 'Ada Lovelace CofE High School',
         shortName: 'Ada Lovelace',
