@@ -40,9 +40,11 @@
                 </v-card-title>
                 <v-card-text class="pt-4">
                     <p>All intake information is based on data in the
-                        <a target="_blank"
-                           href="https://viewer.joomag.com/high-school-prospectus-2022/0579981001629885520">Starting
-                            High School 2022</a>,
+                      <a target="_blank"
+                         href="https://www.ealing.gov.uk/download/downloads/id/13820/high_school_prospectus_202324.pdf">High School Prospectus 2023/24</a>,
+                      <a target="_blank"
+                         href="https://viewer.joomag.com/high-school-prospectus-2022/0579981001629885520">Starting
+                        High School 2022</a>,
                         <a target="_blank"
                            href="https://www.ealing.gov.uk/download/downloads/id/13820/high_school_prospectus_202122.pdf">Starting
                             High School 2021</a> and
@@ -56,6 +58,8 @@
                             March 2022"</em></p>
 
                     <p>Where all applicants were offered a space an arbitary 3 miles intake zone is shown.</p>
+
+                    <p>Where the entry criteria is more complex no intake zone is shown.</p>
 
                     <p>Enter your address in the box in the top left to see your home on the map, click schools in the
                         left panel to enable or disable their zones.</p>
@@ -169,7 +173,7 @@ export default {
             showSchoolInfo: false,
             showHelp: false,
             year: "2022",
-            years: ['average', "2019", "2020", "2021", "2022"]
+            years: ['min', 'max', 'average', "2019", "2020", "2021", "2022"]
         }
     },
     methods: {

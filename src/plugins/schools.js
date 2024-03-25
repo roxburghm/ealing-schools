@@ -445,23 +445,35 @@ const schoolsList = [
 
 schoolsList.forEach(school => {
     let average = 0;
+    let max = 0;
+    let min = 999;
+
     let values = 0;
     for (let i in school.intakeDist) {
         let val = school.intakeDist[i];
         if (val !== null && val > 0) {
             average += val;
+            if (max < val) max = val;
+            if (val && min > val) min = val;
             values++;
         }
     }
 
     if (values === 0) {
         average = school.intakeDist['2020'];
+        min = school.intakeDist['2020'];
+        max = school.intakeDist['2020'];
     } else {
         average = average / values;
     }
 
     school.intakeDist['average'] = average;
+    school.intakeDist['min'] = min;
+    school.intakeDist['max'] = max;
 });
+
+console.log(schoolsList)
+
 
 
 export default schoolsList;
