@@ -6,12 +6,15 @@ const schoolsList = [
             "2019": 0.749,
             "2020": 0.885,
             "2021": 0.726,
-            "2022": 0.626
+            "2022": 0.626,
+            "2023": null,
+            "2024": 0.727
         },
         "visible": true,
         "radius": true,
         "notes": null,
         "rating": "good",
+         
         "centre": {
             "lat": 51.518949,
             "lng": -0.293081
@@ -23,7 +26,12 @@ const schoolsList = [
         "email": "admissions@adalovelace.org.uk",
         "address": "Park View Road<BR>Ealing<BR>London<BR>W5 2JX",
         "phone": "020 3540 0200",
-        "perf": "https://www.compare-school-performance.service.gov.uk/school/145724"
+        "perf": "https://www.compare-school-performance.service.gov.uk/school/145724",
+        "perfDetailed": "https://www.compare-school-performance.service.gov.uk/school/145724/ada-lovelace-church-of-england-high-school/secondary",
+        "progress8": 1.4,
+        "progress8Confidence": "Low",
+        "attainment8": 67,
+        "grade5Above": 84,   
     },
     {
         "name": "Alec Reed Academy",
@@ -32,7 +40,9 @@ const schoolsList = [
             "2019": null,
             "2020": null,
             "2021": null,
-            "2022": null
+            "2022": null,
+            "2023": null,
+            "2024": null
         },
         "visible": false,
         "radius": true,
@@ -49,7 +59,12 @@ const schoolsList = [
         "email": "enquiries@alecreedacademy.co.uk",
         "address": "Bengarth Road<BR>Northolt<BR>UB5 5LQ",
         "phone": "020 8841 4511",
-        "perf": "https://www.compare-school-performance.service.gov.uk/school/134369"
+        "perf": "https://www.compare-school-performance.service.gov.uk/school/134369",
+        "perfDetailed": "https://www.compare-school-performance.service.gov.uk/school/134369/alec-reed-academy/secondary",
+        "progress8": 0.24,
+        "progress8Confidence": "Medium",
+        "attainment8": 43,
+        "grade5Above": 38
     },
     {
         "name": "Ark Acton Academy",
@@ -75,7 +90,12 @@ const schoolsList = [
         "email": "enq@actonhigh.ealing.sch.uk",
         "address": "Gunnersbury Lane<BR>Acton<BR>London<BR>W3 8EY",
         "phone": "020 3110 2400",
-        "perf": "https://www.compare-school-performance.service.gov.uk/school/146318"
+        "perf": "https://www.compare-school-performance.service.gov.uk/school/146318",
+        "perfDetailed": "https://www.compare-school-performance.service.gov.uk/school/146318/ark-acton-academy/secondary",
+        "progress8": 0.21,
+        "progress8Confidence": "Low",
+        "attainment8": 46,
+        "grade5Above": 46
     },
     {
         "name": "ARK Soane Academy",
@@ -84,7 +104,9 @@ const schoolsList = [
             "2019": 0,
             "2020": 0,
             "2021": null,
-            "2022": null
+            "2022": null,
+            "2023": null,
+            "2024": null
         },
         "visible": false,
         "radius": true,
@@ -101,7 +123,12 @@ const schoolsList = [
         "email": "info@arksoane.org",
         "address": "Ark Soane Academy<BR>Gunnersbury Lane<BR>Acton<BR>London<BR>W3 8EA",
         "phone": "02074308858",
-        "perf": "https://www.compare-school-performance.service.gov.uk/school/147863"
+        "perf": "https://www.compare-school-performance.service.gov.uk/school/147863",
+        "perfDetailed": "https://www.compare-school-performance.service.gov.uk/school/147863/ark-soane-academy/secondary",
+        "progress8": null,
+        "progress8Confidence": null,
+        "attainment8": null,
+        "grade5Above": null
     },
     {
         "name": "Brentside High School",
@@ -110,7 +137,9 @@ const schoolsList = [
             "2019": 2.062,
             "2020": null,
             "2021": null,
-            "2022": null
+            "2022": null,
+            "2023": null,
+            "2024": null
         },
         "visible": false,
         "radius": true,
@@ -127,7 +156,12 @@ const schoolsList = [
         "email": "info@brentsidehigh.ealing.sch.uk",
         "address": "Greenford Avenue<BR>Hanwell<BR>London<BR>W7 1JJ",
         "phone": "020 8575 9162",
-        "perf": "https://www.compare-school-performance.service.gov.uk/school/101939"
+        "perf": "https://www.compare-school-performance.service.gov.uk/school/101939",
+        "perfDetailed": "https://www.compare-school-performance.service.gov.uk/school/101939/brentside-high-school/secondary",
+        "progress8": -0.04,
+        "progress8Confidence": "Medium",
+        "attainment8": 45,
+        "grade5Above": 41
     },
     {
         "name": "Dormers Wells High School",
@@ -136,7 +170,9 @@ const schoolsList = [
             "2019": 1.058,
             "2020": 1.123,
             "2021": 1.183,
-            "2022": 3.391
+            "2022": 3.391,
+            "2023": null,
+            "2024": 1.542
         },
         "visible": false,
         "radius": true,
@@ -153,7 +189,12 @@ const schoolsList = [
         "address": "Dormers Wells Lane<BR>Southall<BR>UB1 3HZ",
         "phone": "0208 566 6446",
         "perf": "https://www.compare-school-performance.service.gov.uk/school/145348",
-        "schoolId": 2665
+        "schoolId": 2665,
+        "perfDetailed": "https://www.compare-school-performance.service.gov.uk/school/145348/dormers-wells-high-school/secondary",
+        "progress8": 0.64,
+        "progress8Confidence": "Low",
+        "attainment8": 49,
+        "grade5Above": 56
     },
     {
         "name": "Drayton Manor High School",
@@ -162,7 +203,9 @@ const schoolsList = [
             "2019": 0.78,
             "2020": 1.434,
             "2021": 0.897,
-            "2022": 1.555
+            "2022": 1.555,
+            "2023": null,
+            "2024": 1.614
         },
         "visible": true,
         "radius": false,
@@ -179,7 +222,12 @@ const schoolsList = [
         "address": "Drayton Bridge Road<BR>Hanwell<BR>London<BR>W7 1EU",
         "phone": "020 8357 1900",
         "perf": "https://www.compare-school-performance.service.gov.uk/school/137221",
-        "schoolId": 2604
+        "schoolId": 2604,
+        "perfDetailed": "https://www.compare-school-performance.service.gov.uk/school/137221/drayton-manor-high-school/secondary",
+        "progress8": 0.65,
+        "progress8Confidence": "High",
+        "attainment8": 55,
+        "grade5Above": 64
     },
     {
         "name": "Ealing Fields High School",
@@ -188,7 +236,9 @@ const schoolsList = [
             "2019": 0.557,
             "2020": 0.637,
             "2021": 0.545,
-            "2022": 0.425
+            "2022": 0.425,
+            "2023": null,
+            "2024": 0.498
         },
         "visible": true,
         "radius": true,
@@ -205,7 +255,12 @@ const schoolsList = [
         "address": "Little Ealing Lane<BR>Ealing<BR>London<BR>W5 4EJ",
         "phone": "0203 711 0022",
         "perf": "https://www.compare-school-performance.service.gov.uk/school/142654",
-        "schoolId": 40554
+        "schoolId": 40554,
+        "perfDetailed": "https://www.compare-school-performance.service.gov.uk/school/142654/ealing-fields-high-school/secondary",
+        "progress8": 0.65,
+        "progress8Confidence": "High",
+        "attainment8": 55,
+        "grade5Above": 64
     },
     {
         "name": "Elthorne Park High School",
@@ -214,7 +269,9 @@ const schoolsList = [
             "2019": 0.705,
             "2020": 0.92,
             "2021": 0.701,
-            "2022": 0.943
+            "2022": 0.943,
+            "2023": null,
+            "2024": 0.718
         },
         "visible": true,
         "radius": true,
@@ -240,7 +297,9 @@ const schoolsList = [
             "2019": 0.501,
             "2020": 0.522,
             "2021": 0.439,
-            "2022": 0.814
+            "2022": 0.814,
+            "2023": null,
+            "2024": 1.032
         },
         "visible": false,
         "radius": true,
@@ -257,7 +316,12 @@ const schoolsList = [
         "address": " - <BR>11 -  Montague Waye<BR>Southall<BR>UB2 5HF",
         "phone": "020 8843 0984",
         "perf": "https://www.compare-school-performance.service.gov.uk/school/137729",
-        "schoolId": 2666
+        "schoolId": 2666,
+        "perfDetailed": "https://www.compare-school-performance.service.gov.uk/school/137729/featherstone-high-school/secondary",
+        "progress8": 0.61,
+        "progress8Confidence": "High",
+        "attainment8": 50,
+        "grade5Above": 56
     },
     {
         "name": "Greenford High School",
@@ -266,7 +330,9 @@ const schoolsList = [
             "2019": 0.699,
             "2020": 0.621,
             "2021": 0.626,
-            "2022": 0.845
+            "2022": 0.845,
+            "2023": null,
+            "2024": 1.136
         },
         "visible": false,
         "radius": true,
@@ -283,7 +349,12 @@ const schoolsList = [
         "address": "Lady Margaret Road<BR>Southall<BR>Greenford<BR>UB1 2GU",
         "phone": "020 8578 9152",
         "perf": "https://www.compare-school-performance.service.gov.uk/school/101940",
-        "schoolId": 2602
+        "schoolId": 2602,
+        "perfDetailed": "https://www.compare-school-performance.service.gov.uk/school/101940/greenford-high-school/secondary",
+        "progress8": 0.37,
+        "progress8Confidence": "High",
+        "attainment8": 51,
+        "grade5Above": 59
     },
     {
         "name": "Northolt High School",
@@ -292,7 +363,9 @@ const schoolsList = [
             "2019": null,
             "2020": null,
             "2021": null,
-            "2022": null
+            "2022": null,
+            "2023": null,
+            "2024": null
         },
         "visible": false,
         "radius": true,
@@ -309,7 +382,12 @@ const schoolsList = [
         "address": "Eastcote Lane<BR>Northolt<BR>UB5 4HP",
         "phone": "020 8864 8544",
         "perf": "https://www.compare-school-performance.service.gov.uk/school/101943",
-        "schoolId": 2605
+        "schoolId": 2605,
+        "perfDetailed": "https://www.compare-school-performance.service.gov.uk/school/101943/northolt-high-school/secondary",
+        "progress8": -24,
+        "progress8Confidence": "Low",
+        "attainment8": 39,
+        "grade5Above": 34
     },
     {
         "name": "The Cardinal Wiseman Catholic School",
@@ -318,7 +396,9 @@ const schoolsList = [
             "2019": 2.103,
             "2020": 2.158,
             "2021": 3.609,
-            "2022": 2.806
+            "2022": 2.806,
+            "2023": null,
+            "2024": 1.078
         },
         "visible": false,
         "radius": true,
@@ -335,7 +415,12 @@ const schoolsList = [
         "address": "Greenford Road<BR>Greenford<BR>UB6 9AW",
         "phone": "020 8575 8222",
         "perf": "https://www.compare-school-performance.service.gov.uk/school/101934",
-        "schoolId": 2669
+        "schoolId": 2669,
+        "perfDetailed": "https://www.compare-school-performance.service.gov.uk/school/101934/the-cardinal-wiseman-catholic-school/secondary",
+        "progress8": 0.83,
+        "progress8Confidence": "High",
+        "attainment8": 58,
+        "grade5Above": 69
     },
     {
         "name": "The Ellen Wilkinson School for Girls",
@@ -344,7 +429,9 @@ const schoolsList = [
             "2019": 3.54,
             "2020": 3.21,
             "2021": 2.531,
-            "2022": null
+            "2022": null,
+            "2023": null,
+            "2024": 3.880
         },
         "visible": false,
         "radius": true,
@@ -361,7 +448,12 @@ const schoolsList = [
         "address": "Queens Drive<BR>Acton<BR>London<BR>W3 0HW",
         "phone": "020 8752 1525",
         "perf": "https://www.compare-school-performance.service.gov.uk/school/101941",
-        "schoolId": 2603
+        "schoolId": 2603,
+        "perfDetailed": "https://www.compare-school-performance.service.gov.uk/school/101941/the-ellen-wilkinson-school-for-girls/secondary",
+        "progress8": 0.97,
+        "progress8Confidence": "Medium",
+        "attainment8": 58,
+        "grade5Above": 61
     },
     {
         "name": "Twyford Church of England High School",
@@ -370,7 +462,9 @@ const schoolsList = [
             "2019": 0.323,
             "2020": 0.357,
             "2021": 0.585,
-            "2022": 0.492
+            "2022": 0.492,
+            "2023": null,
+            "2024": 0.860
         },
         "visible": true,
         "radius": true,
@@ -386,8 +480,13 @@ const schoolsList = [
         "email": "office@twyford.ealing.sch.uk",
         "address": "Twyford Crescent<BR>Acton<BR>London<BR>W3 9PP",
         "phone": "020 8752 0141",
-        "perf": "https://www.compare-school-performance.service.gov.uk/school/101933",
-        "schoolId": 2668
+        "perf": "https://www.compare-school-performance.service.gov.uk/school/137546/twyford-church-of-england-high-school",
+        "schoolId": 2668,
+        "perfDetailed": "https://www.compare-school-performance.service.gov.uk/school/137546/twyford-church-of-england-high-school/secondary",
+        "progress8": 1,
+        "progress8Confidence": "High",
+        "attainment8": 63,
+        "grade5Above": 74
     },
     {
         "name": "Villiers High School",
@@ -396,7 +495,9 @@ const schoolsList = [
             "2019": null,
             "2020": null,
             "2021": null,
-            "2022": null
+            "2022": null,
+            "2023": null,
+            "2024": null
         },
         "visible": false,
         "radius": true,
@@ -413,7 +514,12 @@ const schoolsList = [
         "address": "Boyd Avenue<BR>Southall<BR>UB1 3BT",
         "phone": "020 8813 8001",
         "perf": "https://www.compare-school-performance.service.gov.uk/school/101928",
-        "schoolId": 2663
+        "schoolId": 2663,
+        "perfDetailed": "https://www.compare-school-performance.service.gov.uk/school/101928/villiers-high-school/secondary",
+        "progress8": 0.5,
+        "progress8Confidence": null,
+        "attainment8": 46,
+        "grade5Above": 50
     },
     {
         "name": "William Perkin CE High School",
@@ -422,7 +528,9 @@ const schoolsList = [
             "2019": 0.375,
             "2020": 0.315,
             "2021": 0.346,
-            "2022": 0.709
+            "2022": 0.709,
+            "2023": null,
+            "2024": 1.160
         },
         "visible": false,
         "radius": true,
@@ -439,7 +547,12 @@ const schoolsList = [
         "address": "Oldfield Lane North<BR>Greenford<BR>UB6 8QD",
         "phone": "020 8832 8950",
         "perf": "https://www.compare-school-performance.service.gov.uk/school/139725",
-        "schoolId": 37048
+        "schoolId": 37048,
+        "perfDetailed": "https://www.compare-school-performance.service.gov.uk/school/139725/william-perkin-ce-high-school/secondary",
+        "progress8": 0.87,
+        "progress8Confidence": "High",
+        "attainment8": 59,
+        "grade5Above": 64
     }
 ];
 
