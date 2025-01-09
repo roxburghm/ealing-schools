@@ -173,7 +173,7 @@ export default {
             showSchoolInfo: false,
             showHelp: false,
             year: "2022",
-            years: ['min', 'max', 'average', "2019", "2020", "2021", "2022"]
+            years: ['min', 'max', 'average', "2019", "2020", "2021", "2022", "2024"]
         }
     },
     methods: {
