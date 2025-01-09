@@ -13,8 +13,8 @@ const schoolsList = [
         "visible": true,
         "radius": true,
         "notes": null,
-        "rating": "good",
-         
+        "rating": "outstanding",
+        "ratingDate": "2023-03-08",
         "centre": {
             "lat": 51.518949,
             "lng": -0.293081
@@ -48,6 +48,7 @@ const schoolsList = [
         "radius": true,
         "notes": null,
         "rating": "good",
+        "ratingDate": "2023-08-01",
         "centre": {
             "lat": 51.542750,
             "lng": -0.383807
@@ -73,12 +74,14 @@ const schoolsList = [
             "2019": null,
             "2020": null,
             "2021": null,
-            "2022": null
+            "2022": null,
+            "2024": null
         },
         "visible": false,
         "radius": true,
         "notes": null,
-        "rating": "inadequate",
+        "rating": "good",
+        "ratingDate": "2023-03-20",
         "centre": {
             "lat": 51.505401,
             "lng": -0.281008
@@ -111,7 +114,8 @@ const schoolsList = [
         "visible": false,
         "radius": true,
         "notes": null,
-        "rating": "unknown",
+        "rating": "outstanding",
+        "ratingDate": "2024-05-30",
         "centre": {
             "lat": 51.507604,
             "lng": -0.276717
@@ -145,6 +149,7 @@ const schoolsList = [
         "radius": true,
         "notes": null,
         "rating": "good",
+        "ratingDate": "2020-03-09",
         "centre": {
             "lat": 51.526546,
             "lng": -0.339980
@@ -178,6 +183,7 @@ const schoolsList = [
         "radius": true,
         "notes": null,
         "rating": "good",
+        "ratingDate": "2022-03-10",
         "centre": {
             "lat": 51.517817,
             "lng": -0.367062
@@ -211,6 +217,7 @@ const schoolsList = [
         "radius": false,
         "notes": "Distance measured in walking distance via pavements",
         "rating": "outstanding",
+        "ratingDate": "2024-01-29",
         "centre": {
             "lat": 51.515894,
             "lng": -0.335856
@@ -244,6 +251,7 @@ const schoolsList = [
         "radius": true,
         "notes": null,
         "rating": "good",
+        "ratingDate": "2019-09-10",
         "centre": {
             "lat": 51.496161,
             "lng": -0.312257
@@ -277,6 +285,7 @@ const schoolsList = [
         "radius": true,
         "notes": null,
         "rating": "outstanding",
+        "ratingDate": "2019-04-05",
         "centre": {
             "lat": 51.500617,
             "lng": -0.330865
@@ -305,6 +314,7 @@ const schoolsList = [
         "radius": true,
         "notes": null,
         "rating": "outstanding",
+        "ratingDate": "2022-05-25",
         "centre": {
             "lat": 51.499616,
             "lng": -0.386514
@@ -337,7 +347,8 @@ const schoolsList = [
         "visible": false,
         "radius": true,
         "notes": null,
-        "rating": "outstanding",
+        "rating": "good",
+        "ratingDate": "2022-03-31",
         "centre": {
             "lat": 51.532424,
             "lng": -0.371254
@@ -371,6 +382,7 @@ const schoolsList = [
         "radius": true,
         "notes": null,
         "rating": "good",
+        "ratingDate": "2023-12-10",
         "centre": {
             "lat": 51.551684,
             "lng": -0.375067
@@ -404,6 +416,7 @@ const schoolsList = [
         "radius": true,
         "notes": null,
         "rating": "outstanding",
+        "ratingDate": "2024-05-20",
         "centre": {
             "lat": 51.525260,
             "lng": -0.352121
@@ -437,6 +450,7 @@ const schoolsList = [
         "radius": true,
         "notes": null,
         "rating": "outstanding",
+        "ratingDate": "2019-06-28",
         "centre": {
             "lat": 51.516368,
             "lng": -0.287527
@@ -470,6 +484,7 @@ const schoolsList = [
         "radius": true,
         "notes": null,
         "rating": "outstanding",
+        "ratingDate": "2023-12-14",
         "centre": {
             "lat": 51.509637,
             "lng": -0.277995
@@ -503,6 +518,7 @@ const schoolsList = [
         "radius": true,
         "notes": null,
         "rating": "outstanding",
+        "ratingDate": "2022-10-07",
         "centre": {
             "lat": 51.509497,
             "lng": -0.373441
@@ -536,6 +552,7 @@ const schoolsList = [
         "radius": true,
         "notes": null,
         "rating": "outstanding",
+        "ratingDate": "2019-03-12",
         "centre": {
             "lat": 51.537516,
             "lng": -0.349544
@@ -584,10 +601,6 @@ schoolsList.forEach(school => {
     school.intakeDist['min'] = min;
     school.intakeDist['max'] = max;
 });
-
-console.log(schoolsList)
-
-
 
 export default schoolsList;
 

@@ -13,7 +13,7 @@
             <div class="font-weight-thin title hidden-md-and-up">Ealing Intake</div>
             <v-spacer/>
             <v-layout class="hidden-sm-and-down shrink">
-                <v-btn class="mr-2" v-for="showYear in years" :key="showYear"
+                <v-btn :class="showYear === 'average' ? 'mr-12' : 'mr-2'" v-for="showYear in years" :key="showYear"
                        @click="year = showYear"
                        :color="showYear === year ? 'primary' : 'grey'">{{ showYear }}
                 </v-btn>
@@ -85,7 +85,8 @@
                             Rating
                         </v-col>
                         <v-col cols="8">
-                            <v-chip small :color="ratingColour(currentSchool.rating)" class="white--text">{{ currentSchool.rating }}</v-chip>
+                            <v-chip small :color="ratingColour(currentSchool.rating)" class="white--text mr-4">{{ currentSchool.rating }}</v-chip>
+                          {{ currentSchool.ratingDate }}
                             <a target="_blank" class="ml-4 text-decoration-none" :href="currentSchool.perf">
                                 <v-btn elevation="0" color="primary" x-small>Compare</v-btn>
                             </a>
@@ -113,6 +114,12 @@
                         </v-col>
                         <v-col cols="8" v-html="currentSchool.address">
                         </v-col>
+                        <v-col cols="4" class="text-right">
+                            Notes
+                        </v-col>
+                        <v-col cols="8" v-html="currentSchool.notes">
+                        </v-col>
+
                     </v-row>
                     <v-row dense>
                         <v-col cols="4" class="text-right">
@@ -126,19 +133,22 @@
                                 <tr>
                                     <th class="text-right">Year</th>
                                     <th>Distance</th>
+                                    <th v-if="home && currentSchool.radius" class="text-center">In Catchment</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr dense v-for="(intakeDist, year) in currentSchool.intakeDist" :key="year">
+                                <tr :class="{ 'grey lighten-2': isNaN(parseInt(year))}" dense v-for="(intakeDist, year) in currentSchool.intakeDist" :key="year">
                                     <td class="text-right">
                                         {{ year }}
                                     </td>
                                     <td>
                                         {{
-                                            currentSchool.intakeDist[year] === null ? 'All applicants accepted' : currentSchool.intakeDist[year].toFixed(3) + ' mi'
-                                        }}<br/>
-                                        {{ currentSchool.notes }}
+                                            currentSchool.intakeDist[year] === null ? 'All applicants accepted' : humanDistanceInMiles(currentSchool.intakeDist[year], 'en-GB', 'us', false)
+                                        }}
                                     </td>
+                                  <td class="text-center" v-if="home && currentSchool.radius">
+                                    <in-intake-icon :school="currentSchool" :year="year" :home="home"/>
+                                  </td>
                                 </tr>
                                 </tbody>
                             </v-simple-table>
@@ -154,13 +164,17 @@
 </template>
 
 <script>
+import DistanceUtils from "@/plugins/distanceUtils.js";
+
 import GoogleMap from './components/GoogleMap.vue'
 import SchoolList from "./components/SchoolList";
 import schools from '@/plugins/schools';
+import InIntakeIcon from "@/InIntakeIcon.vue";
 
 export default {
     name: 'App',
     components: {
+      InIntakeIcon,
         SchoolList,
         GoogleMap
     },
@@ -172,11 +186,15 @@ export default {
             currentSchool: null,
             showSchoolInfo: false,
             showHelp: false,
-            year: "2022",
+            year: "2024",
             years: ['min', 'max', 'average', "2019", "2020", "2021", "2022", "2024"]
         }
     },
     methods: {
+      humanDistanceInMiles(dist, locale, unitSystem, forceSign) {
+        console.log('Dist', dist, locale, unitSystem, forceSign)
+        return DistanceUtils.getHumanDistanceInMiles(dist, locale, unitSystem, forceSign);
+      },
         ratingColour(rating) {
             switch (rating) {
                 case 'outstanding':
