@@ -1,17 +1,20 @@
 <template>
-  <div>
+  <div class="bg-grey-lighten-2">
+    <v-row>
+      <v-col>
     <v-card class="mx-2 px-2 my-3 py-2">
-      <v-layout>
-        <v-flex class="input-area">
-          <GmapAutocomplete
+      <v-layout class="input-area">
+          <GMapAutocomplete
               placeholder="Enter your home address"
               :bounds="autoCompleteBounds"
               :options="autoCompleteOptions"
               @place_changed='setPlace'
           />
-        </v-flex>
       </v-layout>
     </v-card>
+      </v-col>
+    </v-row>
+
     <school-card :school="school" :year="year"
                  :key="'m-' + index"
                  v-for="(school, index) in schools"
@@ -26,7 +29,7 @@
 </template>
 
 <script>
-import SchoolCard from "./SchoolCard";
+import SchoolCard from "./SchoolCard.vue";
 
 export default {
   name: "SchoolList",
@@ -53,7 +56,9 @@ export default {
     year: {type: String, required: true}
   },
   methods: {
-    setPlace(place) {
+    setPlace() {
+      console.log("WHOA")
+      let place = {};
       this.home = {
         lat: place.geometry.location.lat(),
         lng: place.geometry.location.lng(),

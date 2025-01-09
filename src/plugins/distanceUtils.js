@@ -4,14 +4,12 @@ function getHumanDistanceInMiles(dist, locale, unitSystem, forceSign) {
         : {distance: dist, unit: 'mi', smallUnit: 'yds', factor: 1760, smallBorder: 1000 / 1760}
 
     const formatter = new Intl.NumberFormat(locale, { maximumSignificantDigits: 2 })
-    console.log ('if', result.distance, result.smallBorder);
     if (result.distance < result.smallBorder) {
         let distance = result.distance * result.factor
         // if (distance < 40) return `< 50 ${result.smallUnit}`
 
         distance = Math.round(distance / 10) * 10;
         const sign = forceSign && dist > 0 ? '+' : '';
-        console.log('hr', distance)
         return `${sign}${formatter.format(distance)} ${result.smallUnit}`
     }
     return `${formatter.format(result.distance)} ${result.unit}`

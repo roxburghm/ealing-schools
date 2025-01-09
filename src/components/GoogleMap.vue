@@ -1,34 +1,32 @@
 <template>
-  <v-row no-gutters style="height: calc(100vh - 64px)">
-    <v-col cols="12">
-      <GmapMap
+  <div style="height: calc(100vh - 64px)">
+      <GMapMap
           :center='center'
           :zoom='13.5'
-          style='width:100%;  height: 100%;'
+          style='width:100%; height: calc(100vh - 64px); min-height: 200px;'
       >
-        <GmapMarker
+        <GMapMarker
             :key="'m-' + index" v-for="(school, index) in visibleSchools"
             :position="school.centre"
             :icon="getIconForSchool(school)"
             @click="showSchool(school)"
             :label="{ className: 'marker-label', text: school.shortName, fontSize: '20px', fontWeight: 'bold', color:'#666', marginTop: '40px'}"
         />
-        <GmapMarker v-if="home !== null"
+        <GMapMarker v-if="home !== null"
                     :animation="2"
                     :position="home"
                     :label="{ className: 'marker-label', text: 'Home', fontSize: '20px', fontWeight: 'bold', color:'#666', marginTop: '40px'}"
         />
-        <GmapCircle
+        <GMapCircle
             :key="'r-' + index"
             v-for="(school, index) in visibleSchoolsCircles"
             :center="school.centre" :radius="circleRadius(school)" :options="circleOptions(school)"/>
-        <GmapPolyline
+        <GMapPolyline
             :key="'rp-' + index"
             v-for="(school, index) in visibleSchoolsCirclesWalking"
             :path="circlePath(school)" :options="circleOptions(school)"/>
-      </GmapMap>
-    </v-col>
-  </v-row>
+      </GMapMap>
+  </div>
 </template>
 
 <script>
@@ -61,7 +59,6 @@ export default {
     },
     circlePath(school) {
       let center = school.centre;
-      console.log(center);
       let radiusMeters = this.circleRadius(school);
       const points = [];
       const numPoints = 100; // Number of points to create the circle
@@ -73,7 +70,6 @@ export default {
         const lng = center.lng + (radiusMeters / EarthRadius) * Math.sin(angle) * (180 / Math.PI) / Math.cos(center.lat * Math.PI / 180);
         points.push({ lat, lng});
       }
-console.log(points);
       return points;
     },
     circleRadius(school) {
@@ -85,9 +81,9 @@ console.log(points);
       return !(null === school.intakeDist[this.year]);
     },
     getIconForSchool(school) {
-      if (null === school.intakeDist[this.year]) return require('@/assets/school_all.png')
-      if (!school.radius) return require('@/assets/school_notes.png')
-      return require('@/assets/school.png');
+      if (null === school.intakeDist[this.year]) return '/school_all.png';
+      if (!school.radius) return '/school_notes.png';
+      return '/school.png'
     },
     circleOptions: function (school) {
       return {

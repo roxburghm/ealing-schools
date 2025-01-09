@@ -1,19 +1,18 @@
-import Vue from 'vue'
+import {createApp} from 'vue'
 import App from './App.vue'
 import vuetify from './plugins/vuetify'
-import * as VueGoogleMaps from 'vue2-google-maps'
+import {loadFonts} from './plugins/webfontloader'
 
-Vue.use(VueGoogleMaps, {
-  load: {
-    key: process.env.VUE_APP_GOOGLE_MAPS_API_KEY,
-    libraries: 'places',
-  }
-});
+loadFonts()
 
+import VueGoogleMaps from '@fawmi/vue-google-maps'
 
-Vue.config.productionTip = false
-
-new Vue({
-  vuetify,
-  render: h => h(App)
-}).$mount('#app')
+createApp(App)
+    .use(vuetify)
+    .use(VueGoogleMaps, {
+        load: {
+            key: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+            libraries: 'places',
+        }
+    })
+    .mount('#app')
