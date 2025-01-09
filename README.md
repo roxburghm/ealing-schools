@@ -6,7 +6,7 @@ Preview https://schools.roxb.in
 
 ## Your own data? 
 
-Modify schools.js
+Modify `src/plugins/schools.js`
 
 ```
 const schoolsList = [ 
@@ -21,7 +21,7 @@ const schoolsList = [
         colour: '#008f91'
     },
     ...
-    }
+]
 ```
 
 ```
@@ -29,7 +29,7 @@ const schoolsList = [
  shortName: name shown on map
  intakeDist: object "keyed" by year with intake disant in miles - null = all students admitted - 0 = no students admitted
  visible: whether to show on map by default
- rating: ofted rating
+ rating: ofsted rating
  centre: school location
  description: shown on dialog
  website: shown on dialog

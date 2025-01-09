@@ -7,10 +7,10 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "rsync": "rsync -r  dist/* root@roxburghm.com:/root/webproxy/roxburghm.com/ealingschools"
-
   },
   "dependencies": {
     "core-js": "^3.6.5",
+    "humanize-distance": "^1.0.9",
     "vue": "^2.6.11",
     "vue2-google-maps": "^0.10.7",
     "vuetify": "^2.4.0"
