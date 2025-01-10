@@ -41,9 +41,11 @@ const schoolsList = [
 yarn install
 ```
 
+Note this prject is now `Vue3` and `Vuetify3` running via `Vite`
+
 ### Compiles and hot-reloads for development
 ```
-yarn serve
+yarn dev
 ```
 
 ### Compiles and minifies for production
