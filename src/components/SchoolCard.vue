@@ -73,8 +73,8 @@ export default {
 }
 
 .school-disabled {
-  filter: grayscale(100%);
-  opacity: 0.5;
+  filter: grayscale(50%);
+  opacity: 0.3;
   background-color: lightgrey;
 }
 </style>

@@ -20,6 +20,14 @@
             </a>
           </td>
         </tr>
+        <tr v-if="currentSchool.description">
+          <th class="text-right">
+            Description
+          </th>
+          <td>
+            {{ currentSchool.description}}
+          </td>
+        </tr>
         <tr>
           <th class="text-right">
             Website
@@ -148,12 +156,16 @@ export default {
   },
   methods: {
     getBaseName(uri) {
-      const lastSlashIndex = uri.lastIndexOf('/');
-      if (lastSlashIndex !== -1) {
-        return uri.substring(lastSlashIndex + 1);
-      } else {
-        return uri; // If no slash is found, return the original URI
+      if (uri.indexOf(".pdf") >= 0) {
+        const lastSlashIndex = uri.lastIndexOf('/');
+        if (lastSlashIndex !== -1) {
+          return uri.substring(lastSlashIndex + 1);
+        } else {
+          return uri; // If no slash is found, return the original URI
+        }
       }
+
+      return uri;
     },
     applicableIntakes(intakes) {
       console.log(intakes)
