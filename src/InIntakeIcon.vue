@@ -1,11 +1,13 @@
 <template>
-  <v-row>
+  <v-row dense>
+    <v-col class="text-right text-no-wrap text-caption" >
+      <span style="width: 70px; max-width: 70px; display: inline-block;">
+      {{ humanDistanceInMiles(relativeDist, 'en-GB', 'us', true) }}
+        </span>
+    </v-col>
     <v-col>
       <v-icon :color="color">{{ icon }}</v-icon>
 
-    </v-col>
-    <v-col class="text-right">
-      {{ humanDistanceInMiles(relativeDist, 'en-GB', 'us', true) }}
     </v-col>
   </v-row>
 </template>
@@ -21,11 +23,13 @@ export default {
   },
   methods: {
     humanDistanceInMiles(dist, locale, unitSystem, forceSign) {
+      if (dist === null) return '';
       return DistanceUtils.getHumanDistanceInMiles(dist, locale, unitSystem, forceSign);
     }
   },
   computed: {
     relativeDist() {
+      if (this.school.intakeDist[this.year] === null) return null;
       let dist = this.school.intakeDist[this.year] - this.distanceFromSchool;
       return (dist < 0 ? '-' : '+') + Math.abs(dist);
     },
@@ -33,6 +37,7 @@ export default {
       return DistanceUtils.getDistanceInMiles(this.school.centre, this.home);
     },
     inIntake() {
+      if (this.school.intakeDist[this.year] === null) return true;
       return this.distanceFromSchool <= this.school.intakeDist[this.year];
     },
     icon() {

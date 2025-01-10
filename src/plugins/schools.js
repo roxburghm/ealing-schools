@@ -396,7 +396,7 @@ const schoolsList = [
         "perf": "https://www.compare-school-performance.service.gov.uk/school/101943",
         "schoolId": 2605,
         "perfDetailed": "https://www.compare-school-performance.service.gov.uk/school/101943/northolt-high-school/secondary",
-        "progress8": -24,
+        "progress8": -0.32,
         "progress8Confidence": "Low",
         "attainment8": 39,
         "grade5Above": 34
