@@ -13,7 +13,7 @@ function getRatingColor(rating) {
 }
 
 function getConfidenceColor(confidence) {
-    if (confidence === null) {
+    if (confidence === null || confidence === undefined) {
         return 'grey';
     }
 

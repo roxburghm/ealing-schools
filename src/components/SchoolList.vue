@@ -3,13 +3,13 @@
     <v-row>
       <v-col>
     <v-card class="mx-2 px-2 my-3 py-2">
-      <v-layout class="input-area">
-          <GMapAutocomplete
-              placeholder="Enter your home address"
-              :bounds="autoCompleteBounds"
-              :options="autoCompleteOptions"
-              @place_changed='setPlace'
-          />
+      <v-layout class="input-area" id="home-address-input">
+<!--          <GMapAutocomplete-->
+<!--              placeholder="Enter your home address"-->
+<!--              :bounds="autoCompleteBounds"-->
+<!--              :options="autoCompleteOptions"-->
+<!--              @place_changed='setPlace'-->
+<!--          />-->
       </v-layout>
     </v-card>
       </v-col>
@@ -30,16 +30,13 @@
 
 <script>
 import SchoolCard from "./SchoolCard.vue";
+import VueGoogleAutocomplete from "vue-google-autocomplete";
 
 export default {
   name: "SchoolList",
-  mounted() {
-    this.$emit('home', this.home);
-  },
   data() {
     return {
       schools: [],
-      home: JSON.parse(localStorage.getItem('home')),
     }
   },
   watch: {
@@ -50,32 +47,14 @@ export default {
       }
     }
   },
-  components: {SchoolCard},
+  components: {SchoolCard, VueGoogleAutocomplete},
   props: {
     value: {type: Array, required: true},
     year: {type: String, required: true}
   },
   methods: {
-    setPlace() {
-      console.log("WHOA")
-      let place = {};
-      this.home = {
-        lat: place.geometry.location.lat(),
-        lng: place.geometry.location.lng(),
-      };
-      localStorage.setItem('home', JSON.stringify(this.home))
-      this.$emit('home', this.home);
-    },
   },
   computed: {
-    autoCompleteOptions() {
-      return {
-        strictBounds: true
-      }
-    },
-    autoCompleteBounds() {
-      return {south: 51.438253, west: -0.436249, north: 51.586963, east: -0.167084};
-    }
   }
 }
 </script>

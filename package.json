@@ -10,13 +10,15 @@
     "rsync": "rsync -r  dist/* root@roxburghm.com:/root/webproxy/roxburghm.com/ealingschools"
   },
   "dependencies": {
-    "@fawmi/vue-google-maps": "^0.9.79",
     "@mdi/font": "5.9.55",
     "@vue/compat": "^3.1.0",
     "core-js": "^3.6.5",
     "roboto-fontface": "*",
     "vue": "^3.1.5",
+    "vue-google-autocomplete": "^1.1.4",
+    "vue3-google-map": "^0.21.0",
     "vuetify": "^3.0.0",
+    "vuex": "^4.1.0",
     "webfontloader": "^1.0.0",
     "webpack-plugin-vuetify": "^3.0.3"
   },

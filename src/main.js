@@ -2,17 +2,22 @@ import {createApp} from 'vue'
 import App from './App.vue'
 import vuetify from './plugins/vuetify'
 import {loadFonts} from './plugins/webfontloader'
+import {createStore} from "vuex";
+
+const store = createStore({
+    state: {
+        homeLocation: null,
+    },
+    mutations: {
+        homeLocation(state, payload) {
+            state.homeLocation = payload
+        }
+    }
+});
 
 loadFonts()
 
-import VueGoogleMaps from '@fawmi/vue-google-maps'
-
 createApp(App)
     .use(vuetify)
-    .use(VueGoogleMaps, {
-        load: {
-            key: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-            libraries: 'places',
-        }
-    })
+    .use(store)
     .mount('#app')
