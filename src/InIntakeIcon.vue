@@ -1,15 +1,10 @@
 <template>
-  <v-row dense>
-    <v-col class="text-right text-no-wrap text-caption" >
-      <span style="width: 70px; max-width: 70px; display: inline-block;">
+  <div class="text-no-wrap text-caption text-right">
+      <span style="width: 70px; max-width: 70px;" class="mr-4 d-inline-block">
       {{ humanDistanceInMiles(relativeDist, 'en-GB', 'us', true) }}
         </span>
-    </v-col>
-    <v-col>
       <v-icon size="small" :color="color">{{ icon }}</v-icon>
-
-    </v-col>
-  </v-row>
+  </div>
 </template>
 <script>
 import DistanceUtils from "@/plugins/distanceUtils.js";

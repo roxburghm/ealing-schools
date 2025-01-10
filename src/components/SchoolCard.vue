@@ -8,8 +8,7 @@
         </v-col>
 
 
-        <v-col>
-          <span>
+        <v-col cols="11">
               <v-chip size="x-small" class="mr-1" :outlined="school.rating !== 'unknown'"
                       :color="ratingColor">
                   {{ school.rating }}
@@ -18,7 +17,9 @@
                       :text-color="p8Color === 'yellow' ? 'black' : 'white'">
                   p8: {{ school.progress8 }}
               </v-chip>
-          </span>
+        </v-col>
+          <v-col cols="1">
+            <v-icon v-if="school.intakeCriteria" v-tooltip="'Has Intake Criteria'" class="d-inline-block" size="small">mdi-filter-outline</v-icon>
 
         </v-col>
         <v-col cols="12" class="caption font-italic" v-if="school.intakeDist[year] === null">

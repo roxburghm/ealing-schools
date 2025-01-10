@@ -19,6 +19,7 @@ const schoolsList = [
             "lat": 51.518949,
             "lng": -0.293081
         },
+        "intakeCriteria": "https://www.ealing.gov.uk/download/downloads/id/16013/ada_lovelace_cofe_high_school_admissions_policy_2025-26.pdf",
         "description": "",
         "website": "www.adalovelace.org.uk",
         "colour": "#008f91",
@@ -53,6 +54,7 @@ const schoolsList = [
             "lat": 51.542750,
             "lng": -0.383807
         },
+        "intakeCriteria": "https://www.ealing.gov.uk/download/downloads/id/16027/alec_reed_academy_admissions_policy_2025-26.pdf",
         "description": "",
         "website": "www.alecreedacademy.co.uk",
         "colour": "#004a85",
@@ -87,6 +89,7 @@ const schoolsList = [
             "lat": 51.505401,
             "lng": -0.281008
         },
+        "intakeCriteria": "https://www.ealing.gov.uk/download/downloads/id/16013/ada_lovelace_cofe_high_school_admissions_policy_2025-26.pdf",
         "description": "",
         "website": "www.arkacton.org",
         "colour": "#be0c33",
@@ -121,6 +124,7 @@ const schoolsList = [
             "lat": 51.507604,
             "lng": -0.276717
         },
+        "intakeCriteria": "https://www.ealing.gov.uk/download/downloads/id/16156/ark_soane_academy_admissions_policy_2025-26.pdf",
         "description": "",
         "website": "arksoane.org",
         "colour": "#64a0c8",
@@ -155,6 +159,7 @@ const schoolsList = [
             "lat": 51.526546,
             "lng": -0.339980
         },
+        "intakeCriteria": "https://www.ealing.gov.uk/download/downloads/id/16643/brentside_high_school_admissions_policy_2025-26.pdf",
         "description": "",
         "website": "www.brentsidehigh.ealing.sch.uk",
         "colour": "#ce172e",
@@ -189,6 +194,7 @@ const schoolsList = [
             "lat": 51.517817,
             "lng": -0.367062
         },
+        "intakeCriteria": "https://www.ealing.gov.uk/download/downloads/id/15252/dormers_wells_high_school_admissions_policy_2024-25.pdf",
         "description": "",
         "website": "www.dwhs.co.uk",
         "colour": "#467cb4",
@@ -223,6 +229,7 @@ const schoolsList = [
             "lat": 51.515894,
             "lng": -0.335856
         },
+        "intakeCriteria": "https://www.ealing.gov.uk/download/downloads/id/16154/drayton_manor_high_school_admissions_policy_2025-26.pdf",
         "description": "",
         "website": "www.draytonmanorhighschool.co.uk",
         "colour": "#651968",
@@ -257,6 +264,7 @@ const schoolsList = [
             "lat": 51.496161,
             "lng": -0.312257
         },
+        "intakeCriteria": "https://www.ealing.gov.uk/download/downloads/id/16022/ealing_fields_high_school_admissions_policy_2025-26.pdf",
         "description": "",
         "website": "ealingfields.org.uk",
         "colour": "#f2a900",
@@ -291,6 +299,7 @@ const schoolsList = [
             "lat": 51.500617,
             "lng": -0.330865
         },
+        "intakeCriteria": "",
         "description": "",
         "website": "www.ephs.ealing.sch.uk",
         "colour": "#8d2424",
@@ -320,6 +329,7 @@ const schoolsList = [
             "lat": 51.499616,
             "lng": -0.386514
         },
+        "intakeCriteria": "https://www.ealing.gov.uk/download/downloads/id/16273/featherstone_high_school_admissions_policy_2025-26.pdf",
         "description": "",
         "website": "www.featherstonehigh.ealing.sch.uk",
         "colour": "#1e1344",
@@ -354,6 +364,7 @@ const schoolsList = [
             "lat": 51.532424,
             "lng": -0.371254
         },
+        "intakeCriteria": "https://www.ealing.gov.uk/download/downloads/id/16157/greenford_high_school_admissions_policy_2025-26.pdf",
         "description": "",
         "website": "www.greenford.ealing.sch.uk",
         "colour": "#2fa866",
@@ -388,6 +399,7 @@ const schoolsList = [
             "lat": 51.551684,
             "lng": -0.375067
         },
+        "intakeCriteria": "https://www.ealing.gov.uk/download/downloads/id/16155/northolt_high_school_admissions_policy_2025-26.pdf",
         "description": "",
         "website": "www.northolthigh.org.uk",
         "colour": "#3b87a4",
@@ -422,6 +434,7 @@ const schoolsList = [
             "lat": 51.525260,
             "lng": -0.352121
         },
+        "intakeCriteria": "https://www.ealing.gov.uk/download/downloads/id/16019/the_cardinal_wiseman_catholic_high_school_admissions_policy_2025-26.pdf",
         "description": "",
         "website": "www.wiseman.ealing.sch.uk",
         "colour": "#3c26b7",
@@ -456,6 +469,7 @@ const schoolsList = [
             "lat": 51.516368,
             "lng": -0.287527
         },
+        "intakeCriteria": "https://www.ealing.gov.uk/download/downloads/id/15992/the_ellen_wilkinson_school_for_girls_admissions_policy_2025-26.pdf",
         "description": "",
         "website": "www.ellenwilkinson.ealing.sch.uk",
         "colour": "#f0b600",
@@ -490,6 +504,7 @@ const schoolsList = [
             "lat": 51.509637,
             "lng": -0.277995
         },
+        "intakeCriteria": "https://www.ealing.gov.uk/download/downloads/id/15993/twyford_ce_high_school_admissions_policy_2025-26.pdf",
         "description": "",
         "website": "www.twyford.ealing.sch.uk",
         "colour": "#da1935",
@@ -524,6 +539,7 @@ const schoolsList = [
             "lat": 51.509497,
             "lng": -0.373441
         },
+        "intakeCriteria": "https://www.ealing.gov.uk/download/downloads/id/19669/villiers_high_school_admissions_policy_2025-26.pdf",
         "description": "",
         "website": "www.villiers.ealing.sch.uk",
         "colour": "#337ab7",
@@ -558,6 +574,7 @@ const schoolsList = [
             "lat": 51.537516,
             "lng": -0.349544
         },
+        "intakeCriteria": "https://www.ealing.gov.uk/download/downloads/id/16011/william_perkin_cofe_high_school_admissions_policy_2025-26.pdf",
         "description": "",
         "website": "www.williamperkin.org.uk",
         "colour": "#623580",

@@ -14,7 +14,7 @@
             <v-chip size="x-small" :color="ratingColour(currentSchool.rating)" class="white--text mr-4">
               {{ currentSchool.rating }}
             </v-chip>
-            {{ currentSchool.ratingDate }}
+            Last inspection: {{ currentSchool.ratingDate }}
             <a target="_blank" class="ml-4 text-decoration-none" :href="currentSchool.perf">
               <v-btn elevation="0" color="primary" size="x-small">Compare</v-btn>
             </a>
@@ -25,7 +25,7 @@
             Website
           </th>
           <td>
-            <a target="_blank" :href="currentSchool.website">{{ currentSchool.website }}</a>
+            <a target="_blank" class="text-decoration-none text-blue" :href="currentSchool.website">{{ currentSchool.website }}</a>
           </td>
         </tr>
         <tr>
@@ -33,7 +33,7 @@
             Email
           </th>
           <td>
-            <a target="_blank" :href="'mailto:' + currentSchool.email">{{ currentSchool.email }}</a>
+            <a target="_blank" class="text-decoration-none text-blue" :href="'mailto:' + currentSchool.email">{{ currentSchool.email }}</a>
           </td>
         </tr>
         <tr>
@@ -41,7 +41,7 @@
             Phone
           </th>
           <td>
-            <a target="_blank" :href="'tel:' + currentSchool.phone">{{ currentSchool.phone }}</a>
+            <a target="_blank" class="text-decoration-none text-blue" :href="'tel:' + currentSchool.phone">{{ currentSchool.phone }}</a>
           </td>
         </tr>
         <tr>
@@ -53,6 +53,15 @@
         </tr>
         <tr>
           <th class="text-right">
+            Intake Criteria
+          </th>
+          <td>
+            <a v-if="currentSchool.intakeCriteria" target="_blank" class="text-decoration-none text-blue" :href="currentSchool.intakeCriteria">{{ getBaseName(currentSchool.intakeCriteria) }}</a>
+            <span class="font-italic" v-else>None</span>
+          </td>
+        </tr>
+        <tr v-if="currentSchool.notes">
+          <th class="text-right" >
             Notes
           </th>
           <td v-html="currentSchool.notes">
@@ -138,6 +147,14 @@ export default {
     years: {}
   },
   methods: {
+    getBaseName(uri) {
+      const lastSlashIndex = uri.lastIndexOf('/');
+      if (lastSlashIndex !== -1) {
+        return uri.substring(lastSlashIndex + 1);
+      } else {
+        return uri; // If no slash is found, return the original URI
+      }
+    },
     applicableIntakes(intakes) {
       console.log(intakes)
       let result = {};
@@ -161,9 +178,10 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 th {
   padding-right: 16px;
-  opacity: 0.5;
+  opacity: 0.9;
+  font-weight: lighter !important;
 }
 </style>

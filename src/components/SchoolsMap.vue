@@ -22,8 +22,14 @@
           :pin-options="schoolMarkerPinOptions(school)"
           @click="showSchool(school)"
       />
+      <AdvancedMarker
+          :key="'im-' + index" v-for="(school, index) in invisibleSchools"
+          :options="invisiSchoolMarkerOptions(school)"
+          :pin-options="invisiSchoolMarkerPinOptions(school)"
+          @click="showSchool(school)"
+      />
       <AdvancedMarker v-if="home !== null"
-                  :options="homeMarkerOptions()"
+                      :options="homeMarkerOptions()"
       />
       <Circle
           :key="'r-' + index"
@@ -42,8 +48,8 @@
 </template>
 
 <script>
-import {GoogleMap, AdvancedMarker , Circle, Polyline, Polygon} from 'vue3-google-map'
-import { Loader } from '@googlemaps/js-api-loader';
+import {GoogleMap, AdvancedMarker, Circle, Polyline, Polygon} from 'vue3-google-map'
+import {Loader} from '@googlemaps/js-api-loader';
 import VueGoogleAutocomplete from "vue-google-autocomplete";
 
 export default {
@@ -130,6 +136,18 @@ export default {
         scale: 1.5
       }
     },
+    invisiSchoolMarkerOptions(school) {
+      return {
+        position: school.centre,
+      }
+    },
+    invisiSchoolMarkerPinOptions(school) {
+      const marker = this.schoolMarkerPinOptions(school);
+      marker.glyph.style.opacity = 0.2
+      marker.background = '#ffffffc0'
+      marker.borderColor = '#00000020';
+      return marker;
+    },
     homeMarkerOptions() {
       return {
         position: this.home
@@ -209,39 +227,27 @@ export default {
     showSchool(school) {
       this.$emit('show-school-info', school);
     },
-    markerImage(pinColor) {
-      var pinSVGFilled = "M 12,2 C 8.1340068,2 5,5.1340068 5,9 c 0,5.25 7,13 7,13 0,0 7,-7.75 7,-13 0,-3.8659932 -3.134007,-7 -7,-7 z";
-      var labelOriginFilled = [12, 9];
-
-
-      var markerImage = {  // https://developers.google.com/maps/documentation/javascript/reference/marker#MarkerLabel
-        path: pinSVGFilled,
-        anchor: [12, 17],
-        fillOpacity: 1,
-        fillColor: pinColor,
-        strokeWeight: 2,
-        strokeColor: "white",
-        scale: 2,
-        labelOrigin: labelOriginFilled
-      };
-      return markerImage;
-    }
   },
   computed: {
     visibleSchools() {
       return this.schools.filter(school => school.visible)
-    }
-    ,
+    },
+    invisibleSchools() {
+      return this.schools.filter(school => !school.visible)
+    },
     visibleSchoolsCircles() {
       return this.schools.filter(school => school.visible && school.radius && this.hasIntakeDistance(school))
-    }
-    ,
+    },
     visibleSchoolsCirclesWalking() {
       return this.schools.filter(school => school.visible && !school.radius && this.hasIntakeDistance(school))
     },
     home: {
-      get() { return this.$store.state.homeLocation },
-      set(newValue) { this.$store.commit('homeLocation', newValue) }
+      get() {
+        return this.$store.state.homeLocation
+      },
+      set(newValue) {
+        this.$store.commit('homeLocation', newValue)
+      }
     }
   }
 }

@@ -5,7 +5,7 @@
       color="blue"
       :line-width="width"
       smooth
-      min="0"
+      :min="allSame ? 0 : undefined"
       padding="16"
   ></v-sparkline>
 </template>
@@ -31,6 +31,13 @@ export default {
         result.push(this.school.intakeDist[year] ?? null)
       })
       return result;
+    },
+    allSame() {
+       if (this.getDistancesForYearsForSpark.length === 0) {
+          return true; // Empty array considered all the same
+        }
+        const firstNumber = this.getDistancesForYearsForSpark[0];
+        return this.getDistancesForYearsForSpark.every(number => number === firstNumber);
     },
     actualYears() {
       return this.years.filter(year => !isNaN(parseInt(year)));

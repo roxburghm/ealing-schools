@@ -22,8 +22,9 @@
     />
     <v-card>
       <v-card-text class="font-weight-light font-italic text-center">
-        Use at your own risk - all data approximate - issues contact matt@roxburghm.com
-        v0.4
+        Use at your own risk - all data approximate - issues contact matt@roxburghm.com<br/>
+
+        <v-chip variant="outlined" color="grey" size="x-small" density="comfortable">Build: {{ buildDateTime }}</v-chip>
       </v-card-text>
     </v-card>
   </div>
@@ -56,6 +57,9 @@ export default {
   methods: {
   },
   computed: {
+    buildDateTime() {
+      return import.meta.env.VITE_BUILD_DATE_TIME;
+    }
   }
 }
 </script>

@@ -17,6 +17,9 @@ jobs:
     env:
       VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.VITE_GOOGLE_MAPS_API_KEY }} # Used for google maps
     steps:
+      - name: Set build date and time
+        run: |
+          echo "BUILD_DATE_TIME=$(date +'%Y-%m-%d %H:%M')" >> $GITHUB_ENV
       - uses: actions/checkout@v2
         with:
           submodules: true
