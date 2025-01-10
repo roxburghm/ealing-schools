@@ -23,6 +23,7 @@
     <v-card>
       <v-card-text class="font-weight-light font-italic text-center">
         Use at your own risk - all data approximate - issues contact matt@roxburghm.com
+        v0.3
       </v-card-text>
     </v-card>
   </div>
