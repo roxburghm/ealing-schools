@@ -11,7 +11,7 @@
             Ofsted Rating
           </th>
           <td>
-            <v-chip size="x-small" :color="ratingColour" class="white--text mr-4">
+            <v-chip size="x-small" :color="ratingColour(currentSchool.rating)" class="white--text mr-4">
               {{ currentSchool.rating }}
             </v-chip>
             {{ currentSchool.ratingDate }}
@@ -62,7 +62,7 @@
 
           <th class="text-right" v-if="currentSchool.progress8">Progress 8</th>
           <td v-if="currentSchool.progress8">{{ currentSchool.progress8 }}
-            <v-chip size="x-small" class="ml-1" outlined :color="confidenceColor">
+            <v-chip size="x-small" class="ml-1" outlined :color="confidenceColor(currentSchool.progress8Confidence)">
               Confidence: {{ currentSchool.progress8Confidence }}
             </v-chip>
           </td>
@@ -91,12 +91,12 @@
             <tbody>
             <tr :class="{ 'bg-grey-lighten-2': isNaN(parseInt(year))}" dense
                 v-for="(intakeDist, year) in applicableIntakes(currentSchool.intakeDist)" :key="year">
-              <td class="text-right">
+              <td class="text-right text-caption">
                 {{ year }}
               </td>
-              <td>
+              <td class="text-caption">
                 {{
-                  currentSchool.intakeDist[year] === null ? 'All applicants accepted' : humanDistanceInMiles
+                  currentSchool.intakeDist[year] === null ? 'All applicants accepted' : humanDistanceInMiles(currentSchool.intakeDist[year], 'en-GB', 'us')
                 }}
               </td>
               <td class="text-center text-no-wrap" v-if="home && currentSchool.radius">
@@ -119,27 +119,38 @@
 </template>
 <script>
 import InIntakeIcon from "@/InIntakeIcon.vue"
+import DistanceUtils from "@/plugins/distanceUtils";
+import utils from "@/plugins/utils";
 
 export default {
   name: 'SchoolInfo',
   components: {InIntakeIcon},
   props: {
-    confidenceColor: {},
     currentSchool: {},
     home: {},
-    humanDistanceInMiles: {},
-    ratingColour: {},
     years: {}
   },
   methods: {
     applicableIntakes(intakes) {
-      return Object.fromEntries(
-          Object.entries(intakes)
-              .filter(([key]) => this.years.includes(key))
-      );
-    }
+      console.log(intakes)
+      let result = {};
+      Object.keys(intakes).forEach(key => {
+        if (this.years.includes(key)) {
+          result[key] = intakes[key]
+        }
+      })
+      return result;
+    },
+  humanDistanceInMiles(dist, locale, unitSystem, forceSign) {
+    return DistanceUtils.getHumanDistanceInMiles(dist, locale, unitSystem, forceSign);
+  },
+  ratingColour(rating) {
+    return utils.getRatingColor(rating);
+  },
+  confidenceColor(confidence) {
+    return utils.getConfidenceColor(confidence)
   }
-
+  }
 }
 </script>
 

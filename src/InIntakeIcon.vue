@@ -6,7 +6,7 @@
         </span>
     </v-col>
     <v-col>
-      <v-icon :color="color">{{ icon }}</v-icon>
+      <v-icon size="small" :color="color">{{ icon }}</v-icon>
 
     </v-col>
   </v-row>

@@ -37,10 +37,7 @@
 
     <v-dialog v-model="showSchoolInfo" width="600">
       <div v-if="showSchoolInfo">
-        <SchoolInfo :confidence-color="confidenceColor(currentSchool.progress8Confidence)"
-                      :current-school="currentSchool" :home="home" :years="years"
-                      :human-distance-in-miles="humanDistanceInMiles(currentSchool.intakeDist[year], 'en-GB', 'us', false)"
-                      :rating-colour="ratingColour(currentSchool.rating)"/>
+        <SchoolInfo :current-school="currentSchool" :home="home" :years="years"/>
       </div>
     </v-dialog>
 
@@ -78,15 +75,6 @@ export default {
     }
   },
   methods: {
-    humanDistanceInMiles(dist, locale, unitSystem, forceSign) {
-      return DistanceUtils.getHumanDistanceInMiles(dist, locale, unitSystem, forceSign);
-    },
-    ratingColour(rating) {
-      return utils.getRatingColor(rating);
-    },
-    confidenceColor(confidence) {
-      return utils.getConfidenceColor(confidence)
-    },
     showSchool(school) {
       this.currentSchool = school;
       this.showSchoolInfo = true;
