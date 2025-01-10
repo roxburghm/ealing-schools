@@ -4,41 +4,32 @@
       Information
     </v-card-title>
     <v-card-text class="pt-4">
-      <p class="mb-4">All intake information is based on data in the
-        <a target="_blank"
-           href="https://www.ealing.gov.uk/download/downloads/id/13820/high_school_prospectus_202324.pdf">High
-          School Prospectus 2023/24</a>,
-        <a target="_blank"
-           href="https://viewer.joomag.com/high-school-prospectus-2022/0579981001629885520">Starting
-          High School 2022</a>,
-        <a target="_blank"
-           href="https://www.ealing.gov.uk/download/downloads/id/13820/high_school_prospectus_202122.pdf">Starting
-          High School 2021</a> and
-        <a target="_blank"
-           href="https://view.joomag.com/high-school-prospectus-ec8682-high-school-prospectus-2020-final/0315251001567583240?short">Starting
-          High School 2020</a>
-      </p>
+      <p class="mb-4">All intake information is based on data in the following documents:</p>
 
-      <p class="mb-4">The distance used to show the "intake areas" is from the "School Statistics" table on page 6/7
-        of
-        the above in the column <em>"The distance and criterion of the last person to be offered on 1
+        <ul class="mb-4 ml-8 text-decoration-none">
+          <li><a target="_blank" href="/Documents/Starting_High_School_2025.pdf">Starting High School 2025 (&apos;24 data)</a></li>
+          <li><a target="_blank" href="/Documents/2024-High-School-Prospectus.pdf">Starting High School 2024 (&apos;23 data)</a></li>
+    <li>Starting High School 2023  (&apos;22 data - document unavailable),</li>
+          <li><a target="_blank" href="/Documents/High+School+Prospectus+2022.pdf">Starting High School 2022 (&apos;21 data)</a></li>
+          <li><a target="_blank" href="/Documents/2021_High_School_Prospectus.pdf">Starting High School 2021  (&apos;20 data)</a></li>
+          <li><a target="_blank" href="/Documents/HighSchoolProspectus2020FINAL.pdf">Starting High School 2020  (&apos;19 data)</a></li>
+      </ul>
+
+      <p class="mb-4">The distance used to show the "intake areas" is taken from values such as <em>"The distance and criterion of the last person to be offered on 1
           March 2022"</em></p>
 
-      <p class="mb-4">Where all applicants were offered a space an arbitary 3 miles intake zone is shown.</p>
-
-      <p class="mb-4">Where the entry criteria is more complex only a line is shown for the intake zone is shown and
+      <p class="mb-4">Where the entry criteria is more complex a dashed line is shown for the intake zone is shown and
         the icon has a "notes" indicator.</p>
 
       <p class="mb-4">Enter your address in the box in the top left to see your home on the map, click schools in
         the
-        left panel to enable or disable their zones.</p>
+        left panel to enable or disable schools.</p>
 
-      <p class="text-caption mb-4"><em>Privacy: NO DATA IS COLLECTED WHEN USING THIS APPLICATION. IT ALL STAYS
-        LOCALLY ON YOUR
-        MACHINE.</em></p>
+      <p class="text-caption mb-4"><em>Privacy: No data is intentionally collected when using this application. It all stays
+        locally on your machine except when using the google map address lookup.</em></p>
 
       <p class="font-weight-light font-italic text-caption text-center bg-grey">
-        Use at your own risk - all data approximate - any issues contact me matt@roxburghm.com
+        Use at your own risk - all data approximate - any issues contact matt@roxburghm.com quoting "ealing schools intake website"
       </p>
     </v-card-text>
   </v-card>
