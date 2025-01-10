@@ -78,7 +78,13 @@
           <td v-if="currentSchool.grade5Above">{{ currentSchool.grade5Above }}%</td>
         </tr>
         <tr>
-          <th class="">Intake Distances</th>
+          <th class="text-right">Intake Distance Trend</th>
+          <td>
+            <intake-dist-sparkline :school="currentSchool" :years="years" :width="2" :show-labels="true"/>
+          </td>
+        </tr>
+        <tr>
+          <th class="text-right">Intake Distances</th>
           <td>
           <v-table density="compact">
             <thead>
@@ -121,10 +127,11 @@
 import InIntakeIcon from "@/InIntakeIcon.vue"
 import DistanceUtils from "@/plugins/distanceUtils";
 import utils from "@/plugins/utils";
+import IntakeDistSparkline from "@/components/IntakeDistSparkline.vue";
 
 export default {
   name: 'SchoolInfo',
-  components: {InIntakeIcon},
+  components: {IntakeDistSparkline, InIntakeIcon},
   props: {
     currentSchool: {},
     home: {},

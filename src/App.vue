@@ -22,6 +22,9 @@
         <v-select class="shrink" style="max-width: 100px;" v-model="year" :items="years" hide-details/>
       </v-layout>
 
+      <v-btn @click="showTable = true" icon>
+        <v-icon large color="white">mdi-table</v-icon>
+      </v-btn>
       <v-btn @click="showHelp = true" icon>
         <v-icon large color="white">mdi-help-circle</v-icon>
       </v-btn>
@@ -35,7 +38,11 @@
       <Help/>
     </v-dialog>
 
-    <v-dialog v-model="showSchoolInfo" width="600">
+    <v-dialog v-model="showTable" width="90%">
+      <SchoolTable :years="years" :schools="schools"/>
+    </v-dialog>
+
+    <v-dialog v-model="showSchoolInfo" width="900">
       <div v-if="showSchoolInfo">
         <SchoolInfo :current-school="currentSchool" :home="home" :years="years"/>
       </div>
@@ -53,11 +60,13 @@ import schools from '@/plugins/schools';
 import utils from "@/plugins/utils";
 import Help from "@/Help.vue";
 import SchoolInfo from "@/SchoolInfo.vue";
+import SchoolTable from "@/components/SchoolTable.vue";
 
 export default {
   name: 'App',
 
   components: {
+    SchoolTable,
     SchoolInfo,
     Help,
     SchoolList,
@@ -70,8 +79,9 @@ export default {
       currentSchool: null,
       showSchoolInfo: false,
       showHelp: false,
+      showTable: false,
       year: "2024",
-      years: ['min', 'max', 'average', "2019", "2020", "2021", "2022", "2024"],
+      years: ['min', 'max', 'average', "2019", "2020", "2021", "2022", "2023", "2024"],
     }
   },
   methods: {
