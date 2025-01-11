@@ -31,18 +31,10 @@
       <AdvancedMarker v-if="home !== null"
                       :options="homeMarkerOptions()"
       />
-      <Circle
+      <Polygon
           :key="'r-' + index"
           v-for="(school, index) in visibleSchoolsCircles"
           :options="circleOptions(school)"/>
-      <Polygon
-          :key="'rp-' + index"
-          v-for="(school, index) in visibleSchoolsCirclesWalking"
-          :options="polygonOptions(school)"/>
-      <Polyline
-          :key="'rpl-' + index"
-          v-for="(school, index) in visibleSchoolsCirclesWalking"
-          :options="polygonOptions(school)"/>
     </GoogleMap>
   </div>
 </template>
@@ -162,6 +154,9 @@ export default {
       });
     },
     circlePath(school) {
+      if (school.intakePath && school.intakePath[this.year]) {
+        return school.intakePath[this.year].map(point => { return { "lat": point[1], "lng": point[0]} })
+      }
       let center = school.centre;
       let radiusMeters = this.circleRadius(school);
       const points = [];
@@ -174,6 +169,7 @@ export default {
         const lng = center.lng + (radiusMeters / EarthRadius) * Math.sin(angle) * (180 / Math.PI) / Math.cos(center.lat * Math.PI / 180);
         points.push({lat, lng});
       }
+
 
       return points;
     },
@@ -192,8 +188,7 @@ export default {
     },
     circleOptions: function (school) {
       return {
-        center: school.centre,
-        radius: this.circleRadius(school),
+        path: this.circlePath(school),
         strokeColor: school.colour,
         strokeOpacity: school.intakeDist[this.year] == null ? 0.4 : null,
         strokeWeight: 0.6,
@@ -236,10 +231,7 @@ export default {
       return this.schools.filter(school => !school.visible)
     },
     visibleSchoolsCircles() {
-      return this.schools.filter(school => school.visible && school.radius && this.hasIntakeDistance(school))
-    },
-    visibleSchoolsCirclesWalking() {
-      return this.schools.filter(school => school.visible && !school.radius && this.hasIntakeDistance(school))
+      return this.schools.filter(school => school.visible && this.hasIntakeDistance(school))
     },
     home: {
       get() {
