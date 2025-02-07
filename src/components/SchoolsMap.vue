@@ -5,6 +5,7 @@
                                placeholder="Enter your home address"
                                @placechanged="setPlace"
                                country="uk"
+                               enable-geolocation
                                v-if="mapReady"
       />
 
@@ -31,6 +32,11 @@
       <AdvancedMarker v-if="home !== null"
                       :options="homeMarkerOptions()"
       />
+      <Polyline
+          :key="'r-' + index"
+          v-for="(school, index) in visibleSchoolsIntakeAll"
+          :options="linkOptions(school)"
+      />
       <Polygon
           :key="'r-' + index"
           v-for="(school, index) in visibleSchoolsCircles"
@@ -40,7 +46,7 @@
 </template>
 
 <script>
-import {GoogleMap, AdvancedMarker, Circle, Polyline, Polygon} from 'vue3-google-map'
+import {AdvancedMarker, Circle, GoogleMap, Polygon, Polyline} from 'vue3-google-map'
 import {Loader} from '@googlemaps/js-api-loader';
 import VueGoogleAutocomplete from "vue-google-autocomplete";
 
@@ -173,6 +179,9 @@ export default {
 
       return points;
     },
+    linkPath(school) {
+      return [school.centre, this.home];
+    },
     circleRadius(school) {
       if (null === school.intakeDist[this.year]) return 5 * 1609;
 
@@ -194,6 +203,27 @@ export default {
         strokeWeight: 0.6,
         fillColor: school.colour,
         fillOpacity: school.intakeDist[this.year] == null ? 0.05 : 0.2,
+      }
+    },
+    linkOptions: function (school) {
+      const lineSymbol = {
+        path: "M 0,-1 0,1",
+        strokeOpacity: 1,
+        scale: 2,
+      };
+
+      return {
+        path: this.linkPath(school),
+        strokeColor: school.colour,
+        strokeWeight: 1,
+        strokeOpacity: 0,
+        icons: [
+          {
+            icon: lineSymbol,
+            offset: "0",
+            repeat: "10px",
+          },
+        ],
       }
     },
     polygonOptions: function (school) {
@@ -229,6 +259,9 @@ export default {
     },
     invisibleSchools() {
       return this.schools.filter(school => !school.visible)
+    },
+    visibleSchoolsIntakeAll() {
+      return this.schools.filter(school => school.visible && this.home !== null && !this.hasIntakeDistance(school))
     },
     visibleSchoolsCircles() {
       return this.schools.filter(school => school.visible && this.hasIntakeDistance(school))

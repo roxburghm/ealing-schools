@@ -168,7 +168,6 @@ export default {
       return uri;
     },
     applicableIntakes(intakes) {
-      console.log(intakes)
       let result = {};
       Object.keys(intakes).forEach(key => {
         if (this.years.includes(key)) {
