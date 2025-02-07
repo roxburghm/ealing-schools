@@ -16,14 +16,15 @@
       </ul>
 
       <p class="mb-4">The distance used to show the "intake areas" is taken from values such as <em>"The distance and criterion of the last person to be offered on 1
-          March 2022"</em></p>
+          March 2022", if all applicants were successful no intake area is shown and a dashed line is drawn to the home address (if entered).</em></p>
 
-      <p class="mb-4">Where the entry criteria is more complex a dashed line is shown for the intake zone is shown and
+      <p class="mb-4">Where the entry criteria is more complex a non circular area is shown for the intake zone and
         the icon has a "notes" indicator.</p>
 
-      <p class="mb-4">Enter your address in the box in the top left to see your home on the map, click schools in
-        the
-        left panel to enable or disable schools.</p>
+      <p class="mb-4">Enter your address in the box in the top left to see your home on the map, click on individual schools in
+        the left panel to enable or disable schools.</p>
+
+      <p class="mb-4">The table icon in the top right will show the data for all schools in a tabular format.</p>
 
       <p class="text-caption mb-4"><em>Privacy: No data is intentionally collected when using this application. It all stays
         locally on your machine except when using the google map address lookup.</em></p>

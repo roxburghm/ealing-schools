@@ -34,7 +34,7 @@
       <SchoolsMap :home="home" :schools="schools" @show-school-info="showSchool" :year="year"/>
     </v-main>
 
-    <v-dialog v-model="showHelp" width="500">
+    <v-dialog v-model="showHelp" width="800">
       <Help/>
     </v-dialog>
 
