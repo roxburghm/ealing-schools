@@ -6,7 +6,8 @@
         <thead>
         <tr>
           <th>School</th>
-          <th>Trend</th>
+          <th>Rating Trend</th>
+          <th>Dist Trend</th>
           <th class="text-center" v-for="year in actualYears" :key="`th-${year}`">{{ year }}</th>
         </tr>
         </thead>
@@ -15,6 +16,9 @@
           <td>{{ school.name }}</td>
           <td>
             <IntakeDistSparkline :school="school" :years="years"/>
+          </td>
+          <td>
+            <RatingSparkline :school="school" :years="years"/>
           </td>
           <td class="text-center" v-for="(dist, dIdx) in getDistancesForYears(school)" :key="`td-${sIdx}-${dIdx}`">
             {{ formatDist(dist) }}
@@ -31,6 +35,7 @@
 <script>
 
 import IntakeDistSparkline from "@/components/IntakeDistSparkline.vue";
+import RatingSparkline from "@/components/RatingSparkline.vue";
 
 export default {
   name: "SchoolTable",

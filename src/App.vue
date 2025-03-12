@@ -34,18 +34,16 @@
       <SchoolsMap :home="home" :schools="schools" @show-school-info="showSchool" :year="year"/>
     </v-main>
 
-    <v-dialog v-model="showHelp" width="800">
+    <v-dialog v-model="showHelp" width="800" scrollable>
       <Help/>
     </v-dialog>
 
-    <v-dialog v-model="showTable" width="90%">
+    <v-dialog v-model="showTable" width="90%" scrollable>
       <SchoolTable :years="years" :schools="schools"/>
     </v-dialog>
 
-    <v-dialog v-model="showSchoolInfo" width="900">
-      <div v-if="showSchoolInfo">
-        <SchoolInfo :current-school="currentSchool" :home="home" :years="years"/>
-      </div>
+    <v-dialog v-model="showSchoolInfo" max-height="90vh" width="900" max-width="90vw" scrollable>
+        <SchoolInfo v-if="showSchoolInfo" :current-school="currentSchool" :home="home" :years="years"/>
     </v-dialog>
 
   </v-app>
@@ -80,8 +78,8 @@ export default {
       showSchoolInfo: false,
       showHelp: false,
       showTable: false,
-      year: "2024",
-      years: ['min', 'max', 'average', "2019", "2020", "2021", "2022", "2023", "2024"],
+      year: "2025",
+      years: ['min', 'max', 'average', "2019", "2020", "2021", "2022", "2023", "2024","2025"],
     }
   },
   methods: {

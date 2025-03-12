@@ -64,3 +64,5 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 ### Getting isodistances
 
 used `https://api.geoapify.com/v1/isoline?lat=51.515894&lon=%20-0.335856&type=distance&mode=walk&range=2307&apiKey=28c4...2482`
+
+

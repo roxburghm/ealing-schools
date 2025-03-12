@@ -7,6 +7,7 @@
       <p class="mb-4">All intake information is based on data in the following documents:</p>
 
         <ul class="mb-4 ml-8 text-decoration-none">
+          <li><a target="_blank" href="/Documents/High_school_on_time_offers_2025.pdf">High school on time offers 2025 (os;24 data)</a></li>
           <li><a target="_blank" href="/Documents/Starting_High_School_2025.pdf">Starting High School 2025 (&apos;24 data)</a></li>
           <li><a target="_blank" href="/Documents/Starting_High_School_2024.pdf">Starting High School 2024 (&apos;23 data)</a></li>
           <li><a target="_blank" href="/Documents/Starting_High_School_2023.pdf">Starting High School 2024 (&apos;22 data)</a></li>

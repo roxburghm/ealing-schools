@@ -1,9 +1,9 @@
 <template>
-  <v-card>
+  <v-card class="px-0">
     <v-card-title class="headline text-white font-weight-light "
                   :style="'background-color: ' + currentSchool.colour">{{ currentSchool.name }}
     </v-card-title>
-    <v-card-text class="text-caption pt-4">
+    <v-card-text class="text-caption pt-4 px-0">
       <v-table density="compact">
         <tbody>
         <tr>
@@ -14,8 +14,10 @@
             <v-chip size="x-small" :color="ratingColour(currentSchool.rating)" class="white--text mr-4">
               {{ currentSchool.rating }}
             </v-chip>
+            <br class="hidden-md-and-up" />
             Last inspection: {{ currentSchool.ratingDate }}
-            <a target="_blank" class="ml-4 text-decoration-none" :href="currentSchool.perf">
+            <span class="ml-4 hidden-sm-and-down"></span>
+            <a target="_blank" class="text-decoration-none" :href="currentSchool.perf">
               <v-btn elevation="0" color="primary" size="x-small">Compare</v-btn>
             </a>
           </td>
@@ -194,5 +196,6 @@ th {
   padding-right: 16px;
   opacity: 0.9;
   font-weight: lighter !important;
+  font-size: 0.6rem;
 }
 </style>
