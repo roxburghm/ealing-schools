@@ -110,7 +110,7 @@
             <tr>
               <th class="text-right">Year</th>
               <th>Intake Distance</th>
-              <th v-if="home && currentSchool.radius" class="text-center">In Catchment</th>
+              <th v-if="home && currentSchool.radius" class="text-right">In Catchment</th>
             </tr>
             </thead>
             <tbody>
