@@ -39,7 +39,7 @@ import RatingSparkline from "@/components/RatingSparkline.vue";
 
 export default {
   name: "SchoolTable",
-  components: {IntakeDistSparkline},
+  components: {IntakeDistSparkline, RatingSparkline},
   data() {
     return {}
   },
