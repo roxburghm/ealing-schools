@@ -26,6 +26,9 @@ export default defineConfig({
     ],
   },
   /* remove the need to specify .vue files https://vitejs.dev/config/#resolve-extensions
+  define: {
+    __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false'
+  },
   resolve: {
     extensions: [
       '.js',

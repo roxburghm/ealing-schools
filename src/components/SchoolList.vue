@@ -1,30 +1,30 @@
 <template>
-  <div class="bg-grey-lighten-2">
-    <v-row>
+  <div class="fill-height bg-surface">
+    <v-row no-gutters>
       <v-col>
-    <v-card class="mx-2 px-2 my-3 py-2">
-      <v-layout class="input-area" id="home-address-input">
-<!--          <GMapAutocomplete-->
-<!--              placeholder="Enter your home address"-->
-<!--              :bounds="autoCompleteBounds"-->
-<!--              :options="autoCompleteOptions"-->
-<!--              @place_changed='setPlace'-->
-<!--          />-->
+    <v-card class="mx-3 mt-3 mb-2" variant="outlined" color="grey-lighten-2">
+      <v-layout class="input-area pa-2" id="home-address-input">
       </v-layout>
     </v-card>
       </v-col>
     </v-row>
 
-    <school-card :school="school" :year="year"
-                 :key="'m-' + index"
-                 v-for="(school, index) in schools"
-                 @school-visibility="school.visible = !school.visible"
-    />
-    <v-card>
-      <v-card-text class="font-weight-light font-italic text-center">
-        Use at your own risk - all data approximate - issues contact matt@roxburghm.com<br/>
+    <v-list class="bg-transparent pa-2" density="compact">
+      <school-card :school="school" :year="year"
+                   :key="'m-' + index"
+                   v-for="(school, index) in schools"
+                   @school-visibility="school.visible = !school.visible"
+                   @mouseover="$emit('hover-school', school)"
+                   @mouseleave="$emit('hover-school', null)"
+                   compact
+      />
+    </v-list>
+    <v-card flat class="bg-transparent mt-2 mb-16">
+      <v-card-text class="font-weight-light text-caption text-center text-medium-emphasis">
+        Use at your own risk - all data approximate<br/>
+        Issues: <a href="mailto:matt@roxburghm.com" class="text-decoration-none text-primary">matt@roxburghm.com</a><br/>
 
-        <v-chip variant="outlined" color="grey" size="x-small" density="comfortable">Build: {{ buildDateTime }}</v-chip>
+        <v-chip variant="text" color="grey" size="x-small" density="comfortable" class="mt-2">Build: {{ buildDateTime }}</v-chip>
       </v-card-text>
     </v-card>
   </div>

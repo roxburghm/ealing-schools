@@ -1,37 +1,43 @@
 <template>
-  <v-app class="fill-height">
-    <v-navigation-drawer width="340"
+  <v-app class="fill-height bg-background">
+    <v-navigation-drawer width="360"
                          v-model="drawer"
-                         app :temporary="false"
+                         app
+                         elevation="2"
+                         class="border-none"
     >
-      <school-list :year="year" :value="schools" @home="newVal => home = newVal"/>
+      <school-list :year="year" :value="schools" @home="newVal => home = newVal" @hover-school="hoveredSchool = $event"/>
     </v-navigation-drawer>
 
-    <v-app-bar app color="blue" dark>
-      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
-      <div class="font-weight-thin display-1 hidden-sm-and-down">Ealing School Intake Areas</div>
-      <div class="font-weight-thin title hidden-md-and-up">Ealing Intake</div>
+    <v-app-bar app color="surface" elevation="1" density="comfortable">
+      <v-app-bar-nav-icon @click="drawer = !drawer" color="primary"></v-app-bar-nav-icon>
+      <div class="text-h6 font-weight-bold text-primary ml-2 d-none d-md-flex">Ealing School Intake</div>
+      <div class="text-subtitle-1 font-weight-bold text-primary ml-2 d-md-none">Ealing Intake</div>
       <v-spacer/>
-      <v-layout class="hidden-sm-and-down shrink">
-        <v-btn :class="showYear === 'average' ? 'mr-12' : 'mr-2'" v-for="showYear in years" :key="showYear"
-               @click="year = showYear"
-               :color="showYear === year ? 'white' : 'blue-grey'">{{ showYear }}
-        </v-btn>
-      </v-layout>
-      <v-layout class="hidden-md-and-up shrink">
-        <v-select class="shrink" style="max-width: 100px;" v-model="year" :items="years" hide-details/>
+      
+      <div class="d-none d-md-flex align-center">
+        <span class="text-caption text-medium-emphasis mr-2">Year:</span>
+        <v-btn-toggle v-model="year" mandatory density="compact" color="primary" variant="outlined" divided class="mr-4">
+            <v-btn v-for="showYear in years" :key="showYear" :value="showYear" size="small">
+                {{ showYear }}
+            </v-btn>
+        </v-btn-toggle>
+      </div>
+
+      <v-layout class="d-md-none shrink align-center">
+        <v-select density="compact" variant="outlined" color="primary" class="shrink mr-2" style="min-width: 130px;" v-model="year" :items="years" hide-details label="Year"/>
       </v-layout>
 
-      <v-btn @click="showTable = true" icon>
-        <v-icon large color="white">mdi-table</v-icon>
+      <v-btn @click="showTable = true" icon color="primary" variant="text">
+        <v-icon>mdi-table</v-icon>
       </v-btn>
-      <v-btn @click="showHelp = true" icon>
-        <v-icon large color="white">mdi-help-circle</v-icon>
+      <v-btn @click="showHelp = true" icon color="primary" variant="text">
+        <v-icon>mdi-help-circle-outline</v-icon>
       </v-btn>
     </v-app-bar>
 
     <v-main>
-      <SchoolsMap :home="home" :schools="schools" @show-school-info="showSchool" :year="year"/>
+      <SchoolsMap :home="home" :schools="schools" @show-school-info="showSchool" :year="year" :hovered-school="hoveredSchool" @hover-school="hoveredSchool = $event"/>
     </v-main>
 
     <v-dialog v-model="showHelp" width="800" scrollable>
@@ -80,6 +86,7 @@ export default {
       showTable: false,
       year: "2025",
       years: ['min', 'max', 'average', "2019", "2020", "2021", "2022", "2023", "2024","2025"],
+      hoveredSchool: null,
     }
   },
   methods: {
@@ -102,6 +109,13 @@ export default {
 </script>
 
 <style>
+:root {
+  font-family: 'Inter', sans-serif;
+}
+
+.v-application {
+  font-family: 'Inter', sans-serif !important;
+}
 
 .gold {
   background-color: gold !important;

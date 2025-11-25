@@ -11,27 +11,69 @@
 
     </teleport>
     <GoogleMap
-        mapId="school-map"
         :center='center'
         :zoom='13.5'
         :api-promise="apiPromise"
         style='width:100%; height: calc(100vh - 64px); min-height: 200px;'
+        :styles="mapStyles"
     >
-      <AdvancedMarker
+      <CustomMarker
           :key="'m-' + index" v-for="(school, index) in visibleSchools"
-          :options="schoolMarkerOptions(school)"
-          :pin-options="schoolMarkerPinOptions(school)"
+          :options="{ position: school.centre, zIndex: isHovered(school) ? 100 : 1 }"
           @click="showSchool(school)"
-      />
-      <AdvancedMarker
+      >
+        <div style="position: relative; width: 0; height: 0; cursor: pointer;"
+             @mouseover="$emit('hover-school', school)"
+             @mouseleave="$emit('hover-school', null)">
+          <!-- Image: Anchored bottom-center to (0,0) using transform -->
+          <div style="position: absolute; left: 0; top: 0; height: 30px; transform: translate(-50%, -100%); transition: transform 0.2s;"
+               :style="{ transform: isHovered(school) ? 'translate(-50%, -100%) scale(1.2)' : 'translate(-50%, -100%)' }">
+             <img :src="getIconForSchool(school)" alt="School Marker" style="height: 100%; width: auto; display: block;">
+          </div>
+          
+          <!-- Label: Anchored top-center to (0,0) with tighter offset -->
+          <div class="marker-label"
+               style="position: absolute; top: 2px; left: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center;"
+               :style="{
+                 backgroundColor: isHovered(school) ? '#3F51B5' : 'white',
+                 color: isHovered(school) ? 'white' : 'black',
+                 fontWeight: isHovered(school) ? 'bold' : '500',
+                 zIndex: isHovered(school) ? 100 : 10
+               }">
+            <span style="white-space: nowrap;">{{ school.shortName }}</span>
+            <span v-if="!school.radius" style="font-size: 0.75em; font-weight: normal; white-space: nowrap; opacity: 0.8;">(See notes)</span>
+            <span v-if="school.intakeDist[year] === null" style="font-size: 0.75em; font-weight: normal; white-space: nowrap; opacity: 0.8; color: #2E7D32;">(All accepted)</span>
+          </div>
+        </div>
+      </CustomMarker>
+
+      <CustomMarker
           :key="'im-' + index" v-for="(school, index) in invisibleSchools"
-          :options="invisiSchoolMarkerOptions(school)"
-          :pin-options="invisiSchoolMarkerPinOptions(school)"
+          :options="{ position: school.centre, zIndex: 0 }"
           @click="showSchool(school)"
-      />
-      <AdvancedMarker v-if="home !== null"
-                      :options="homeMarkerOptions()"
-      />
+      >
+         <div style="position: relative; width: 0; height: 0; cursor: pointer;"
+              @mouseover="$emit('hover-school', school)"
+              @mouseleave="$emit('hover-school', null)">
+           <!-- Dot: Anchored center to (0,0) -->
+          <div style="position: absolute; left: -6px; top: -6px; width: 12px; height: 12px; border-radius: 50%; background-color: #9E9E9E; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.3);">
+          </div>
+          
+          <!-- Label: Hidden by default, shown on hover -->
+          <div class="marker-label" 
+               v-if="isHovered(school)"
+               style="position: absolute; top: 10px; left: 0; transform: translateX(-50%); white-space: nowrap; background-color: white; padding: 2px 6px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); font-size: 11px; z-index: 100;">
+            {{ school.shortName }}
+          </div>
+        </div>
+      </CustomMarker>
+
+      <CustomMarker v-if="home !== null" :options="{ position: home }">
+         <div style="transform: translate(-50%, -50%);">
+            <v-icon color="red" size="large">mdi-map-marker</v-icon>
+         </div>
+      </CustomMarker>
+
       <Polyline
           :key="'r-' + index"
           v-for="(school, index) in visibleSchoolsIntakeAll"
@@ -46,7 +88,7 @@
 </template>
 
 <script>
-import {AdvancedMarker, Circle, GoogleMap, Polygon, Polyline} from 'vue3-google-map'
+import {CustomMarker, Circle, GoogleMap, Polygon, Polyline} from 'vue3-google-map'
 import {Loader} from '@googlemaps/js-api-loader';
 import VueGoogleAutocomplete from "vue-google-autocomplete";
 
@@ -60,12 +102,100 @@ export default {
       center: {lat: 51.51215, lng: -0.312812},
       currentSchool: null,
       showSchoolInfo: false,
+      mapStyles: [
+        {
+          "elementType": "geometry",
+          "stylers": [{"color": "#f5f5f5"}]
+        },
+        {
+          "elementType": "labels.icon",
+          "stylers": [{"visibility": "off"}]
+        },
+        {
+          "elementType": "labels.text.fill",
+          "stylers": [{"color": "#616161"}]
+        },
+        {
+          "elementType": "labels.text.stroke",
+          "stylers": [{"color": "#f5f5f5"}]
+        },
+        {
+          "featureType": "administrative.land_parcel",
+          "elementType": "labels.text.fill",
+          "stylers": [{"color": "#bdbdbd"}]
+        },
+        {
+          "featureType": "poi",
+          "elementType": "geometry",
+          "stylers": [{"color": "#eeeeee"}]
+        },
+        {
+          "featureType": "poi",
+          "elementType": "labels.text.fill",
+          "stylers": [{"color": "#757575"}]
+        },
+        {
+          "featureType": "poi.park",
+          "elementType": "geometry",
+          "stylers": [{"color": "#e5e5e5"}]
+        },
+        {
+          "featureType": "poi.park",
+          "elementType": "labels.text.fill",
+          "stylers": [{"color": "#9e9e9e"}]
+        },
+        {
+          "featureType": "road",
+          "elementType": "geometry",
+          "stylers": [{"color": "#ffffff"}]
+        },
+        {
+          "featureType": "road.arterial",
+          "elementType": "labels.text.fill",
+          "stylers": [{"color": "#757575"}]
+        },
+        {
+          "featureType": "road.highway",
+          "elementType": "geometry",
+          "stylers": [{"color": "#dadada"}]
+        },
+        {
+          "featureType": "road.highway",
+          "elementType": "labels.text.fill",
+          "stylers": [{"color": "#616161"}]
+        },
+        {
+          "featureType": "road.local",
+          "elementType": "labels.text.fill",
+          "stylers": [{"color": "#9e9e9e"}]
+        },
+        {
+          "featureType": "transit.line",
+          "elementType": "geometry",
+          "stylers": [{"color": "#e5e5e5"}]
+        },
+        {
+          "featureType": "transit.station",
+          "elementType": "geometry",
+          "stylers": [{"color": "#eeeeee"}]
+        },
+        {
+          "featureType": "water",
+          "elementType": "geometry",
+          "stylers": [{"color": "#c9c9c9"}]
+        },
+        {
+          "featureType": "water",
+          "elementType": "labels.text.fill",
+          "stylers": [{"color": "#9e9e9e"}]
+        }
+      ]
     }
   },
   beforeMount() {
     const loader = new Loader({
       apiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-      libraries: ['places', 'marker'],
+      libraries: ['places'], // Removed 'marker' as we don't need AdvancedMarker anymore
     });
 
     this.apiPromise = loader.load();
@@ -78,10 +208,11 @@ export default {
     this.geolocate();
     this.home = JSON.parse(localStorage.getItem('home'))
   },
-  components: {GoogleMap, AdvancedMarker, Circle, Polygon, Polyline, VueGoogleAutocomplete},
+  components: {GoogleMap, CustomMarker, Circle, Polygon, Polyline, VueGoogleAutocomplete},
   props: {
     schools: {type: Array, required: true},
     year: {type: String, required: true},
+    hoveredSchool: {type: Object, default: null}
   },
   methods: {
     setPlace(place) {
@@ -92,64 +223,8 @@ export default {
 
       localStorage.setItem('home', JSON.stringify(this.home))
     },
-    schoolMarkerOptions(school) {
-      return {
-        position: school.centre,
-      }
-    },
-    schoolMarkerPinOptions(school) {
-      const image = document.createElement('img');
-      image.src = this.getIconForSchool(school);
-      image.alt = 'School Marker';
-      image.style.width = '30px';
-      image.style.height = '30px';
-
-      const markerContainer = document.createElement('div');
-      markerContainer.style.position = 'relative'; // Required for positioning the label
-
-// Add the image to the container
-      markerContainer.appendChild(image);
-
-// Create the label element
-      const label = document.createElement('div');
-      label.textContent = school.shortName;
-      label.style.position = 'absolute';
-      label.style.top = '60px'; // Adjust this value to position the label below the image
-      label.style.left = '-35px';
-      label.style.padding = '4px'
-      label.style.borderRadius = '4px'
-      label.style.backgroundColor = 'black';
-      label.style.textAlign = 'center';
-      label.style.width = '100px';
-      label.style.fontSize = '12px'; // Adjust font size as needed
-
-// Add the label to the container
-      markerContainer.appendChild(label);
-
-      return {
-        glyph: markerContainer,
-        borderColor: 'black',
-        background: 'white',
-        glyphColor: 'white',
-        scale: 1.5
-      }
-    },
-    invisiSchoolMarkerOptions(school) {
-      return {
-        position: school.centre,
-      }
-    },
-    invisiSchoolMarkerPinOptions(school) {
-      const marker = this.schoolMarkerPinOptions(school);
-      marker.glyph.style.opacity = 0.2
-      marker.background = '#ffffffc0'
-      marker.borderColor = '#00000020';
-      return marker;
-    },
-    homeMarkerOptions() {
-      return {
-        position: this.home
-      }
+    isHovered(school) {
+        return this.hoveredSchool && this.hoveredSchool.name === school.name;
     },
     geolocate: function () {
       navigator.geolocation.getCurrentPosition(position => {
@@ -191,32 +266,40 @@ export default {
       return !(null === school.intakeDist[this.year]);
     },
     getIconForSchool(school) {
-      if (null === school.intakeDist[this.year]) return '/school_all.png';
-      if (!school.radius) return '/school_notes.png';
+      // if (null === school.intakeDist[this.year]) return '/school_all.png'; // Deprecated
+      // if (!school.radius) return '/school_notes.png'; // Deprecated
       return '/school.png'
     },
     circleOptions: function (school) {
+      const isHovered = this.isHovered(school);
+      
       return {
         path: this.circlePath(school),
         strokeColor: school.colour,
-        strokeOpacity: school.intakeDist[this.year] == null ? 0.4 : null,
-        strokeWeight: 0.6,
+        strokeOpacity: school.intakeDist[this.year] == null ? 0.4 : (isHovered ? 1.0 : null),
+        strokeWeight: isHovered ? 2 : 0.6,
         fillColor: school.colour,
-        fillOpacity: school.intakeDist[this.year] == null ? 0.05 : 0.2,
+        fillOpacity: school.intakeDist[this.year] == null ? 0.05 : (isHovered ? 0.4 : 0.2),
+        zIndex: isHovered ? 100 : 1
       }
     },
     linkOptions: function (school) {
+      const isHovered = this.isHovered(school);
+      const isTookAll = school.intakeDist[this.year] == null;
+      const color = isTookAll ? '#4CAF50' : school.colour;
+
       const lineSymbol = {
         path: "M 0,-1 0,1",
-        strokeOpacity: 1,
+        strokeOpacity: isHovered ? 1 : 0.4,
         scale: 2,
       };
 
       return {
         path: this.linkPath(school),
-        strokeColor: school.colour,
-        strokeWeight: 1,
+        strokeColor: color,
+        strokeWeight: isHovered ? 2 : 1,
         strokeOpacity: 0,
+        zIndex: isHovered ? 100 : 1,
         icons: [
           {
             icon: lineSymbol,
@@ -284,30 +367,50 @@ export default {
   opacity: 0.3;
 }
 
-.xinput-area {
-  border: 2px solid black;
-  padding: 8px 8px;
-}
-
-input:focus {
-  outline: none;
-}
-
-input {
+/* Style the teleported autocomplete input to match Vuetify */
+#home-address-input input {
   width: 100%;
+  padding: 8px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.38);
+  border-radius: 4px;
+  font-size: 16px;
+  background-color: white;
+  transition: 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+}
+
+#home-address-input input:focus {
+  outline: none;
+  border-color: #3F51B5; /* Primary color */
+  border-width: 2px;
+  padding-left: 11px; /* Adjust for border width change */
 }
 
 .marker-label {
   opacity: 1;
-  margin-top: 80px;
-  border-radius: 10px;
-  background-color: rgba(255, 255, 255, 0.4);
-  padding: 2px 6px;
+  border-radius: 4px;
+  background-color: white;
+  color: rgba(0, 0, 0, 0.87);
+  padding: 4px 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  font-weight: 500;
+  border: 1px solid rgba(0,0,0,0.1);
 }
 
 .pac-container {
   z-index: 2000;
-  width: 275px !important;
+  font-family: 'Inter', sans-serif;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  border-top: none;
+}
+
+.pac-item {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.pac-item:hover {
+  background-color: #F5F7FA;
 }
 
 </style>
