@@ -84,8 +84,8 @@ export default {
       showSchoolInfo: false,
       showHelp: false,
       showTable: false,
-      year: "2025",
-      years: ['min', 'max', 'average', "2019", "2020", "2021", "2022", "2023", "2024","2025"],
+      year: "2026",
+      years: ['min', 'max', 'average', "2019", "2020", "2021", "2022", "2023", "2024","2025","2026"],
       hoveredSchool: null,
     }
   },
