@@ -13,9 +13,9 @@
 
     <main class="app-main">
       <section class="col-list" aria-label="Schools ranked by your chances">
-        <home-picker :maps-ready="mapsReady" :home-name="homeName" @set-home="setHome"/>
+        <home-picker class="o-picker" :maps-ready="mapsReady" :home-name="homeName" @set-home="setHome"/>
 
-        <div class="list-head">
+        <div class="list-head o-listhead">
           <h2>{{ home ? `Your chances from ${homeName}` : 'Schools' }}</h2>
           <label class="check">
             <input type="checkbox" v-model="onlyOutstanding">
@@ -23,10 +23,10 @@
           </label>
         </div>
 
-        <ranked-list :rows="rankedRows" :selected-name="selected && selected.name" :year="year"
+        <ranked-list class="o-list" :rows="rankedRows" :selected-name="selected && selected.name" :year="year"
                      @select="selectSchool"/>
 
-        <p class="fine-print">
+        <p class="fine-print o-fine">
           Mini charts: each bar is the furthest distance offered in a year, {{ YEARS[0] }}–{{ YEARS[YEARS.length - 1] }}.
           The orange line is your home. Pale full-height bars mean everyone who applied got a place.
           Distances are straight-line unless noted. Check each school’s admission rules before you apply.
@@ -34,7 +34,7 @@
       </section>
 
       <section class="col-map" aria-label="Map and school details">
-        <div class="card map-card">
+        <div class="card map-card o-map">
           <div class="map-card__head">
             <div>
               <span class="eyebrow">Furthest distance offered for September</span>
@@ -44,7 +44,7 @@
           </div>
           <schools-map :schools="schools" :year="year" :home="home" :selected="selected"
                        :api-promise="apiPromise" :maps-ready="mapsReady" :maps-failed="mapsFailed"
-                       @select="selectSchool" @set-home="p => setHome(p, 'your pin')"/>
+                       @select="s => selectSchool(s, true)" @set-home="p => setHome(p, 'your pin')"/>
           <div class="legend">
             <span><i class="lg-ring"></i>Furthest distance offered in {{ year }}</span>
             <span><i class="lg-walk"></i>Walking-distance area (Drayton Manor)</span>
@@ -53,7 +53,7 @@
           </div>
         </div>
 
-        <school-detail v-if="selected" :school="selected" :assessment="assessments.get(selected)" :year="year"/>
+        <school-detail v-if="selected" ref="detail" class="o-detail" :school="selected" :assessment="assessments.get(selected)" :year="year"/>
       </section>
     </main>
 
@@ -137,8 +137,15 @@ export default {
         // storage unavailable – keep the in-memory value
       }
     },
-    selectSchool(school) {
+    selectSchool(school, fromMap) {
       this.selected = school;
+      // On narrow screens the detail panel sits above the list, so bring it into view
+      if (!fromMap && window.matchMedia('(max-width: 1019px)').matches) {
+        this.$nextTick(() => {
+          const el = this.$refs.detail && this.$refs.detail.$el;
+          if (el) el.scrollIntoView({behavior: 'smooth', block: 'start'});
+        });
+      }
     },
   },
   computed: {
@@ -287,6 +294,19 @@ export default {
   font-size: 12px;
   color: var(--ink-3);
   line-height: 1.5;
+}
+
+/* Stacked layout: picker, map, detail, then the list */
+@media (max-width: 1019px) {
+  .app-main { flex-direction: column; gap: 16px; }
+  .col-list, .col-map { display: contents; }
+  .o-picker { order: 1; }
+  .o-map { order: 2; }
+  .o-detail { order: 3; scroll-margin-top: 12px; }
+  .o-listhead { order: 4; margin-top: 8px; }
+  .o-list { order: 5; }
+  .o-fine { order: 6; }
+  .map { height: clamp(300px, 50vh, 480px) !important; }
 }
 
 @media (max-width: 600px) {
