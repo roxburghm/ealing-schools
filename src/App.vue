@@ -40,12 +40,12 @@
                 <span class="map-card__label">Furthest distance offered for September</span>
                 <span class="big-year">{{ year }}</span>
               </div>
-              <!-- The selected school's years at a glance, beside the year slider -->
-              <div v-if="selected" class="head-spark" :title="`${selected.shortName}: furthest distance offered each year`">
-                <mini-spark :school="selected" :year="year" :dist="assessments.get(selected).dist"
+              <!-- The picked school's years at a glance, beside the year slider (only while one is picked) -->
+              <div v-if="focused" class="head-spark" :title="`${focused.shortName}: furthest distance offered each year`">
+                <mini-spark :school="focused" :year="year" :dist="assessments.get(focused).dist"
                             :width="128" :height="32"/>
                 <span class="head-spark__name">
-                  <i :style="{background: selected.colour}"></i>{{ selected.shortName }}
+                  <i :style="{background: focused.colour}"></i>{{ focused.shortName }}
                 </span>
               </div>
               <year-timeline v-model="year" :years="YEARS"/>
