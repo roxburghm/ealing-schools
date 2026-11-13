@@ -134,7 +134,7 @@ const schoolsList = [
         },
         "visible": false,
         "radius": true,
-        "notes": null,
+        "notes": "The council publishes two cut-offs, one measured from the school and one from Acton Town Hall. The figure shown is from the school.",
         "rating": "outstanding",
         "ratingDate": "2024-03-06",
         "ofsted": {
@@ -17831,7 +17831,7 @@ const schoolsList = [
         },
         "visible": true,
         "radius": false,
-        "notes": "Distance measured in walking distance via pavements",
+        "notes": "Distance is measured as a walk along pavements. Children for whom Drayton Manor is the nearest high school were all offered places in 2024–2026; the walking cut-off applies to everyone else.",
         "rating": "outstanding",
         "ratingDate": "2023-11-28",
         "ofsted": {
@@ -18062,7 +18062,7 @@ const schoolsList = [
         },
         "visible": false,
         "radius": true,
-        "notes": null,
+        "notes": "Formerly Northolt High School, the name used in the council's 2024–2026 offers documents.",
         "rating": "good",
         "ratingDate": "2015-07-08",
         "ofsted": {
@@ -18107,7 +18107,7 @@ const schoolsList = [
         },
         "visible": false,
         "radius": true,
-        "notes": "Faith criteria: since 2024 the distance applies to applicants below the Catholic-practice criteria. Check the admissions policy",
+        "notes": "Catholic school: places go first to Catholic applicants, most with a Certificate of Catholic Practice. The cut-off shown is for the last faith group offered places (Catechumens and Eastern Christians in 2025 and 2026). Applicants below the faith criteria were all refused in 2024–2026.",
         "rating": "outstanding",
         "ratingDate": "2018-07-03",
         "ofsted": {
@@ -18152,7 +18152,7 @@ const schoolsList = [
         },
         "visible": false,
         "radius": true,
-        "notes": null,
+        "notes": "Girls only.",
         "rating": "outstanding",
         "ratingDate": "2019-06-04",
         "ofsted": {
@@ -18197,7 +18197,7 @@ const schoolsList = [
         },
         "visible": true,
         "radius": true,
-        "notes": null,
+        "notes": "Places are given by faith points from the school's supplementary information form, in Foundation and World Faith bands. The cut-off shown is for the World Faith band living in Ealing Deanery; applicants without the form were all refused. 19 places are given by music aptitude.",
         "rating": "outstanding",
         "ratingDate": "2023-10-17",
         "ofsted": {
@@ -18282,7 +18282,7 @@ const schoolsList = [
         },
         "visible": false,
         "radius": true,
-        "notes": null,
+        "notes": "Places after siblings go to children for whom William Perkin is the nearest high school, and the cut-off applies only to them. Everyone else applying on distance was refused in 2024, 2025 and 2026. 20 places are given by language aptitude.",
         "rating": "outstanding",
         "ratingDate": "2025-05-07",
         "ofsted": {
