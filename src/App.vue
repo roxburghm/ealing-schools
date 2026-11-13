@@ -110,7 +110,8 @@
             <button type="button" role="tab" :aria-selected="view === 'map'" @click="view = 'map'">Map</button>
           </div>
         </div>
-        <year-timeline v-model="year" :years="YEARS" class="m-bar__years"/>
+        <!-- Map tab only: the list's verdicts already cover every year -->
+        <year-timeline v-if="view === 'map'" v-model="year" :years="YEARS" class="m-bar__years"/>
       </header>
 
       <main class="m-content" :class="`m-content--${view}`">
