@@ -1,6 +1,6 @@
 <template>
   <div class="legend" :class="{'legend--compact': compact}">
-    <span><i class="lg-ring"></i>{{ compact ? `Cut-off ${year}` : `Furthest distance offered, ${year}` }}</span>
+    <span><i class="lg-ring"></i>{{ compact ? 'Cut-off' : 'Furthest distance offered' }}</span>
     <span><i class="lg-dot"><school-icon kind="distance"/></i>{{ compact ? 'By distance' : 'Places by distance' }}</span>
     <span><i class="lg-dot"><school-icon kind="walk"/></i>{{ compact ? 'By walking' : 'By walking distance' }}</span>
     <span><i class="lg-dot"><school-icon kind="open"/></i>Everyone offered</span>
@@ -15,7 +15,6 @@ export default {
   name: 'MapLegend',
   components: {SchoolIcon},
   props: {
-    year: {type: String, required: true},
     // Short labels in a floating card, for the full-screen phone map.
     compact: {type: Boolean, default: false},
   },

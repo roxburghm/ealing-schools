@@ -47,7 +47,7 @@
                          :api-promise="apiPromise" :maps-ready="mapsReady" :maps-failed="mapsFailed"
                          @clear-focus="focused = null"
                          @select="selectSchool"/>
-            <map-legend :year="year"/>
+            <map-legend/>
           </div>
 
           <div class="d-detail">
@@ -117,7 +117,7 @@
                        :api-promise="apiPromise" :maps-ready="mapsReady" :maps-failed="mapsFailed"
                        @clear-focus="focused = null"
                        @select="openSchool"/>
-          <map-legend :year="year" compact class="m-map__legend"/>
+          <map-legend compact class="m-map__legend"/>
         </div>
       </main>
 
@@ -415,6 +415,8 @@ export default {
 
 .v-application, .app-root {
   font-family: var(--font) !important;
+  /* Same-width digits: changing years and distances don't nudge their surroundings */
+  font-variant-numeric: tabular-nums;
   color: var(--ink);
   background: var(--ground) !important;
 }
