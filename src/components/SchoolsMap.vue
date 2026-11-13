@@ -98,8 +98,12 @@ export default {
     };
   },
   computed: {
+    // While zoomed to a school, hide the others so its catchment stands out.
+    shown() {
+      return this.focus ? this.schools.filter(s => s.name === this.focus.name) : this.schools;
+    },
     rings() {
-      return this.schools
+      return this.shown
           .filter(s => typeof s.intakeDist[this.year] === 'number' && s.intakeDist[this.year] > 0)
           .map(s => {
             const sel = this.isSelected(s);
@@ -120,7 +124,7 @@ export default {
           });
     },
     pins() {
-      return this.schools.map(s => {
+      return this.shown.map(s => {
         const cut = s.intakeDist[this.year];
         return {
           school: s,
@@ -193,7 +197,8 @@ export default {
         map.panTo(points[0]);
         map.setZoom(15);
       } else {
-        map.fitBounds(bounds, 32);
+        // Extra room at the top for the home pin (it rises above its point) and the Show all button.
+        map.fitBounds(bounds, {top: 64, right: 32, bottom: 32, left: 32});
       }
     },
     isSelected(s) {
