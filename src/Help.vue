@@ -92,10 +92,15 @@ export default {
   data() {
     return {
       documents: [
+        {title: 'High school on-time offers 2026', href: '/Documents/High_school_on_time_offers_2026.pdf'},
+        {title: 'Starting High School 2027 (2026 figures)', href: '/Documents/Starting_High_School_2027.pdf'},
         {title: 'High school on-time offers 2025', href: '/Documents/High_school_on_time_offers_2025.pdf'},
+        {title: 'Starting High School 2026 (2025 figures)', href: '/Documents/Starting_High_School_2026.pdf'},
+        {title: 'High school on-time offers 2024', href: '/Documents/High_school_on_time_offers_2024.pdf'},
         {title: 'Starting High School 2025 (2024 figures)', href: '/Documents/Starting_High_School_2025.pdf'},
         {title: 'Starting High School 2024 (2023 figures)', href: '/Documents/Starting_High_School_2024.pdf'},
         {title: 'Starting High School 2023 (2022 figures)', href: '/Documents/Starting_High_School_2023.pdf'},
+        {title: 'High school on-time offers 2022', href: '/Documents/Other/High_School_ontime_offers_2022.pdf'},
         {title: 'Starting High School 2022 (2021 figures)', href: '/Documents/Starting_High_School_2022.pdf'},
         {title: 'Starting High School 2021 (2020 figures)', href: '/Documents/Starting_High_School_2021.pdf'},
         {title: 'Starting High School 2020 (2019 figures)', href: '/Documents/Starting_High_School_2020.pdf'},
