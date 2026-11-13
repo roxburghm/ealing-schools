@@ -4,7 +4,7 @@
     <div v-if="!narrow" class="d-shell">
       <header class="app-header">
         <div class="brand">
-          <span class="brand__mark" aria-hidden="true"><school-icon kind="distance"/></span>
+          <span class="brand__mark" aria-hidden="true"><school-icon kind="cap"/></span>
           <div>
             <h1>Ealing secondary school places</h1>
             <p>How close did you need to live to get a place? Cut-off distances for every school, 2019–2026.</p>
@@ -83,7 +83,7 @@
     <div v-else class="m-shell">
       <header class="m-bar">
         <div class="m-bar__top">
-          <span class="brand__mark brand__mark--small" aria-hidden="true"><school-icon kind="distance"/></span>
+          <span class="brand__mark brand__mark--small" aria-hidden="true"><school-icon kind="cap"/></span>
           <h1>Ealing school places</h1>
           <button type="button" class="icon-btn" aria-label="Compare schools" @click="showTable = true">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"

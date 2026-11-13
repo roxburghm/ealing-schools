@@ -1,5 +1,6 @@
 <template>
-  <!-- One of four glyphs saying how a school offered places in a year. Drawn in currentColor. -->
+  <!-- One of four glyphs saying how a school offered places in a year, plus the app's
+       mortarboard mark. Drawn in currentColor. -->
   <svg viewBox="0 0 24 24" aria-hidden="true" class="school-icon">
     <!-- Everyone offered: a tick -->
     <path v-if="kind === 'open'" d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3.5"
@@ -8,6 +9,10 @@
     <!-- Walking distance: a walking figure (Material Design Icons "walk") -->
     <path v-else-if="kind === 'walk'" fill="currentColor"
           d="M14.12,10H19V8.2H15.38L13.38,4.87C13.08,4.37 12.54,4.03 11.92,4.03C11.74,4.03 11.58,4.06 11.42,4.11L6,5.8V11H7.8V7.33L9.91,6.67L6,22H7.8L10.67,13.89L13,17V22H14.8V15.59L12.31,11.05L13.04,8.18M14,3.8C15,3.8 15.8,3 15.8,2C15.8,1 15,0.2 14,0.2C13,0.2 12.2,1 12.2,2C12.2,3 13,3.8 14,3.8Z"/>
+
+    <!-- App mark: a mortarboard (Material Design Icons "school") -->
+    <path v-else-if="kind === 'cap'" fill="currentColor"
+          d="M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z"/>
 
     <!-- No places by distance: a dash -->
     <path v-else-if="kind === 'none'" d="M6.5 12h11" fill="none" stroke="currentColor" stroke-width="3.5"
@@ -26,7 +31,7 @@
 export default {
   name: 'SchoolIcon',
   props: {
-    // 'open' | 'walk' | 'none' | 'distance'
+    // 'open' | 'walk' | 'none' | 'distance' | 'cap'
     kind: {type: String, required: true},
   },
 };
