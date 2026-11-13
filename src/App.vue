@@ -240,10 +240,13 @@ export default {
     this.media.addEventListener('change', this.onMedia);
     this.onPopState = this.syncPageWithHistory.bind(this);
     window.addEventListener('popstate', this.onPopState);
+    this.onKeydown = this.stepWithKeys.bind(this);
+    window.addEventListener('keydown', this.onKeydown);
   },
   beforeUnmount() {
     this.media.removeEventListener('change', this.onMedia);
     window.removeEventListener('popstate', this.onPopState);
+    window.removeEventListener('keydown', this.onKeydown);
   },
   methods: {
     setHome(point, name) {
@@ -280,6 +283,30 @@ export default {
       this.showTable = false;
       if (this.narrow) this.openSchool(school);
       else this.selectSchool(school);
+    },
+    // Desktop: ↓ / ↑ move to the next / previous school in the list. Left alone
+    // while typing, on the year slider or a drop-down, in the map (it pans with
+    // the arrows) or with a dialog open.
+    stepWithKeys(event) {
+      if (this.narrow || this.showHelp || this.showTable) return;
+      if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+      if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+      if (event.target.closest('input, textarea, select, [contenteditable], .pac-container, .map-wrap')) return;
+      const rows = this.rankedRows;
+      if (!rows.length) return;
+      event.preventDefault();
+      const current = this.focused || this.selected;
+      const at = current ? rows.findIndex(r => r.school.name === current.name) : -1;
+      let next;
+      if (!this.focused) next = at < 0 ? 0 : at; // first press picks the school already shown
+      else next = Math.min(rows.length - 1, Math.max(0, at + (event.key === 'ArrowDown' ? 1 : -1)));
+      const school = rows[next].school;
+      if (this.focused && school.name === this.focused.name) return;
+      this.selectSchool(school);
+      this.$nextTick(() => {
+        const row = this.$el.querySelector(`.d-list [data-school="${CSS.escape(school.name)}"]`);
+        row?.scrollIntoView({block: 'nearest'});
+      });
     },
     // Desktop: show the school in the right-hand pane and zoom the map to it.
     // Picking the zoomed-in school again works like "Show all schools".

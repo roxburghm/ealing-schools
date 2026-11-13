@@ -1,7 +1,7 @@
 <template>
   <div>
     <ol class="ranked">
-      <li v-for="row in rows" :key="row.school.name">
+      <li v-for="row in rows" :key="row.school.name" :data-school="row.school.name">
         <button type="button" :class="['row', {'row--on': row.school.name === selectedName}]"
                 :aria-pressed="row.school.name === selectedName" @click="$emit('select', row.school)">
           <span class="row__dot" aria-hidden="true" :style="{background: row.school.colour}"></span>
