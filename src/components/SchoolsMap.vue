@@ -1,336 +1,224 @@
 <template>
-  <div style="height: calc(100vh - 64px)" v-if="mapReady">
-    <teleport to="#home-address-input">
-      <vue-google-autocomplete id="school-map" classname="form-control"
-                               placeholder="Enter your home address"
-                               @placechanged="setPlace"
-                               country="uk"
-                               enable-geolocation
-                               v-if="mapReady"
-      />
-
+  <div class="map-wrap">
+    <teleport to="#home-address-input" v-if="mapReady">
+      <div class="address-field" :class="{ 'has-home': home }">
+        <v-icon class="address-icon" size="20" :color="home ? 'primary' : undefined">mdi-home-outline</v-icon>
+        <vue-google-autocomplete id="home-address"
+                                 ref="address"
+                                 classname="address-input"
+                                 placeholder="Enter your home address"
+                                 @placechanged="setPlace"
+                                 country="uk"
+                                 aria-label="Home address"
+        />
+        <v-btn v-if="home" icon="mdi-close" size="small" variant="text" density="comfortable"
+               aria-label="Clear home address" @click="clearHome"/>
+        <v-btn v-else icon="mdi-crosshairs-gps" size="small" variant="text" density="comfortable"
+               aria-label="Use my current location" v-tooltip:bottom="'Use my location'" @click="useMyLocation"/>
+      </div>
     </teleport>
-    <GoogleMap
-        :center='center'
-        :zoom='13.5'
-        :api-promise="apiPromise"
-        style='width:100%; height: calc(100vh - 64px); min-height: 200px;'
-        :styles="mapStyles"
+
+    <GoogleMap v-if="mapReady"
+               :center="center"
+               :zoom="13.5"
+               :api-promise="apiPromise"
+               :styles="mapStyles"
+               :street-view-control="false"
+               :fullscreen-control="false"
+               class="map"
     >
       <CustomMarker
-          :key="'m-' + index" v-for="(school, index) in visibleSchools"
-          :options="{ position: school.centre, zIndex: isHovered(school) ? 100 : 1 }"
+          v-for="school in visibleSchools" :key="'m-' + school.name"
+          :options="{ position: school.centre, zIndex: isHovered(school) ? 100 : 10 }"
           @click="showSchool(school)"
       >
-        <div style="position: relative; width: 0; height: 0; cursor: pointer;"
+        <div class="marker" :class="{ hovered: isHovered(school) }"
              @mouseover="$emit('hover-school', school)"
              @mouseleave="$emit('hover-school', null)">
-          <!-- Image: Anchored bottom-center to (0,0) using transform -->
-          <div style="position: absolute; left: 0; top: 0; height: 30px; transform: translate(-50%, -100%); transition: transform 0.2s;"
-               :style="{ transform: isHovered(school) ? 'translate(-50%, -100%) scale(1.2)' : 'translate(-50%, -100%)' }">
-             <img :src="getIconForSchool(school)" alt="School Marker" style="height: 100%; width: auto; display: block;">
-          </div>
-          
-          <!-- Label: Anchored top-center to (0,0) with tighter offset -->
-          <div class="marker-label"
-               style="position: absolute; top: 2px; left: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center;"
-               :style="{
-                 backgroundColor: isHovered(school) ? '#3F51B5' : 'white',
-                 color: isHovered(school) ? 'white' : 'black',
-                 fontWeight: isHovered(school) ? 'bold' : '500',
-                 zIndex: isHovered(school) ? 100 : 10
-               }">
-            <span style="white-space: nowrap;">{{ school.shortName }}</span>
-            <span v-if="!school.radius" style="font-size: 0.75em; font-weight: normal; white-space: nowrap; opacity: 0.8;">(See notes)</span>
-            <span v-if="school.intakeDist[year] === null" style="font-size: 0.75em; font-weight: normal; white-space: nowrap; opacity: 0.8; color: #2E7D32;">(All accepted)</span>
+          <img src="/school.png" alt="" class="marker-icon">
+          <div class="marker-label">
+            <span class="marker-name">
+              <v-icon v-if="home && statusIcon(school)" :color="statusColour(school)" size="14" class="mr-1">{{ statusIcon(school) }}</v-icon>{{ school.shortName }}
+            </span>
+            <span v-if="school.intakeDist[year] === null" class="marker-note text-success">Everyone offered</span>
+            <span v-else-if="isWalk(school)" class="marker-note">Walking distance</span>
           </div>
         </div>
       </CustomMarker>
 
       <CustomMarker
-          :key="'im-' + index" v-for="(school, index) in invisibleSchools"
-          :options="{ position: school.centre, zIndex: 0 }"
+          v-for="school in hiddenSchools" :key="'h-' + school.name"
+          :options="{ position: school.centre, zIndex: 1 }"
           @click="showSchool(school)"
       >
-         <div style="position: relative; width: 0; height: 0; cursor: pointer;"
-              @mouseover="$emit('hover-school', school)"
-              @mouseleave="$emit('hover-school', null)">
-           <!-- Dot: Anchored center to (0,0) -->
-          <div style="position: absolute; left: -6px; top: -6px; width: 12px; height: 12px; border-radius: 50%; background-color: #9E9E9E; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.3);">
-          </div>
-          
-          <!-- Label: Hidden by default, shown on hover -->
-          <div class="marker-label" 
-               v-if="isHovered(school)"
-               style="position: absolute; top: 10px; left: 0; transform: translateX(-50%); white-space: nowrap; background-color: white; padding: 2px 6px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); font-size: 11px; z-index: 100;">
-            {{ school.shortName }}
-          </div>
+        <div class="marker-dot-wrap"
+             @mouseover="$emit('hover-school', school)"
+             @mouseleave="$emit('hover-school', null)">
+          <div class="marker-dot" :style="{ backgroundColor: isHovered(school) ? school.colour : undefined }"></div>
+          <div v-if="isHovered(school)" class="marker-label marker-label--dot">{{ school.shortName }}</div>
         </div>
       </CustomMarker>
 
-      <CustomMarker v-if="home !== null" :options="{ position: home }">
-         <div style="transform: translate(-50%, -50%);">
-            <v-icon color="red" size="large">mdi-map-marker</v-icon>
-         </div>
+      <CustomMarker v-if="home" :options="{ position: home, zIndex: 200 }">
+        <div class="home-pin" aria-label="Your home">
+          <v-icon color="white" size="18">mdi-home</v-icon>
+        </div>
       </CustomMarker>
 
       <Polyline
-          :key="'r-' + index"
-          v-for="(school, index) in visibleSchoolsIntakeAll"
+          v-for="school in everyoneOfferedSchools" :key="'l-' + school.name"
           :options="linkOptions(school)"
       />
       <Polygon
-          :key="'r-' + index"
-          v-for="(school, index) in visibleSchoolsCircles"
-          :options="circleOptions(school)"/>
+          v-for="school in catchmentSchools" :key="'c-' + school.name"
+          :options="catchmentOptions(school)"
+      />
     </GoogleMap>
+
+    <div class="map-legend" v-if="mapReady">
+      <div class="legend-row"><span class="legend-swatch"></span>Last place offered in {{ yearLabel }}</div>
+      <div class="legend-row"><span class="legend-dash"></span>School offered everyone a place</div>
+    </div>
   </div>
 </template>
 
 <script>
-import {CustomMarker, Circle, GoogleMap, Polygon, Polyline} from 'vue3-google-map'
+import {CustomMarker, GoogleMap, Polygon, Polyline} from 'vue3-google-map'
 import {Loader} from '@googlemaps/js-api-loader';
 import VueGoogleAutocomplete from "vue-google-autocomplete";
+import mapStyles from '@/plugins/mapStyles';
+import walking, {METRES_PER_MILE} from '@/plugins/walking';
+import admission from '@/plugins/admission';
+
+const HOME_KEY = 'home';
 
 export default {
   name: 'SchoolsMap',
+  components: {GoogleMap, CustomMarker, Polygon, Polyline, VueGoogleAutocomplete},
+  props: {
+    schools: {type: Array, required: true},
+    year: {type: String, required: true},
+    yearLabel: {type: String, default: ''},
+    hoveredSchool: {type: Object, default: null}
+  },
+  emits: ['show-school-info', 'hover-school'],
   data() {
     return {
       apiPromise: null,
-      google: null,
       mapReady: false,
       center: {lat: 51.51215, lng: -0.312812},
-      currentSchool: null,
-      showSchoolInfo: false,
-      mapStyles: [
-        {
-          "elementType": "geometry",
-          "stylers": [{"color": "#f5f5f5"}]
-        },
-        {
-          "elementType": "labels.icon",
-          "stylers": [{"visibility": "off"}]
-        },
-        {
-          "elementType": "labels.text.fill",
-          "stylers": [{"color": "#616161"}]
-        },
-        {
-          "elementType": "labels.text.stroke",
-          "stylers": [{"color": "#f5f5f5"}]
-        },
-        {
-          "featureType": "administrative.land_parcel",
-          "elementType": "labels.text.fill",
-          "stylers": [{"color": "#bdbdbd"}]
-        },
-        {
-          "featureType": "poi",
-          "elementType": "geometry",
-          "stylers": [{"color": "#eeeeee"}]
-        },
-        {
-          "featureType": "poi",
-          "elementType": "labels.text.fill",
-          "stylers": [{"color": "#757575"}]
-        },
-        {
-          "featureType": "poi.park",
-          "elementType": "geometry",
-          "stylers": [{"color": "#e5e5e5"}]
-        },
-        {
-          "featureType": "poi.park",
-          "elementType": "labels.text.fill",
-          "stylers": [{"color": "#9e9e9e"}]
-        },
-        {
-          "featureType": "road",
-          "elementType": "geometry",
-          "stylers": [{"color": "#ffffff"}]
-        },
-        {
-          "featureType": "road.arterial",
-          "elementType": "labels.text.fill",
-          "stylers": [{"color": "#757575"}]
-        },
-        {
-          "featureType": "road.highway",
-          "elementType": "geometry",
-          "stylers": [{"color": "#dadada"}]
-        },
-        {
-          "featureType": "road.highway",
-          "elementType": "labels.text.fill",
-          "stylers": [{"color": "#616161"}]
-        },
-        {
-          "featureType": "road.local",
-          "elementType": "labels.text.fill",
-          "stylers": [{"color": "#9e9e9e"}]
-        },
-        {
-          "featureType": "transit.line",
-          "elementType": "geometry",
-          "stylers": [{"color": "#e5e5e5"}]
-        },
-        {
-          "featureType": "transit.station",
-          "elementType": "geometry",
-          "stylers": [{"color": "#eeeeee"}]
-        },
-        {
-          "featureType": "water",
-          "elementType": "geometry",
-          "stylers": [{"color": "#c9c9c9"}]
-        },
-        {
-          "featureType": "water",
-          "elementType": "labels.text.fill",
-          "stylers": [{"color": "#9e9e9e"}]
-        }
-      ]
+      mapStyles,
     }
   },
   beforeMount() {
     const loader = new Loader({
       apiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-      libraries: ['places'], // Removed 'marker' as we don't need AdvancedMarker anymore
+      libraries: ['places'],
     });
 
     this.apiPromise = loader.load();
-    this.apiPromise.then((google) => {
-      this.google = google;
+    this.apiPromise.then(() => {
       this.mapReady = true;
+      this.$nextTick(this.restoreHome);
     });
   },
-  mounted() {
-    this.geolocate();
-    this.home = JSON.parse(localStorage.getItem('home'))
-  },
-  components: {GoogleMap, CustomMarker, Circle, Polygon, Polyline, VueGoogleAutocomplete},
-  props: {
-    schools: {type: Array, required: true},
-    year: {type: String, required: true},
-    hoveredSchool: {type: Object, default: null}
-  },
   methods: {
-    setPlace(place) {
-      this.home = {
-        lat: place.latitude,
-        lng: place.longitude,
-      };
-
-      localStorage.setItem('home', JSON.stringify(this.home))
+    restoreHome() {
+      let saved = null;
+      try {
+        saved = JSON.parse(localStorage.getItem(HOME_KEY));
+      } catch (e) {
+        saved = null;
+      }
+      if (!saved || typeof saved.lat !== 'number') return;
+      this.home = {lat: saved.lat, lng: saved.lng};
+      this.center = this.home;
+      if (saved.label) this.$refs.address?.update(saved.label);
+    },
+    setPlace(place, result) {
+      this.home = {lat: place.latitude, lng: place.longitude};
+      this.center = this.home;
+      const label = result?.formatted_address || '';
+      try {
+        localStorage.setItem(HOME_KEY, JSON.stringify({...this.home, label}));
+      } catch (e) {
+        // Private browsing: the address simply won't be remembered.
+      }
+    },
+    clearHome() {
+      this.home = null;
+      this.$refs.address?.clear();
+      try {
+        localStorage.removeItem(HOME_KEY);
+      } catch (e) {
+        // Nothing stored.
+      }
+    },
+    useMyLocation() {
+      this.$refs.address?.geolocate();
     },
     isHovered(school) {
-        return this.hoveredSchool && this.hoveredSchool.name === school.name;
+      return this.hoveredSchool && this.hoveredSchool.name === school.name;
     },
-    geolocate: function () {
-      navigator.geolocation.getCurrentPosition(position => {
-        this.centerx = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        };
-      });
+    isWalk(school) {
+      return admission.measure(school) === 'walk';
     },
-    circlePath(school) {
-      if (school.intakePath && school.intakePath[this.year]) {
-        return school.intakePath[this.year].map(point => { return { "lat": point[1], "lng": point[0]} })
-      }
-      let center = school.centre;
-      let radiusMeters = this.circleRadius(school);
+    statusFor(school) {
+      return admission.status(school, this.year, this.home);
+    },
+    statusIcon(school) {
+      return admission.STATUS_ICON[this.statusFor(school).kind];
+    },
+    statusColour(school) {
+      return admission.STATUS_COLOUR[this.statusFor(school).kind];
+    },
+    // Walking-distance schools use the outline CI built from GraphHopper, then
+    // any hand-made outline in the data, then fall back to a circle.
+    catchmentPath(school) {
+      const outline = walking.cutoffOutline(school, this.year)
+          || school.intakePath?.[this.year];
+      if (outline) return outline.map(([lng, lat]) => ({lat, lng}));
+      return this.circle(school.centre, school.intakeDist[this.year] * METRES_PER_MILE);
+    },
+    circle(centre, radiusMetres) {
+      const EARTH_RADIUS = 6371000;
       const points = [];
-      const numPoints = 100; // Number of points to create the circle
-      const EarthRadius = 6371000; // Earth's radius in meters
-
-      for (let i = 0; i <= numPoints; i++) {
-        const angle = (Math.PI * 2 * i) / numPoints;
-        const lat = center.lat + (radiusMeters / EarthRadius) * Math.cos(angle) * (180 / Math.PI);
-        const lng = center.lng + (radiusMeters / EarthRadius) * Math.sin(angle) * (180 / Math.PI) / Math.cos(center.lat * Math.PI / 180);
-        points.push({lat, lng});
+      for (let i = 0; i <= 100; i++) {
+        const angle = (Math.PI * 2 * i) / 100;
+        points.push({
+          lat: centre.lat + (radiusMetres / EARTH_RADIUS) * Math.cos(angle) * (180 / Math.PI),
+          lng: centre.lng + (radiusMetres / EARTH_RADIUS) * Math.sin(angle) * (180 / Math.PI) / Math.cos(centre.lat * Math.PI / 180),
+        });
       }
-
-
       return points;
     },
-    linkPath(school) {
-      return [school.centre, this.home];
-    },
-    circleRadius(school) {
-      if (null === school.intakeDist[this.year]) return 5 * 1609;
-
-      return 1609 * school.intakeDist[this.year];
-    },
-    hasIntakeDistance(school) {
-      return !(null === school.intakeDist[this.year]);
-    },
-    getIconForSchool(school) {
-      // if (null === school.intakeDist[this.year]) return '/school_all.png'; // Deprecated
-      // if (!school.radius) return '/school_notes.png'; // Deprecated
-      return '/school.png'
-    },
-    circleOptions: function (school) {
-      const isHovered = this.isHovered(school);
-      
+    catchmentOptions(school) {
+      const hovered = this.isHovered(school);
       return {
-        path: this.circlePath(school),
+        path: this.catchmentPath(school),
         strokeColor: school.colour,
-        strokeOpacity: school.intakeDist[this.year] == null ? 0.4 : (isHovered ? 1.0 : null),
-        strokeWeight: isHovered ? 2 : 0.6,
+        strokeOpacity: hovered ? 1 : 0.7,
+        strokeWeight: hovered ? 2.5 : 1,
         fillColor: school.colour,
-        fillOpacity: school.intakeDist[this.year] == null ? 0.05 : (isHovered ? 0.4 : 0.2),
-        zIndex: isHovered ? 100 : 1
+        fillOpacity: hovered ? 0.35 : 0.16,
+        zIndex: hovered ? 100 : 1,
+        clickable: false,
       }
     },
-    linkOptions: function (school) {
-      const isHovered = this.isHovered(school);
-      const isTookAll = school.intakeDist[this.year] == null;
-      const color = isTookAll ? '#4CAF50' : school.colour;
-
-      const lineSymbol = {
-        path: "M 0,-1 0,1",
-        strokeOpacity: isHovered ? 1 : 0.4,
-        scale: 2,
-      };
-
+    linkOptions(school) {
+      const hovered = this.isHovered(school);
       return {
-        path: this.linkPath(school),
-        strokeColor: color,
-        strokeWeight: isHovered ? 2 : 1,
+        path: [school.centre, this.home],
+        strokeColor: '#2E7D32',
         strokeOpacity: 0,
-        zIndex: isHovered ? 100 : 1,
-        icons: [
-          {
-            icon: lineSymbol,
-            offset: "0",
-            repeat: "10px",
-          },
-        ],
-      }
-    },
-    polygonOptions: function (school) {
-
-      var lineSymbol = {
-        path: 'M 0,-1 0,1',
-        strokeOpacity: 1,
-        strokeWeight: 0.8,
-        scale: 3
-      };
-
-      return {
-        ...this.circleOptions(school),
-        path: this.circlePath(school),
+        zIndex: hovered ? 100 : 1,
+        clickable: false,
         icons: [{
-          icon: lineSymbol,
+          icon: {path: 'M 0,-1 0,1', strokeOpacity: hovered ? 1 : 0.5, strokeWeight: hovered ? 2.5 : 1.5, scale: 2},
           offset: '0',
-          repeat: '15px'
+          repeat: '10px',
         }],
-        strokeOpacity: 0,
-        fillOpacity: 0.07
-
       }
-
     },
     showSchool(school) {
       this.$emit('show-school-info', school);
@@ -340,14 +228,15 @@ export default {
     visibleSchools() {
       return this.schools.filter(school => school.visible)
     },
-    invisibleSchools() {
+    hiddenSchools() {
       return this.schools.filter(school => !school.visible)
     },
-    visibleSchoolsIntakeAll() {
-      return this.schools.filter(school => school.visible && this.home !== null && !this.hasIntakeDistance(school))
+    everyoneOfferedSchools() {
+      if (!this.home) return [];
+      return this.visibleSchools.filter(school => school.intakeDist[this.year] === null)
     },
-    visibleSchoolsCircles() {
-      return this.schools.filter(school => school.visible && this.hasIntakeDistance(school))
+    catchmentSchools() {
+      return this.visibleSchools.filter(school => school.intakeDist[this.year] > 0)
     },
     home: {
       get() {
@@ -359,58 +248,217 @@ export default {
     }
   }
 }
-;
 </script>
 
 <style>
-.disabled {
-  opacity: 0.3;
+.map-wrap {
+  position: relative;
+  height: calc(100dvh - var(--v-layout-top, 56px));
+  min-height: 320px;
 }
 
-/* Style the teleported autocomplete input to match Vuetify */
-#home-address-input input {
+.map {
   width: 100%;
-  padding: 8px 12px;
-  border: 1px solid rgba(0, 0, 0, 0.38);
-  border-radius: 4px;
-  font-size: 16px;
-  background-color: white;
-  transition: 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+  height: 100%;
 }
 
-#home-address-input input:focus {
-  outline: none;
-  border-color: #3F51B5; /* Primary color */
-  border-width: 2px;
-  padding-left: 11px; /* Adjust for border width change */
+.marker {
+  position: relative;
+  width: 0;
+  height: 0;
+  cursor: pointer;
+}
+
+.marker-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 28px;
+  transform: translate(-50%, -100%);
+  transition: transform 160ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.marker.hovered .marker-icon {
+  transform: translate(-50%, -100%) scale(1.15);
 }
 
 .marker-label {
-  opacity: 1;
-  border-radius: 4px;
-  background-color: white;
-  color: rgba(0, 0, 0, 0.87);
-  padding: 4px 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  position: absolute;
+  top: 3px;
+  left: 0;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  white-space: nowrap;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgb(var(--v-theme-surface));
+  color: rgb(var(--v-theme-on-surface));
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12), 0 2px 6px rgba(15, 23, 42, 0.08);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  transition: background-color 160ms, color 160ms;
+}
+
+.marker.hovered .marker-label {
+  background: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-on-primary));
+}
+
+.marker.hovered .marker-label .v-icon,
+.marker.hovered .marker-note {
+  color: inherit !important;
+}
+
+.marker-name {
+  display: inline-flex;
+  align-items: center;
+}
+
+.marker-note {
+  font-size: 10.5px;
   font-weight: 500;
-  border: 1px solid rgba(0,0,0,0.1);
+  opacity: 0.85;
+}
+
+.marker-dot-wrap {
+  position: relative;
+  width: 0;
+  height: 0;
+  cursor: pointer;
+}
+
+.marker-dot {
+  position: absolute;
+  left: -6px;
+  top: -6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #9AA1AD;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.3);
+}
+
+.marker-label--dot {
+  top: 10px;
+  font-weight: 500;
+}
+
+.home-pin {
+  width: 32px;
+  height: 32px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgb(var(--v-theme-primary));
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.35);
+}
+
+.map-legend {
+  position: absolute;
+  left: 12px;
+  bottom: 28px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12), 0 2px 8px rgba(15, 23, 42, 0.08);
+  font-size: 12px;
+  color: rgba(var(--v-theme-on-surface), 0.75);
+  pointer-events: none;
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-row + .legend-row {
+  margin-top: 4px;
+}
+
+.legend-swatch {
+  width: 14px;
+  height: 10px;
+  border-radius: 3px;
+  background: rgba(var(--v-theme-primary), 0.18);
+  border: 1px solid rgba(var(--v-theme-primary), 0.7);
+}
+
+.legend-dash {
+  width: 14px;
+  border-top: 2px dashed #2E7D32;
+}
+
+/* Address search, teleported into the side panel */
+.address-field {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 44px;
+  padding: 0 4px 0 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.2);
+  background: rgb(var(--v-theme-surface));
+  transition: border-color 160ms, box-shadow 160ms;
+}
+
+.address-field:focus-within {
+  border-color: rgb(var(--v-theme-primary));
+  box-shadow: 0 0 0 3px rgba(var(--v-theme-primary), 0.16);
+}
+
+.address-icon {
+  opacity: 0.6;
+}
+
+.address-field.has-home .address-icon {
+  opacity: 1;
+}
+
+.address-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-size: 15px;
+  color: rgb(var(--v-theme-on-surface));
+  text-overflow: ellipsis;
+}
+
+.address-input::placeholder {
+  color: rgba(var(--v-theme-on-surface), 0.55);
 }
 
 .pac-container {
-  z-index: 2000;
-  font-family: 'Inter', sans-serif;
-  border-radius: 0 0 4px 4px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  z-index: 3000;
+  font-family: inherit;
+  margin-top: 4px;
+  border-radius: 10px;
   border-top: none;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.14);
 }
 
 .pac-item {
-  padding: 8px;
+  padding: 6px 10px;
   cursor: pointer;
 }
 
 .pac-item:hover {
-  background-color: #F5F7FA;
+  background-color: rgb(var(--v-theme-background));
 }
 
+@media (max-width: 600px) {
+  .map-legend {
+    display: none;
+  }
+}
 </style>
