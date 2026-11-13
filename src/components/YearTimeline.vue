@@ -1,13 +1,16 @@
 <template>
-  <nav class="timeline" aria-label="Offer year" :style="{'--n': years.length}">
+  <div class="timeline" :style="{'--n': years.length}">
     <span class="timeline__track" aria-hidden="true"></span>
     <span class="timeline__fill" aria-hidden="true" :style="{width: fillWidth}"></span>
-    <button v-for="(y, i) in years" :key="y" type="button" class="timeline__step"
-            :aria-pressed="y === modelValue" :aria-label="`Show ${y}`" @click="$emit('update:modelValue', y)">
+    <div v-for="(y, i) in years" :key="y" class="timeline__step" aria-hidden="true">
       <span :class="['timeline__dot', {'is-on': y === modelValue, 'is-past': i < index}]"></span>
-      <span :class="['timeline__label', {'is-on': y === modelValue}]">{{ y }}</span>
-    </button>
-  </nav>
+      <span :class="['timeline__label', {'is-on': y === modelValue}]">’{{ y.slice(2) }}</span>
+    </div>
+    <!-- A real range input on top: drag, tap anywhere, or use the arrow keys -->
+    <input class="timeline__range" type="range" min="0" :max="years.length - 1" step="1" :value="index"
+           aria-label="Offer year" :aria-valuetext="modelValue"
+           @input="$emit('update:modelValue', years[+$event.target.value])">
+  </div>
 </template>
 
 <script>
@@ -35,9 +38,11 @@ export default {
   position: relative;
   display: grid;
   grid-template-columns: repeat(var(--n), minmax(0, 1fr));
-  flex: 0 1 460px;
+  flex: 0 1 380px;
   min-width: 0;
+  border-radius: 10px;
 }
+.timeline:focus-within { outline: 2px solid var(--accent); outline-offset: 4px; }
 .timeline__track, .timeline__fill {
   position: absolute;
   top: 14px;
@@ -45,18 +50,15 @@ export default {
   left: calc(50% / var(--n));
 }
 .timeline__track { right: calc(50% / var(--n)); background: var(--line); }
-.timeline__fill { background: var(--accent); transition: width .2s; }
+.timeline__fill { background: var(--accent); transition: width .15s; }
 .timeline__step {
   position: relative;
-  min-height: 48px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
+  min-height: 44px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
+  pointer-events: none;
 }
 .timeline__dot {
   position: relative;
@@ -79,15 +81,27 @@ export default {
   border: 0;
   box-shadow: 0 0 0 4px #fff, 0 0 0 6px var(--accent);
 }
-.timeline__label { font-size: 12px; font-weight: 500; color: var(--ink-3); }
+.timeline__label { font-size: 12px; font-weight: 500; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 .timeline__label.is-on { font-weight: 700; color: var(--ink); }
-.timeline__step:hover .timeline__dot:not(.is-on) { border-color: var(--accent); }
 
-/* Phones: full width, and short year labels so eight fit */
+/* Invisible range input covering the whole timeline. Its thumb lines up with
+   the dots because the range runs from the first dot's centre to the last's. */
+.timeline__range {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(50% / var(--n) - 12px);
+  width: calc(100% - 100% / var(--n) + 24px);
+  margin: 0;
+  opacity: 0;
+  cursor: grab;
+  touch-action: pan-y;
+}
+.timeline__range:active { cursor: grabbing; }
+.timeline__range::-webkit-slider-thumb { width: 24px; height: 44px; -webkit-appearance: none; appearance: none; }
+.timeline__range::-moz-range-thumb { width: 24px; height: 44px; border: 0; }
+
 @media (max-width: 600px) {
   .timeline { flex: 1 1 100%; }
-}
-@media (max-width: 380px) {
-  .timeline__label { font-size: 11px; letter-spacing: -0.01em; }
 }
 </style>

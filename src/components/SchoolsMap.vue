@@ -1,8 +1,10 @@
 <template>
-  <div class="map-wrap">
-    <GoogleMap v-if="mapsReady" ref="gmap" :api-promise="apiPromise" :center="center" :zoom="13" :styles="mapStyles"
+  <div class="map-wrap" :style="height ? {height} : null">
+    <GoogleMap v-if="mapsReady" ref="gmap" :api-promise="apiPromise" :center="center" :zoom="12" :styles="mapStyles"
                :clickable-icons="false" :street-view-control="false" :map-type-control="false"
-               :fullscreen-control="true" class="map" @click="onMapClick" @idle="onIdle">
+               :fullscreen-control="interactive" :zoom-control="interactive" :disable-default-ui="!interactive"
+               :gesture-handling="interactive ? 'greedy' : 'cooperative'"
+               class="map" :class="{'map--fill': height}" @click="onMapClick" @idle="onIdle">
       <Polygon v-for="r in rings" :key="'ring-' + r.key" :options="r.options"/>
 
       <CustomMarker v-for="pin in pins" :key="'pin-' + pin.school.name"
@@ -24,8 +26,8 @@
         </svg>
       </CustomMarker>
     </GoogleMap>
-    <div v-else class="map map--loading">{{ mapsFailed ? 'The map couldn’t load. You can still enter your address above to see your chances.' : 'Loading map…' }}</div>
-    <button v-if="focus && mapsReady" type="button" class="show-all" @click="$emit('clear-focus')">
+    <div v-else class="map map--loading" :class="{'map--fill': height}">{{ mapsFailed ? 'The map couldn’t load. You can still enter your address above to see your chances.' : 'Loading map…' }}</div>
+    <button v-if="focus && mapsReady && interactive" type="button" class="show-all" @click="$emit('clear-focus')">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>
@@ -67,6 +69,12 @@ export default {
     apiPromise: {type: Promise, default: null},
     mapsReady: {type: Boolean, default: false},
     mapsFailed: {type: Boolean, default: false},
+    // CSS height for the map, e.g. '100%' or '220px'. Defaults to a share of the viewport.
+    height: {type: String, default: null},
+    // false for small preview maps: no clicking to set home, no controls.
+    interactive: {type: Boolean, default: true},
+    // Re-fit when a hidden map (another tab) becomes visible again.
+    visible: {type: Boolean, default: true},
   },
   emits: ['select', 'set-home', 'clear-focus'],
   data() {
@@ -123,12 +131,34 @@ export default {
       });
     },
   },
+  mounted() {
+    // Re-fit when the map's box changes size (first layout, rotating a phone,
+    // resizing the window) so the schools always fill it.
+    if (typeof ResizeObserver === 'undefined') return;
+    let last = '';
+    this.resizeObserver = new ResizeObserver(([entry]) => {
+      const {width, height} = entry.contentRect;
+      const size = `${Math.round(width)}x${Math.round(height)}`;
+      if (!width || !height || size === last) return;
+      last = size;
+      clearTimeout(this.resizeTimer);
+      this.resizeTimer = setTimeout(this.fitView, 120);
+    });
+    this.resizeObserver.observe(this.$el);
+  },
+  beforeUnmount() {
+    this.resizeObserver?.disconnect();
+    clearTimeout(this.resizeTimer);
+  },
   watch: {
     focus() {
       this.fitView();
     },
     year() {
       if (this.focus) this.fitView();
+    },
+    visible(now) {
+      if (now) this.$nextTick(this.fitView);
     },
   },
   methods: {
@@ -170,7 +200,7 @@ export default {
       return !!this.selected && this.selected.name === s.name;
     },
     onMapClick(e) {
-      if (!e || !e.latLng) return;
+      if (!this.interactive || !e || !e.latLng) return;
       this.$emit('set-home', {lat: e.latLng.lat(), lng: e.latLng.lng()});
     },
   },
@@ -179,6 +209,7 @@ export default {
 
 <style scoped>
 .map-wrap { position: relative; }
+.map--fill { height: 100% !important; }
 .map {
   width: 100%;
   height: clamp(360px, 58vh, 640px);

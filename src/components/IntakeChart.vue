@@ -29,7 +29,7 @@
               :y="bar.kind === 'value' ? y(bar.value) - 6 : (bar.kind === 'all' ? pad.top - 6 : y(0) - 6)"
               text-anchor="middle" class="value">{{ bar.short }}</text>
         <text :x="x(i) + barWidth / 2" :y="height - 8" text-anchor="middle"
-              class="year" :class="{ current: bar.year === selected }">{{ bar.year }}</text>
+              class="year" :class="{ current: bar.year === selected }">{{ narrow ? `’${bar.year.slice(2)}` : bar.year }}</text>
       </template>
     </g>
 

@@ -1,5 +1,5 @@
 <template>
-  <article class="card detail">
+  <article class="card detail" :class="{'detail--flat': flat}">
     <div class="detail__head">
       <div class="detail__title">
         <h2>{{ school.name }}</h2>
@@ -83,6 +83,8 @@ export default {
     assessment: {type: Object, required: true},
     year: {type: String, required: true},
     home: {type: Object, default: null},
+    // On its own phone page: no card border.
+    flat: {type: Boolean, default: false},
   },
   data() {
     return {YEARS};
@@ -154,6 +156,8 @@ export default {
 
 <style scoped>
 .detail { padding: 20px 22px; display: flex; flex-direction: column; gap: 18px; }
+.detail--flat { border: 0; border-radius: 0; padding: 16px 16px 32px; background: transparent; }
+.detail--flat .detail__verdict { align-items: flex-start; }
 .detail__head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: flex-start; }
 .detail__title { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
 .detail__title h2 { margin: 0; font-family: var(--font-display); font-size: 22px; font-weight: 700; text-wrap: balance; }
