@@ -23,6 +23,19 @@ const OUTCOMES = {
     improving: 'may have improved',
 };
 
+// Five-step tone shared by both scales, for badges: top, good, mid, warn, bad.
+const GRADE_TONES = {
+    'exceptional': 'top', 'outstanding': 'top',
+    'strong standard': 'good', 'good': 'good',
+    'expected standard': 'mid',
+    'needs attention': 'warn', 'requires improvement': 'warn',
+    'urgent improvement': 'bad', 'inadequate': 'bad',
+};
+
+function gradeTone(grade) {
+    return GRADE_TONES[(grade || '').toLowerCase()] || 'none';
+}
+
 function gradeColour(grade) {
     return GRADE_COLOURS[(grade || '').toLowerCase()] || 'grey';
 }
@@ -66,6 +79,7 @@ function summary(school) {
         const top = predominantGrade(latest.areas, REPORT_CARD_SCALE);
         return {
             kind: 'reportCard',
+            grade: top.grade,
             label: capitalise(top.label),
             colour: gradeColour(top.grade),
             date: latest.date,
@@ -81,6 +95,7 @@ function summary(school) {
         const top = predominantGrade(latest.areas, LEGACY_SCALE);
         return {
             kind: 'keyJudgements',
+            grade: top.grade,
             label: capitalise(top.label),
             colour: gradeColour(top.grade),
             date: latest.date,
@@ -101,6 +116,7 @@ function summary(school) {
 
     return {
         kind: 'graded',
+        grade: legacy.grade,
         label: capitalise(legacy.grade),
         colour: gradeColour(legacy.grade),
         date: legacy.date,
@@ -117,6 +133,7 @@ export default {
     summary,
     reportUrl,
     gradeColour,
+    gradeTone,
     formatMonth,
     capitalise,
 };

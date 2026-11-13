@@ -238,11 +238,12 @@ export default {
 }
 
 .home-band {
-  fill: rgba(var(--v-theme-primary), 0.1);
+  fill: var(--home, rgb(var(--v-theme-primary)));
+  fill-opacity: 0.12;
 }
 
 .home-line {
-  stroke: rgb(var(--v-theme-primary));
+  stroke: var(--home, rgb(var(--v-theme-primary)));
   stroke-width: 2;
   stroke-dasharray: 6 4;
 }
@@ -253,7 +254,7 @@ export default {
 }
 
 .home-pill {
-  fill: rgb(var(--v-theme-primary));
+  fill: var(--home-dark, var(--home, rgb(var(--v-theme-primary))));
 }
 
 .home-text {
