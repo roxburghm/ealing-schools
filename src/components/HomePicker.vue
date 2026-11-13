@@ -11,7 +11,7 @@
         <circle cx="12" cy="9" r="2.5"/>
       </svg>
       <vue-google-autocomplete v-if="mapsReady" ref="search" id="home-search" classname="home-picker__input"
-                               :placeholder="hasHome ? 'Search for a different address' : 'Enter your postcode or street'" country="uk"
+                               :placeholder="hasHome ? 'Search for a different address' : 'Enter your postcode or street'" country="uk" types="geocode"
                                @placechanged="placeChanged" @no-results-found="noResult"/>
       <input v-else id="home-search" class="home-picker__input" placeholder="Loading address search…" disabled>
       <button type="button" class="home-picker__locate" aria-label="Use my current location"
@@ -46,6 +46,8 @@ export default {
     mapsReady: {type: Boolean, default: false},
     homeName: {type: String, default: ''},
     hasHome: {type: Boolean, default: false},
+    // {north, south, east, west}: suggestions inside this box are preferred, not required.
+    searchArea: {type: Object, default: null},
   },
   emits: ['set-home', 'clear-home'],
   data() {
@@ -63,8 +65,22 @@ export default {
       ],
     };
   },
+  watch: {
+    mapsReady: {
+      immediate: true,
+      handler(ready) {
+        if (ready) this.$nextTick(this.biasToArea);
+      },
+    },
+  },
   methods: {
-    noResult(place) {
+    biasToArea() {
+      const autocomplete = this.$refs.search?.autocomplete;
+      if (autocomplete && this.searchArea) {
+        autocomplete.setOptions({bounds: this.searchArea, strictBounds: false});
+      }
+    },
+    noResult() {
       this.error = 'Pick an address from the suggestions list.';
     },
     placeChanged(address, place) {

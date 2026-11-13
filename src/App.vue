@@ -14,6 +14,7 @@
     <main class="app-main">
       <section class="col-list" aria-label="Schools ranked by your chances">
         <home-picker class="o-picker" :maps-ready="mapsReady" :home-name="homeName" :has-home="!!home"
+                     :search-area="searchArea"
                      @set-home="setHome" @clear-home="clearHome"/>
 
         <div class="list-head o-listhead">
@@ -195,6 +196,17 @@ export default {
               (y.a.score - x.a.score) ||
               ((x.a.dist ?? 0) - (y.a.dist ?? 0)) ||
               x.school.shortName.localeCompare(y.school.shortName));
+    },
+    // The schools plus about 2 km either side, to steer address suggestions towards Ealing.
+    searchArea() {
+      const lats = this.schools.map(s => s.centre.lat);
+      const lngs = this.schools.map(s => s.centre.lng);
+      return {
+        north: Math.max(...lats) + 0.02,
+        south: Math.min(...lats) - 0.02,
+        east: Math.max(...lngs) + 0.03,
+        west: Math.min(...lngs) - 0.03,
+      };
     },
     buildDateTime() {
       return import.meta.env.VITE_BUILD_DATE_TIME;
