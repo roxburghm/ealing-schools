@@ -290,17 +290,24 @@ export default {
       }
     },
     closeSchool() {
-      if (history.state && history.state.school) history.back();
-      else this.pageOpen = false;
+      if (history.state && history.state.school) {
+        history.back();
+      } else {
+        this.pageOpen = false;
+        this.focused = null;
+      }
     },
     syncPageWithHistory(event) {
       const name = event.state && event.state.school;
       const school = name && this.schools.find(s => s.name === name);
       if (school) {
         this.selected = school;
+        this.focused = school;
         this.pageOpen = true;
       } else {
+        // Back out of a school page: the map goes back to showing every school.
         this.pageOpen = false;
+        this.focused = null;
       }
     },
   },
