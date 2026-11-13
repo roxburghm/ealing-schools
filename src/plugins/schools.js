@@ -17,7 +17,9 @@ const schoolsList = [
         "notes": null,
         "rating": "outstanding",
         "ratingDate": "2023-01-11",
-        "ofstedLatest": {"date": "2023-01-11", "summary": "Outstanding"},
+        "ofsted": {
+            "urn": 145724
+        },
         "centre": {
             "lat": 51.518949,
             "lng": -0.293081
@@ -55,7 +57,9 @@ const schoolsList = [
         "notes": null,
         "rating": "good",
         "ratingDate": "2023-06-20",
-        "ofstedLatest": {"date": "2023-06-20", "summary": "Good"},
+        "ofsted": {
+            "urn": 134369
+        },
         "centre": {
             "lat": 51.542750,
             "lng": -0.383807
@@ -93,7 +97,9 @@ const schoolsList = [
         "notes": null,
         "rating": "good",
         "ratingDate": "2023-02-02",
-        "ofstedLatest": {"date": "2023-02-02", "summary": "Good"},
+        "ofsted": {
+            "urn": 146318
+        },
         "centre": {
             "lat": 51.505401,
             "lng": -0.281008
@@ -131,7 +137,9 @@ const schoolsList = [
         "notes": null,
         "rating": "outstanding",
         "ratingDate": "2024-03-06",
-        "ofstedLatest": {"date": "2024-03-06", "summary": "Outstanding"},
+        "ofsted": {
+            "urn": 147863
+        },
         "centre": {
             "lat": 51.507604,
             "lng": -0.276717
@@ -169,7 +177,20 @@ const schoolsList = [
         "notes": null,
         "rating": "good",
         "ratingDate": "2025-04-29",
-        "ofstedLatest": {"date": "2025-04-29", "summary": "No overall grade (new rules). Good in all four main areas; sixth form Outstanding"},
+        "ofsted": {
+            "urn": 101939,
+            "latest": {
+                "type": "keyJudgements",
+                "date": "2025-04-29",
+                "areas": {
+                    "Quality of education": "good",
+                    "Behaviour and attitudes": "good",
+                    "Personal development": "good",
+                    "Leadership and management": "good",
+                    "Sixth form provision": "outstanding"
+                }
+            }
+        },
         "centre": {
             "lat": 51.526546,
             "lng": -0.339980
@@ -207,7 +228,23 @@ const schoolsList = [
         "notes": null,
         "rating": "good",
         "ratingDate": "2021-11-30",
-        "ofstedLatest": {"date": "2026-02-03", "summary": "New report card: Inclusion Exceptional; five areas Strong standard; Post-16 Expected standard"},
+        "ofsted": {
+            "urn": 145348,
+            "latest": {
+                "type": "reportCard",
+                "date": "2026-02-03",
+                "safeguarding": "met",
+                "areas": {
+                    "Inclusion": "exceptional",
+                    "Curriculum and teaching": "strong standard",
+                    "Achievement": "strong standard",
+                    "Attendance and behaviour": "strong standard",
+                    "Personal development and wellbeing": "strong standard",
+                    "Leadership and governance": "strong standard",
+                    "Post 16 provision": "expected standard"
+                }
+            }
+        },
         "centre": {
             "lat": 51.517817,
             "lng": -0.367062
@@ -17797,7 +17834,10 @@ const schoolsList = [
         "notes": "Distance measured in walking distance via pavements",
         "rating": "outstanding",
         "ratingDate": "2023-11-28",
-        "ofstedLatest": {"date": "2023-11-28", "summary": "Outstanding"},
+        "ofsted": {
+            "urn": 137221
+        },
+        "measure": "walk",
         "centre": {
             "lat": 51.515894,
             "lng": -0.335856
@@ -17835,7 +17875,14 @@ const schoolsList = [
         "notes": null,
         "rating": "good",
         "ratingDate": "2019-06-05",
-        "ofstedLatest": {"date": "2024-12-03", "summary": "Good (graded 2019; re-inspected without new grade, Dec 2024)"},
+        "ofsted": {
+            "urn": 142654,
+            "latest": {
+                "type": "ungraded",
+                "date": "2024-12-03",
+                "outcome": "improving"
+            }
+        },
         "centre": {
             "lat": 51.496161,
             "lng": -0.312257
@@ -17873,7 +17920,14 @@ const schoolsList = [
         "notes": null,
         "rating": "outstanding",
         "ratingDate": "2019-03-05",
-        "ofstedLatest": {"date": "2025-03-04", "summary": "Outstanding (graded 2019; re-inspected without new grade, Mar 2025)"},
+        "ofsted": {
+            "urn": 131310,
+            "latest": {
+                "type": "ungraded",
+                "date": "2025-03-04",
+                "outcome": "maintained"
+            }
+        },
         "centre": {
             "lat": 51.500617,
             "lng": -0.330865
@@ -17906,7 +17960,20 @@ const schoolsList = [
         "notes": null,
         "rating": "outstanding",
         "ratingDate": "2025-03-11",
-        "ofstedLatest": {"date": "2025-03-11", "summary": "No overall grade (new rules). Outstanding in all four main areas; sixth form Good"},
+        "ofsted": {
+            "urn": 137729,
+            "latest": {
+                "type": "keyJudgements",
+                "date": "2025-03-11",
+                "areas": {
+                    "Quality of education": "outstanding",
+                    "Behaviour and attitudes": "outstanding",
+                    "Personal development": "outstanding",
+                    "Leadership and management": "outstanding",
+                    "Sixth form provision": "good"
+                }
+            }
+        },
         "centre": {
             "lat": 51.499616,
             "lng": -0.386514
@@ -17944,7 +18011,23 @@ const schoolsList = [
         "notes": null,
         "rating": "good",
         "ratingDate": "2022-02-08",
-        "ofstedLatest": {"date": "2026-02-10", "summary": "New report card, Feb 2026 (area grades not yet checked). Previously Good (Feb 2022)"},
+        "ofsted": {
+            "urn": 101940,
+            "latest": {
+                "type": "reportCard",
+                "date": "2026-02-10",
+                "safeguarding": "met",
+                "areas": {
+                    "Inclusion": "strong standard",
+                    "Curriculum and teaching": "expected standard",
+                    "Achievement": "expected standard",
+                    "Attendance and behaviour": "expected standard",
+                    "Personal development and wellbeing": "strong standard",
+                    "Leadership and governance": "expected standard",
+                    "Post 16 provision": "strong standard"
+                }
+            }
+        },
         "centre": {
             "lat": 51.532424,
             "lng": -0.371254
@@ -17982,7 +18065,14 @@ const schoolsList = [
         "notes": null,
         "rating": "good",
         "ratingDate": "2015-07-08",
-        "ofstedLatest": {"date": "2024-11-06", "summary": "Good (now Islip Manor High School; re-inspected without new grade, Nov 2024)"},
+        "ofsted": {
+            "urn": 101943,
+            "latest": {
+                "type": "ungraded",
+                "date": "2024-11-06",
+                "outcome": "maintained"
+            }
+        },
         "centre": {
             "lat": 51.551684,
             "lng": -0.375067
@@ -18020,7 +18110,14 @@ const schoolsList = [
         "notes": "Faith criteria: since 2024 the distance applies to applicants below the Catholic-practice criteria. Check the admissions policy",
         "rating": "outstanding",
         "ratingDate": "2018-07-03",
-        "ofstedLatest": {"date": "2024-04-17", "summary": "Outstanding (graded 2018; re-inspected without new grade, Apr 2024)"},
+        "ofsted": {
+            "urn": 101934,
+            "latest": {
+                "type": "ungraded",
+                "date": "2024-04-17",
+                "outcome": "maintained"
+            }
+        },
         "centre": {
             "lat": 51.525260,
             "lng": -0.352121
@@ -18058,7 +18155,14 @@ const schoolsList = [
         "notes": null,
         "rating": "outstanding",
         "ratingDate": "2019-06-04",
-        "ofstedLatest": {"date": "2025-01-14", "summary": "Outstanding (graded 2019; re-inspected without new grade, Jan 2025)"},
+        "ofsted": {
+            "urn": 101941,
+            "latest": {
+                "type": "ungraded",
+                "date": "2025-01-14",
+                "outcome": "improving"
+            }
+        },
         "centre": {
             "lat": 51.516368,
             "lng": -0.287527
@@ -18096,7 +18200,9 @@ const schoolsList = [
         "notes": null,
         "rating": "outstanding",
         "ratingDate": "2023-10-17",
-        "ofstedLatest": {"date": "2023-10-17", "summary": "Outstanding"},
+        "ofsted": {
+            "urn": 137546
+        },
         "centre": {
             "lat": 51.509637,
             "lng": -0.277995
@@ -18134,7 +18240,14 @@ const schoolsList = [
         "notes": null,
         "rating": "outstanding",
         "ratingDate": "2019-05-22",
-        "ofstedLatest": {"date": "2025-03-18", "summary": "Outstanding (graded 2019; re-inspected without new grade, Mar 2025)"},
+        "ofsted": {
+            "urn": 101928,
+            "latest": {
+                "type": "ungraded",
+                "date": "2025-03-18",
+                "outcome": "maintained"
+            }
+        },
         "centre": {
             "lat": 51.509497,
             "lng": -0.373441
@@ -18172,7 +18285,20 @@ const schoolsList = [
         "notes": null,
         "rating": "outstanding",
         "ratingDate": "2025-05-07",
-        "ofstedLatest": {"date": "2025-05-07", "summary": "No overall grade (new rules). Outstanding in all five areas"},
+        "ofsted": {
+            "urn": 139725,
+            "latest": {
+                "type": "keyJudgements",
+                "date": "2025-05-07",
+                "areas": {
+                    "Quality of education": "outstanding",
+                    "Behaviour and attitudes": "outstanding",
+                    "Personal development": "outstanding",
+                    "Leadership and management": "outstanding",
+                    "Sixth form provision": "outstanding"
+                }
+            }
+        },
         "centre": {
             "lat": 51.537516,
             "lng": -0.349544

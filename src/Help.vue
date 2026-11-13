@@ -1,132 +1,202 @@
 <template>
-  <v-card class="rounded-xl overflow-hidden">
-    <!-- Header -->
-    <v-toolbar color="primary" density="comfortable">
-      <v-toolbar-title class="text-h6 font-weight-bold pl-4">
-        <v-icon start icon="mdi-help-circle-outline" class="mr-2"></v-icon>
-        About & Help
-      </v-toolbar-title>
-      <v-btn icon="mdi-close" variant="text" @click="$parent.isActive.value = false"></v-btn>
-    </v-toolbar>
+  <v-card rounded="xl" class="help">
+    <header class="help-head">
+      <h2>About this data</h2>
+      <v-btn icon="mdi-close" variant="text" aria-label="Close" @click="$emit('close')"/>
+    </header>
 
-    <v-card-text class="pa-0">
-      <v-container class="pa-6">
-        
-        <!-- Data Sources Section -->
-        <div class="mb-8">
-          <h3 class="text-h6 font-weight-bold mb-3 text-primary">Data Sources</h3>
-          <p class="text-body-2 text-medium-emphasis mb-4">
-            All intake information is based on official data from the following documents:
-          </p>
-          <v-card variant="outlined" class="rounded-lg border-opacity-50">
-            <v-list density="compact" lines="one" class="bg-transparent py-0">
-              <v-list-item href="/Documents/High_school_on_time_offers_2025.pdf" target="_blank" prepend-icon="mdi-file-pdf-box" color="primary">
-                <v-list-item-title class="text-body-2 font-weight-medium">High school on time offers 2025 ('24 data)</v-list-item-title>
-              </v-list-item>
-              <v-divider></v-divider>
-              <v-list-item href="/Documents/Starting_High_School_2025.pdf" target="_blank" prepend-icon="mdi-file-pdf-box" color="primary">
-                <v-list-item-title class="text-body-2 font-weight-medium">Starting High School 2025 ('24 data)</v-list-item-title>
-              </v-list-item>
-              <v-divider></v-divider>
-              <v-list-item href="/Documents/Starting_High_School_2024.pdf" target="_blank" prepend-icon="mdi-file-pdf-box" color="primary">
-                <v-list-item-title class="text-body-2 font-weight-medium">Starting High School 2024 ('23 data)</v-list-item-title>
-              </v-list-item>
-              <v-divider></v-divider>
-              <v-list-item href="/Documents/Starting_High_School_2023.pdf" target="_blank" prepend-icon="mdi-file-pdf-box" color="primary">
-                <v-list-item-title class="text-body-2 font-weight-medium">Starting High School 2023 ('22 data)</v-list-item-title>
-              </v-list-item>
-              <v-divider></v-divider>
-              <v-list-item href="/Documents/Starting_High_School_2022.pdf" target="_blank" prepend-icon="mdi-file-pdf-box" color="primary">
-                <v-list-item-title class="text-body-2 font-weight-medium">Starting High School 2022 ('21 data)</v-list-item-title>
-              </v-list-item>
-               <v-divider></v-divider>
-              <v-list-item href="/Documents/Starting_High_School_2021.pdf" target="_blank" prepend-icon="mdi-file-pdf-box" color="primary">
-                <v-list-item-title class="text-body-2 font-weight-medium">Starting High School 2021 ('20 data)</v-list-item-title>
-              </v-list-item>
-               <v-divider></v-divider>
-              <v-list-item href="/Documents/Starting_High_School_2020.pdf" target="_blank" prepend-icon="mdi-file-pdf-box" color="primary">
-                <v-list-item-title class="text-body-2 font-weight-medium">Starting High School 2020 ('19 data)</v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-card>
-        </div>
+    <v-card-text class="help-body">
+      <section>
+        <h3>What the map shows</h3>
+        <p>
+          Each shaded area shows how far from the school the last child offered a place on distance lived,
+          on national offer day for the year you pick. If you lived inside it that year, distance alone would
+          have got you a place. Children in higher priority groups, such as looked-after children and siblings,
+          are offered places first, so the cut-off moves from year to year.
+        </p>
+        <ul>
+          <li><strong>Everyone offered:</strong> the school had room for every applicant, so there's no shaded area. A dashed green line links it to your home instead.</li>
+          <li><strong>Tightest, Widest, Average:</strong> the smallest, largest and average cut-off across 2019–2026.</li>
+          <li><strong>Faith and specialist places</strong> follow their own rules. Check the admissions policy linked from each school.</li>
+        </ul>
+      </section>
 
-        <!-- Understanding the Map -->
-        <div class="mb-8">
-          <h3 class="text-h6 font-weight-bold mb-3 text-primary">Understanding the Map</h3>
-          <v-alert color="info" variant="tonal" class="mb-4 text-body-2" border="start" density="comfortable">
-            <div class="font-weight-bold mb-1">Intake Areas</div>
-            The colored circles represent the distance of the last person offered a place on March 1st of that year.
-          </v-alert>
-          
-          <div class="d-flex align-start mb-3">
-             <v-icon color="success" class="mr-3 mt-1">mdi-check-circle-outline</v-icon>
-             <div class="text-body-2 text-medium-emphasis">
-               <strong>"All Accepted"</strong>: If all applicants were successful, no circle is shown. Instead, a <span class="text-success font-weight-bold">green dotted line</span> connects the school to your home address.
-             </div>
-          </div>
+      <section>
+        <h3>How distance is measured</h3>
+        <p>
+          Most Ealing schools measure in a straight line from your home to the school. Drayton Manor measures
+          walking distance along pavements, so its area follows the street network rather than a circle.
+        </p>
+        <p>
+          Walking distances are worked out in advance from OpenStreetMap data using GraphHopper, then looked up on your
+          device. They're estimates: the council uses its own address points and routes. Results near the line are
+          marked <em>too close to call</em>.
+        </p>
+      </section>
 
-          <div class="d-flex align-start">
-             <v-icon color="warning" class="mr-3 mt-1">mdi-alert-circle-outline</v-icon>
-             <div class="text-body-2 text-medium-emphasis">
-               <strong>Complex Criteria</strong>: Where entry criteria are more complex (e.g., faith schools), the icon may show "(See notes)" to indicate you should check the specific admissions policy.
-             </div>
-          </div>
-        </div>
+      <section>
+        <h3>Ofsted grades</h3>
+        <p>
+          Ofsted stopped giving schools one overall grade in September 2024. Since November 2025, inspections produce a
+          report card that grades each area separately, from <em>exceptional</em> to <em>urgent improvement</em>. For
+          older inspections we show the overall grade and its date. For report cards we summarise the area grades
+          and list them on the school's page.
+        </p>
+      </section>
 
-        <!-- How to Use -->
-        <div>
-          <h3 class="text-h6 font-weight-bold mb-3 text-primary">How to Use</h3>
-          <v-row dense>
-            <v-col cols="12" sm="4">
-              <v-card variant="flat" color="grey-lighten-4" class="pa-3 h-100">
-                <div class="d-flex flex-column align-center text-center">
-                  <v-icon color="primary" class="mb-2">mdi-map-search</v-icon>
-                  <div class="text-subtitle-2 font-weight-bold">Search</div>
-                  <div class="text-caption text-medium-emphasis mt-1">Enter your address in the top-left box to see your location relative to schools.</div>
-                </div>
-              </v-card>
-            </v-col>
-            <v-col cols="12" sm="4">
-              <v-card variant="flat" color="grey-lighten-4" class="pa-3 h-100">
-                <div class="d-flex flex-column align-center text-center">
-                  <v-icon color="primary" class="mb-2">mdi-filter-variant</v-icon>
-                  <div class="text-subtitle-2 font-weight-bold">Filter</div>
-                  <div class="text-caption text-medium-emphasis mt-1">Click schools in the list to toggle their visibility on the map.</div>
-                </div>
-              </v-card>
-            </v-col>
-             <v-col cols="12" sm="4">
-              <v-card variant="flat" color="grey-lighten-4" class="pa-3 h-100">
-                <div class="d-flex flex-column align-center text-center">
-                  <v-icon color="primary" class="mb-2">mdi-table</v-icon>
-                  <div class="text-subtitle-2 font-weight-bold">Compare</div>
-                  <div class="text-caption text-medium-emphasis mt-1">Use the table icon in the top right to see data for all schools at once.</div>
-                </div>
-              </v-card>
-            </v-col>
-          </v-row>
-        </div>
+      <section>
+        <h3>Sources</h3>
+        <ul class="sources">
+          <li v-for="doc in documents" :key="doc.href">
+            <a :href="doc.href" target="_blank" rel="noopener">
+              <v-icon size="18">mdi-file-pdf-box</v-icon>{{ doc.title }}
+            </a>
+          </li>
+        </ul>
+        <p class="small">
+          Exam results from the Department for Education. Ofsted grades from reports.ofsted.gov.uk.
+          Walking routes © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>,
+          calculated with <a href="https://www.graphhopper.com/" target="_blank" rel="noopener">GraphHopper</a>.
+        </p>
+      </section>
 
-      </v-container>
+      <section>
+        <h3>Privacy</h3>
+        <p>
+          Your address is saved only in this browser so it's there next time. Google sees what you type in the address
+          box to suggest matches. Nothing else is sent anywhere.
+        </p>
+      </section>
+
+      <p class="disclaimer">
+        Figures are approximate and for guidance only. Problems or corrections:
+        <a href="mailto:matt@roxburghm.com">matt@roxburghm.com</a>
+      </p>
     </v-card-text>
-
-    <v-divider></v-divider>
-
-    <!-- Footer -->
-    <v-card-actions class="bg-grey-lighten-5 pa-4 d-block">
-      <div class="text-caption text-medium-emphasis text-center mb-2">
-        <strong>Privacy:</strong> No data is intentionally collected. All processing happens locally on your device (except for Google Maps address lookup).
-      </div>
-      <div class="text-caption text-disabled font-italic text-center">
-        Use at your own risk - all data approximate. Contact matt@roxburghm.com for issues.
-      </div>
-    </v-card-actions>
   </v-card>
 </template>
 
 <script>
 export default {
-  name: 'Help'
+  name: 'Help',
+  emits: ['close'],
+  data() {
+    return {
+      documents: [
+        {title: 'High school on-time offers 2025', href: '/Documents/High_school_on_time_offers_2025.pdf'},
+        {title: 'Starting High School 2025 (2024 figures)', href: '/Documents/Starting_High_School_2025.pdf'},
+        {title: 'Starting High School 2024 (2023 figures)', href: '/Documents/Starting_High_School_2024.pdf'},
+        {title: 'Starting High School 2023 (2022 figures)', href: '/Documents/Starting_High_School_2023.pdf'},
+        {title: 'Starting High School 2022 (2021 figures)', href: '/Documents/Starting_High_School_2022.pdf'},
+        {title: 'Starting High School 2021 (2020 figures)', href: '/Documents/Starting_High_School_2021.pdf'},
+        {title: 'Starting High School 2020 (2019 figures)', href: '/Documents/Starting_High_School_2020.pdf'},
+      ],
+    }
+  },
 }
 </script>
+
+<style scoped>
+.help {
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+}
+
+.help-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 12px 8px 28px;
+}
+
+.help-head h2 {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.help-body {
+  padding: 4px 28px 28px !important;
+  font-size: 15px !important;
+  line-height: 1.6 !important;
+  color: rgba(var(--v-theme-on-surface), 0.82) !important;
+}
+
+section {
+  max-width: 68ch;
+}
+
+section + section {
+  margin-top: 28px;
+}
+
+h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: rgb(var(--v-theme-on-surface));
+  margin-bottom: 6px;
+}
+
+p + p {
+  margin-top: 10px;
+}
+
+ul {
+  margin-top: 10px;
+  padding-left: 20px;
+}
+
+li + li {
+  margin-top: 6px;
+}
+
+.sources {
+  list-style: none;
+  padding-left: 0;
+}
+
+.sources li + li {
+  margin-top: 2px;
+}
+
+a {
+  color: rgb(var(--v-theme-primary));
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.sources a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.small {
+  margin-top: 12px;
+  font-size: 13px;
+  color: rgba(var(--v-theme-on-surface), 0.65);
+}
+
+.disclaimer {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(var(--v-theme-on-surface), 0.08);
+  font-size: 13px;
+  color: rgba(var(--v-theme-on-surface), 0.65);
+}
+
+@media (max-width: 600px) {
+  .help-head {
+    padding-left: 16px;
+  }
+
+  .help-body {
+    padding: 4px 16px 24px !important;
+  }
+}
+</style>

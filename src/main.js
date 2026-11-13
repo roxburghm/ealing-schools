@@ -1,7 +1,6 @@
 import {createApp} from 'vue'
 import App from './App.vue'
 import vuetify from './plugins/vuetify'
-import {loadFonts} from './plugins/webfontloader'
 import {createStore} from "vuex";
 
 const store = createStore({
@@ -14,8 +13,6 @@ const store = createStore({
         }
     }
 });
-
-loadFonts()
 
 createApp(App)
     .use(vuetify)

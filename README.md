@@ -61,8 +61,22 @@ yarn lint
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
-### Getting isodistances
+### Walking distances
 
-used `https://api.geoapify.com/v1/isoline?lat=51.515894&lon=%20-0.335856&type=distance&mode=walk&range=2307&apiKey=28c4...2482`
+Schools with `"measure": "walk"` in `src/plugins/schools.js` are judged on walking distance rather than a straight line.
+Their walking data is built from GraphHopper isochrones and saved to `public/data/walk/`, so a visitor's address never
+leaves their browser.
 
+```
+GRAPHHOPPER_API_KEY=... node scripts/walking-bands.mjs            # only files whose inputs changed
+GRAPHHOPPER_API_KEY=... node scripts/walking-bands.mjs --dry-run  # show what would be fetched
+```
 
+The `Walking distance data` GitHub workflow runs this when the school data changes and opens a pull request with the
+result. It needs a `GRAPHHOPPER_API_KEY` repository secret, and "Allow GitHub Actions to create pull requests" enabled.
+
+### Ofsted
+
+`rating` / `ratingDate` hold the last overall grade. Newer inspections go in `ofsted.latest`:
+`{type: "reportCard", date, safeguarding, areas: {...}}`, `{type: "keyJudgements", date, areas: {...}}` or
+`{type: "ungraded", date, outcome: "maintained" | "improving"}`.
