@@ -1,20 +1,26 @@
 <template>
   <div class="home-picker" :class="{'home-picker--compact': compact}">
-    <div v-if="!compact" class="home-picker__top">
-      <label for="home-search" class="home-picker__label">Where do you live?</label>
-      <button v-if="hasHome" type="button" class="home-picker__clear" @click="clear">Clear</button>
-    </div>
+    <label v-if="!compact" for="home-search" class="home-picker__label">Where do you live?</label>
 
-    <!-- Compact (phones): once a home is set, show it as a chip until someone wants to change it -->
-    <button v-if="compact && hasHome && !editing" type="button" class="home-chip" @click="startEditing">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/>
-        <circle cx="12" cy="9" r="2.5"/>
-      </svg>
-      <span class="home-chip__name">{{ homeName }}</span>
-      <span class="home-chip__action">Change</span>
-    </button>
+    <!-- Once a home is set, show it as a chip: change it, or remove it with the × -->
+    <div v-if="hasHome && !editing" class="home-chip">
+      <button type="button" class="home-chip__main" :aria-label="`Change address: ${homeName}`" @click="startEditing">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/>
+          <circle cx="12" cy="9" r="2.5"/>
+        </svg>
+        <span class="home-chip__name">{{ homeName }}</span>
+        <span class="home-chip__action">Change</span>
+      </button>
+      <button type="button" class="home-chip__remove" aria-label="Remove address" v-tooltip:bottom="'Remove address'"
+              @click="clear">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"
+             stroke-linecap="round" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18"/>
+        </svg>
+      </button>
+    </div>
 
     <div v-else class="home-picker__field">
       <svg class="home-picker__pin" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -38,9 +44,8 @@
       </button>
     </div>
 
-    <div v-if="compact && editing" class="home-picker__actions">
-      <button type="button" class="home-picker__clear" @click="clear">Remove address</button>
-      <button type="button" class="home-picker__clear" @click="editing = false">Cancel</button>
+    <div v-if="hasHome && editing" class="home-picker__actions">
+      <button type="button" class="home-picker__clear" @click="editing = false">Keep {{ homeName }}</button>
     </div>
 
     <p v-if="error" class="home-picker__error" role="alert">{{ error }}</p>
@@ -70,11 +75,17 @@ export default {
       editing: false,
     };
   },
+  computed: {
+    // The search box is rebuilt each time it appears (no home yet, or Change).
+    searchShown() {
+      return this.mapsReady && (!this.hasHome || this.editing);
+    },
+  },
   watch: {
-    mapsReady: {
+    searchShown: {
       immediate: true,
-      handler(ready) {
-        if (ready) this.$nextTick(this.biasToArea);
+      handler(shown) {
+        if (shown) this.$nextTick(this.biasToArea);
       },
     },
   },
@@ -87,13 +98,10 @@ export default {
     },
     startEditing() {
       this.editing = true;
-      this.$nextTick(() => {
-        this.biasToArea();
-        this.$refs.search?.focus();
-      });
+      this.$nextTick(() => this.$refs.search?.focus());
     },
     onKeyup(event) {
-      if (event.key === 'Escape' && this.compact && this.hasHome) this.editing = false;
+      if (event.key === 'Escape' && this.hasHome) this.editing = false;
     },
     noResult() {
       this.error = 'Pick an address from the suggestions list.';
@@ -135,7 +143,6 @@ export default {
 /* not scoped: the autocomplete component renders its own <input> */
 .home-picker { display: flex; flex-direction: column; gap: 10px; }
 .home-picker--compact { gap: 6px; }
-.home-picker__top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .home-picker__clear {
   min-height: 32px; padding: 0 8px; border: 0; border-radius: 8px;
   background: transparent; color: var(--accent); font: 600 13px var(--font); cursor: pointer;
@@ -167,27 +174,50 @@ export default {
 }
 .home-picker__locate:hover { background: #F0F2F5; }
 .home-picker__locate:disabled { opacity: .5; cursor: progress; }
-.home-picker__actions { display: flex; justify-content: space-between; }
+.home-picker__actions { display: flex; justify-content: flex-end; }
 .home-picker__error { margin: 0; font-size: 13px; color: #8A3A00; }
 
 .home-chip {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  min-height: 44px;
-  padding: 0 12px;
+  align-items: stretch;
+  min-height: 48px;
   border: 1px solid #D5D9E0;
   border-radius: 12px;
   background: #fff;
+  box-shadow: 0 1px 2px rgba(22, 24, 29, .04);
+  overflow: hidden;
+}
+.home-chip__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px 0 14px;
+  border: 0;
+  background: transparent;
   color: var(--ink);
   font: 500 15px var(--font);
   text-align: left;
   cursor: pointer;
 }
-.home-chip svg { flex: none; color: var(--home); }
+.home-chip__main:hover { background: #F7F8FA; }
+.home-chip__main svg { flex: none; color: var(--home); }
 .home-chip__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .home-chip__action { flex: none; font-size: 13px; font-weight: 600; color: var(--accent); }
+.home-chip__remove {
+  flex: none;
+  width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-left: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.home-chip__remove:hover { background: #FDECEC; color: #8B1C1C; }
 
 .pac-container { z-index: 3000; font-family: var(--font); border-radius: 0 0 10px 10px; box-shadow: 0 6px 16px rgba(0, 0, 0, .12); border-top: none; }
 .pac-item { padding: 8px; cursor: pointer; }

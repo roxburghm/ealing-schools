@@ -333,9 +333,12 @@ export default {
       return map;
     },
     rankedRows() {
-      return this.schools
+      const rows = this.schools
           .filter(s => this.matchesName(s))
-          .map(s => ({school: s, a: this.assessments.get(s)}))
+          .map(s => ({school: s, a: this.assessments.get(s)}));
+      // No address, nothing to rank by: plain A–Z.
+      if (!this.home) return rows.sort((x, y) => x.school.shortName.localeCompare(y.school.shortName));
+      return rows
           .sort((x, y) =>
               (KIND_ORDER.indexOf(x.a.kind) - KIND_ORDER.indexOf(y.a.kind)) ||
               (y.a.score - x.a.score) ||
