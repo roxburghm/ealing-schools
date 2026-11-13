@@ -24,15 +24,7 @@
       </button>
     </div>
     <p v-if="error" class="home-picker__error" role="alert">{{ error }}</p>
-    <div class="home-picker__presets">
-      <span>Near</span>
-      <button v-for="p in presets" :key="p.name" type="button"
-              :class="['preset', {'preset--on': homeName === p.name}]" :aria-pressed="homeName === p.name"
-              @click="$emit('set-home', {lat: p.lat, lng: p.lng}, p.name)">
-        {{ p.name }}
-      </button>
-      <span>or click the map</span>
-    </div>
+    <p class="home-picker__hint">Or click the map to put your home there.</p>
   </div>
 </template>
 
@@ -54,15 +46,6 @@ export default {
     return {
       locating: false,
       error: '',
-      presets: [
-        {name: 'Ealing Broadway', lat: 51.5150, lng: -0.3017},
-        {name: 'West Ealing', lat: 51.5130, lng: -0.3200},
-        {name: 'Hanwell', lat: 51.5096, lng: -0.3384},
-        {name: 'Acton', lat: 51.5070, lng: -0.2731},
-        {name: 'Greenford', lat: 51.5423, lng: -0.3456},
-        {name: 'Northolt', lat: 51.5480, lng: -0.3680},
-        {name: 'Southall', lat: 51.5054, lng: -0.3780},
-      ],
     };
   },
   watch: {
@@ -148,16 +131,7 @@ export default {
 .home-picker__locate:hover { background: #F0F2F5; }
 .home-picker__locate:disabled { opacity: .5; cursor: progress; }
 .home-picker__error { margin: 0; font-size: 13px; color: #8A3A00; }
-.home-picker__presets { display: flex; flex-wrap: wrap; align-items: center; column-gap: 2px; font-size: 13px; color: var(--ink-3); }
-.home-picker__presets > span:first-child { margin-right: 4px; }
-.home-picker__presets > span:last-child { margin-left: 4px; }
-.preset {
-  min-height: 36px; padding: 0 6px;
-  border: 0; background: transparent; cursor: pointer;
-  font: 500 13px var(--font); color: var(--ink-2);
-  text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 4px;
-}
-.preset--on { color: var(--accent); font-weight: 700; text-decoration-color: var(--accent); text-decoration-thickness: 2px; }
+.home-picker__hint { margin: 0; font-size: 13px; color: var(--ink-3); }
 
 .pac-container { z-index: 2000; font-family: var(--font); border-radius: 0 0 10px 10px; box-shadow: 0 6px 16px rgba(0, 0, 0, .12); border-top: none; }
 .pac-item { padding: 8px; cursor: pointer; }

@@ -24,7 +24,7 @@
         </button>
       </li>
     </ol>
-    <p v-if="!rows.length" class="empty">No schools match this filter.</p>
+    <p v-if="!rows.length" class="empty">No school names match that.</p>
   </div>
 </template>
 

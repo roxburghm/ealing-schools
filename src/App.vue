@@ -19,9 +19,14 @@
 
         <div class="list-head o-listhead">
           <h2>{{ home ? `Your chances from ${homeName}` : 'Schools' }}</h2>
-          <label class="check">
-            <input type="checkbox" v-model="onlyOutstanding">
-            Outstanding only
+          <label class="name-filter">
+            <span class="visually-hidden">Filter schools by name</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="7"/>
+              <path d="M20 20l-3.5-3.5"/>
+            </svg>
+            <input type="search" v-model="nameFilter" placeholder="Filter by name" autocomplete="off">
           </label>
         </div>
 
@@ -113,7 +118,7 @@ export default {
       schools,
       year: YEARS[YEARS.length - 1],
       selected: null,
-      onlyOutstanding: false,
+      nameFilter: '',
       homeName: readStored('homeName') || readStored('home')?.label || 'your home',
       showHelp: false,
       showTable: false,
@@ -147,6 +152,10 @@ export default {
       } catch (e) {
         // storage unavailable – keep the in-memory value
       }
+    },
+    matchesName(school) {
+      const query = this.nameFilter.trim().toLowerCase();
+      return !query || school.name.toLowerCase().includes(query) || school.shortName.toLowerCase().includes(query);
     },
     clearHome() {
       this.home = null;
@@ -189,7 +198,7 @@ export default {
     },
     rankedRows() {
       return this.schools
-          .filter(s => !this.onlyOutstanding || s.rating === 'outstanding')
+          .filter(s => this.matchesName(s))
           .map(s => ({school: s, a: this.assessments.get(s)}))
           .sort((x, y) =>
               (KIND_ORDER.indexOf(x.a.kind) - KIND_ORDER.indexOf(y.a.kind)) ||
@@ -311,8 +320,30 @@ export default {
 
 .list-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .list-head h2 { margin: 0; font-family: var(--font-display); font-size: 18px; font-weight: 600; }
-.check { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-2); min-height: 44px; cursor: pointer; }
-.check input { width: 18px; height: 18px; accent-color: var(--accent); }
+.name-filter {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 0 1 220px;
+  min-width: 160px;
+  color: var(--ink-3);
+}
+.name-filter svg { position: absolute; left: 12px; pointer-events: none; }
+.name-filter input {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px 0 34px;
+  border: 1px solid #D5D9E0;
+  border-radius: 10px;
+  background: #fff;
+  font: 14px var(--font);
+  color: var(--ink);
+}
+.name-filter input:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
 
 .fine-print { margin: 0; font-size: 12px; color: var(--ink-3); line-height: 1.5; }
 
