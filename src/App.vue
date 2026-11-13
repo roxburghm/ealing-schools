@@ -256,6 +256,12 @@ export default {
         // storage unavailable – keep the in-memory value
       }
     },
+    fetchWalks() {
+      if (!this.home) return;
+      const walkSchools = this.schools.filter(s => admission.measure(s) === 'walk');
+      walkSchools.forEach(walking.load);
+      if (this.mapsReady) walking.lookupWalks(walkSchools, this.home);
+    },
     matchesName(school) {
       const query = this.nameFilter.trim().toLowerCase();
       return !query || school.name.toLowerCase().includes(query) || school.shortName.toLowerCase().includes(query);
@@ -385,12 +391,16 @@ export default {
     },
   },
   watch: {
-    // Walking bands are only needed once there's a home to measure from.
+    // Walking data is only needed once there's a home to measure from: the
+    // walk itself from Google (once its script has loaded), outlines from CI.
     home: {
       immediate: true,
-      handler(home) {
-        if (home) this.schools.filter(s => admission.measure(s) === 'walk').forEach(walking.load);
+      handler() {
+        this.fetchWalks();
       }
+    },
+    mapsReady() {
+      this.fetchWalks();
     },
     rankedRows(rows) {
       if (!this.selected && rows.length) this.selected = rows[0].school;

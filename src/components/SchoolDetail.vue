@@ -131,7 +131,11 @@ export default {
       if (s.margin === null || s.lowerBound) {
         return `In ${this.year} your home was ${s.kind === 'in' ? 'inside' : 'outside'} the ${m(s.cutoff)} cut-off.`;
       }
-      return `In ${this.year} your home was ${m(Math.abs(s.margin))} ${s.margin >= 0 ? 'inside' : 'outside'} the ${m(s.cutoff)} cut-off.`;
+      const side = `${m(Math.abs(s.margin))} ${s.margin >= 0 ? 'inside' : 'outside'}`;
+      if (s.measure === 'walk') {
+        return `In ${this.year} your ${m(s.homeMiles)} walk was ${side} the ${m(s.cutoff)} walking cut-off.`;
+      }
+      return `In ${this.year} your home was ${side} the ${m(s.cutoff)} cut-off.`;
     },
     p8() {
       const v = this.school.progress8;

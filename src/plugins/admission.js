@@ -36,6 +36,9 @@ export function status(school, year, home) {
     const walk = walking.estimate(school, home);
     const exact = walking.insideCutoff(school, year, home);
 
+    // An exact walk from Google: compare it directly. A near miss stays "too
+    // close to call" because the council's own route may differ.
+    if (walk?.routed) return classify(cutoff, walk, how, straight);
     if (exact !== null && walk) {
         const result = classify(cutoff, walk, how, straight);
         if (result.kind === 'close') result.kind = exact ? 'in' : 'out';

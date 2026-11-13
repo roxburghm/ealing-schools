@@ -22,6 +22,7 @@ function distance(school, home) {
     const straight = DistanceUtils.getDistanceInMiles(home, school.centre);
     if (admission.measure(school) !== 'walk') return {dist: straight, label: `${formatMiles(straight)} away`};
     const walk = walking.estimate(school, home);
+    if (walk?.routed) return {dist: walk.low, label: `${formatMiles(walk.low)} walk`};
     if (walk && !walk.beyond) {
         const mid = (walk.low + walk.high) / 2;
         return {dist: mid, label: `~${formatMiles(mid)} walk`};
