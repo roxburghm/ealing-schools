@@ -17983,7 +17983,7 @@ const schoolsList = [
         "website": "https://www.featherstonehigh.ealing.sch.uk",
         "colour": "#1e1344",
         "email": "info@featherstonehigh.ealing.sch.uk",
-        "address": " - <br/>11 -  Montague Waye<br/>Southall<br/>UB2 5HF",
+        "address": "11 Montague Waye<br/>Southall<br/>UB2 5HF",
         "phone": "020 8843 0984",
         "perf": "https://www.compare-school-performance.service.gov.uk/school/137729",
         "schoolId": 2666,

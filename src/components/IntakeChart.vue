@@ -29,7 +29,7 @@
               :y="bar.kind === 'value' ? y(bar.value) - 6 : (bar.kind === 'all' ? pad.top - 6 : y(0) - 6)"
               text-anchor="middle" class="value">{{ bar.short }}</text>
         <text :x="x(i) + barWidth / 2" :y="height - 8" text-anchor="middle"
-              class="year" :class="{ current: bar.year === selected }">{{ bar.year }}</text>
+              class="year" :class="{ current: bar.year === selected }">{{ narrow ? `’${bar.year.slice(2)}` : bar.year }}</text>
       </template>
     </g>
 
@@ -238,11 +238,12 @@ export default {
 }
 
 .home-band {
-  fill: rgba(var(--v-theme-primary), 0.1);
+  fill: var(--home, rgb(var(--v-theme-primary)));
+  fill-opacity: 0.12;
 }
 
 .home-line {
-  stroke: rgb(var(--v-theme-primary));
+  stroke: var(--home, rgb(var(--v-theme-primary)));
   stroke-width: 2;
   stroke-dasharray: 6 4;
 }
@@ -253,7 +254,7 @@ export default {
 }
 
 .home-pill {
-  fill: rgb(var(--v-theme-primary));
+  fill: var(--home-dark, var(--home, rgb(var(--v-theme-primary))));
 }
 
 .home-text {

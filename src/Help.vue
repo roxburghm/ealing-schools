@@ -9,16 +9,25 @@
       <section>
         <h3>What the map shows</h3>
         <p>
-          Each shaded area shows how far from the school the last child offered a place on distance lived,
+          Each ring shows how far from the school the last child offered a place on distance lived,
           on national offer day for the year you pick. If you lived inside it that year, distance alone would
           have got you a place. Children in higher priority groups, such as looked-after children and siblings,
           are offered places first, so the cut-off moves from year to year.
         </p>
         <ul>
-          <li><strong>Everyone offered:</strong> the school had room for every applicant, so there's no shaded area. A dashed green line links it to your home instead.</li>
-          <li><strong>Tightest, Widest, Average:</strong> the smallest, largest and average cut-off across 2019–2026.</li>
-          <li><strong>Faith and specialist places</strong> follow their own rules. Check the admissions policy linked from each school.</li>
+          <li><strong>All offered:</strong> the school had room for every applicant that year, so there's no ring.</li>
+          <li><strong>Faith and specialist places</strong> follow their own rules. Check the admission rules linked from each school.</li>
         </ul>
+      </section>
+
+      <section>
+        <h3>Your chances</h3>
+        <p>
+          Each school is ranked by how many of the years since 2019 your home fell inside its cut-off.
+          <em>Very likely</em> means every year, <em>Possible</em> at least half, <em>Unlikely</em> fewer than half,
+          and <em>Outside</em> none. Years when everyone got a place count as inside, and years too close to call
+          count as half. Past cut-offs are a guide, not a promise.
+        </p>
       </section>
 
       <section>
@@ -40,7 +49,7 @@
           Ofsted stopped giving schools one overall grade in September 2024. Since November 2025, inspections produce a
           report card that grades each area separately, from <em>exceptional</em> to <em>urgent improvement</em>. For
           older inspections we show the overall grade and its date. For report cards we summarise the area grades
-          and list them on the school's page.
+          and list them in the school's details.
         </p>
       </section>
 
