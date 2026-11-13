@@ -267,7 +267,12 @@ export default {
       else this.selectSchool(school);
     },
     // Desktop: show the school in the right-hand pane and zoom the map to it.
+    // Picking the zoomed-in school again works like "Show all schools".
     selectSchool(school) {
+      if (this.focused && this.focused.name === school.name) {
+        this.focused = null;
+        return;
+      }
       this.selected = school;
       this.focused = school;
       this.$nextTick(() => {
