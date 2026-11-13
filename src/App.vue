@@ -26,8 +26,8 @@
           <ranked-list :rows="rankedRows" :selected-name="focused && focused.name" :year="year"
                        @select="selectSchool"/>
 
-          <p class="fine-print">{{ finePrint }}</p>
-          <p class="fine-print">
+          <p class="fine-print list-note">{{ finePrint }}</p>
+          <p class="fine-print list-note">
             {{ sourceLine }} Questions or corrections: <a href="mailto:matt@roxburghm.com">matt@roxburghm.com</a>
             <span v-if="buildDateTime"> · Build {{ buildDateTime }}</span>
           </p>
@@ -113,8 +113,8 @@
           <p class="m-list__lead">{{ home ? 'Best chances first, from your address.' : 'Add your address to rank schools by your chances.' }}</p>
           <name-filter v-model="nameFilter" id="name-filter-m"/>
           <ranked-list :rows="rankedRows" :selected-name="null" :year="year" @select="openSchool"/>
-          <p class="fine-print">{{ finePrint }}</p>
-          <p class="fine-print">
+          <p class="fine-print list-note">{{ finePrint }}</p>
+          <p class="fine-print list-note">
             {{ sourceLine }} Questions or corrections: <a href="mailto:matt@roxburghm.com">matt@roxburghm.com</a>
             <span v-if="buildDateTime"> · Build {{ buildDateTime }}</span>
           </p>
@@ -485,6 +485,9 @@ export default {
 }
 
 .fine-print { margin: 0; font-size: 12px; color: var(--ink-3); line-height: 1.5; }
+/* Notes under the school list line up with the school names in the cards:
+   2px border + 14px padding + 12px dot + 12px gap */
+.list-note { padding: 0 16px 0 40px; }
 
 .text-btn {
   min-height: 40px;
