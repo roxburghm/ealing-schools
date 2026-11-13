@@ -369,7 +369,8 @@ export default {
     finePrint() {
       return `Mini charts: each bar is the furthest distance offered in a year, ${YEARS[0]}–${YEARS[YEARS.length - 1]}. ` +
           'The orange line is your home. Pale full-height bars mean everyone who applied got a place. ' +
-          'Distances are straight-line unless noted. Check each school’s admission rules before you apply.';
+          'Distances are straight-line unless noted. All figures are estimates; Ealing Council’s admissions ' +
+          'decisions are final. Check each school’s admission rules before you apply.';
     },
     sourceLine() {
       return `Source: Ealing Council “Starting High School” booklets and on-time offer reports, ${YEARS[0]}–${YEARS[YEARS.length - 1]}. ` +

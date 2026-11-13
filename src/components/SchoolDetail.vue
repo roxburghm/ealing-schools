@@ -19,6 +19,13 @@
     <!-- Always present and a fixed height, so changing year doesn't move the content below -->
     <p :class="['detail__year', `detail__year--${status.kind}`]" aria-live="polite">{{ yearLine }}</p>
 
+    <p class="detail__estimate">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+      <span><strong>Estimates only.</strong> These figures are worked out from past offers and our own distance
+        measurements. Ealing Council’s admissions decisions are final.</span>
+    </p>
+
     <p v-if="school.notes" class="detail__note"><strong>Note:</strong> {{ school.notes }}</p>
 
     <div class="detail__body">
@@ -190,6 +197,16 @@ export default {
 .detail__year--out { color: #8B1C1C; }
 .detail__year--close { color: #8A3A00; }
 
+.detail__estimate {
+  display: flex;
+  gap: 8px;
+  margin: -6px 0 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink-3);
+}
+.detail__estimate svg { flex: none; margin-top: 1px; }
+.detail__estimate strong { color: var(--ink-2); }
 .detail__note { margin: 0; padding: 10px 12px; background: #FFF4E5; border-radius: 10px; font-size: 13px; color: #6B3A00; }
 
 .detail__body { display: flex; flex-wrap: wrap; gap: 24px; }

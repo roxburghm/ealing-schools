@@ -79,7 +79,8 @@
       </section>
 
       <p class="disclaimer">
-        Figures are approximate and for guidance only. Problems or corrections:
+        Every figure here is an estimate, for guidance only. Ealing Council’s admissions decisions are final.
+        Problems or corrections:
         <a href="mailto:matt@roxburghm.com">matt@roxburghm.com</a>
       </p>
     </v-card-text>
