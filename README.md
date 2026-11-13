@@ -65,16 +65,20 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 
 Schools with `"measure": "walk"` in `src/plugins/schools.js` are judged on walking distance rather than a straight line.
 The walk from a visitor's home is looked up with Google Maps walking directions (Distance Matrix, using the same Maps
-key) when they set an address. The walking *areas* drawn on the map are built from GraphHopper isochrones and saved to
-`public/data/walk/`; until those exist the hand-drawn `intakePath` outlines are used.
+key) when they set an address. The walking *areas* drawn on the map are OpenStreetMap walking isochrones from the
+public Valhalla server run by FOSSGIS (no key needed), saved to `public/data/walk/`.
 
 ```
-GRAPHHOPPER_API_KEY=... node scripts/walking-bands.mjs            # only files whose inputs changed
-GRAPHHOPPER_API_KEY=... node scripts/walking-bands.mjs --dry-run  # show what would be fetched
+node scripts/walking-bands.mjs                    # only files whose inputs changed
+node scripts/walking-bands.mjs --force            # rebuild everything
+node scripts/walking-bands.mjs --dry-run          # show what would be fetched
+GRAPHHOPPER_API_KEY=... node scripts/walking-bands.mjs --provider graphhopper
 ```
+
+GraphHopper works too, but only on a plan that includes its Isochrone API; the free plan doesn't.
 
 The `Walking distance data` GitHub workflow runs this when the school data changes and opens a pull request with the
-result. It needs a `GRAPHHOPPER_API_KEY` repository secret, and "Allow GitHub Actions to create pull requests" enabled.
+result. It needs "Allow GitHub Actions to create pull requests" enabled.
 
 ### Ofsted
 

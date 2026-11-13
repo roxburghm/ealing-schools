@@ -1,9 +1,13 @@
 #!/usr/bin/env node
-// Builds walking-distance data for schools that measure walking distance,
-// using GraphHopper's Isochrone API. Output goes to public/data/walk/<school>.json
+// Builds walking-distance data for schools that measure walking distance, from
+// OpenStreetMap walking isochrones. Output goes to public/data/walk/<school>.json
 // and is read by src/plugins/walking.js, so the visitor's address is never sent anywhere.
 //
-//   GRAPHHOPPER_API_KEY=... node scripts/walking-bands.mjs [--force] [--all] [--school "Drayton Manor"] [--step 100] [--dry-run]
+//   node scripts/walking-bands.mjs [--force] [--all] [--school "Drayton Manor"] [--step 100] [--dry-run]
+//
+// Isochrones come from the public Valhalla server run by FOSSGIS (no key needed).
+// With GRAPHHOPPER_API_KEY set and --provider graphhopper they come from GraphHopper
+// instead, which needs a plan that includes its Isochrone API (the free plan doesn't).
 //
 // For each school it writes:
 //   bands   nested polygons every --step metres out to a little past the largest cut-off,
@@ -21,7 +25,9 @@ import {fileURLToPath, pathToFileURL} from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT_DIR = path.join(ROOT, 'public/data/walk');
-const API = 'https://graphhopper.com/api/1/isochrone';
+const GRAPHHOPPER_API = 'https://graphhopper.com/api/1/isochrone';
+const VALHALLA_API = 'https://valhalla1.openstreetmap.de/isochrone';
+const VALHALLA_MAX_CONTOURS = 4;
 const METRES_PER_MILE = 1609.344;
 const PAUSE_MS = 1500;
 
@@ -33,14 +39,22 @@ const option = (name, fallback) => {
 };
 
 const key = process.env.GRAPHHOPPER_API_KEY;
+const provider = option('provider', 'valhalla');
 const step = Number(option('step', 100));
 const only = option('school', null);
 const dryRun = flag('dry-run');
 
-if (!key && !dryRun) {
+if (!['valhalla', 'graphhopper'].includes(provider)) {
+    console.error(`Unknown provider "${provider}": use valhalla or graphhopper.`);
+    process.exit(1);
+}
+if (provider === 'graphhopper' && !key && !dryRun) {
     console.error('Set GRAPHHOPPER_API_KEY (or pass --dry-run to see what would be fetched).');
     process.exit(1);
 }
+const SOURCE = provider === 'graphhopper'
+    ? 'GraphHopper Isochrone API, foot profile, © OpenStreetMap contributors'
+    : 'Valhalla (FOSSGIS), pedestrian costing, © OpenStreetMap contributors';
 
 async function loadSchools() {
     // schools.js is an ES module inside a CommonJS package, so import a copy as .mjs.
@@ -76,7 +90,7 @@ function round(coordinates) {
 
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-async function isochrone(school, distanceLimit, buckets) {
+async function graphhopper(school, distanceLimit, buckets) {
     const params = new URLSearchParams({
         point: `${school.centre.lat},${school.centre.lng}`,
         profile: 'foot',
@@ -85,7 +99,7 @@ async function isochrone(school, distanceLimit, buckets) {
         reverse_flow: 'true',
         key,
     });
-    const response = await fetch(`${API}?${params}`);
+    const response = await fetch(`${GRAPHHOPPER_API}?${params}`);
     const credits = response.headers.get('x-ratelimit-credits');
     const remaining = response.headers.get('x-ratelimit-remaining');
     if (!response.ok) {
@@ -103,6 +117,72 @@ async function isochrone(school, distanceLimit, buckets) {
             }
             return round(feature.geometry.coordinates);
         });
+}
+
+// Valhalla gives at most four contours a request, so ask in groups. A contour can
+// come back as several pieces; keep the one around the school.
+async function valhalla(school, distances) {
+    const polygons = [];
+    for (let i = 0; i < distances.length; i += VALHALLA_MAX_CONTOURS) {
+        const group = distances.slice(i, i + VALHALLA_MAX_CONTOURS);
+        const response = await fetch(VALHALLA_API, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'User-Agent': 'ealing-schools walking-bands'},
+            body: JSON.stringify({
+                locations: [{lat: school.centre.lat, lon: school.centre.lng}],
+                costing: 'pedestrian',
+                contours: group.map(metres => ({distance: metres / 1000})),
+                polygons: true,
+                reverse: true,
+            }),
+        });
+        if (!response.ok) {
+            const body = await response.text();
+            throw new Error(`Valhalla ${response.status} for ${school.shortName} (${group.join(', ')} m): ${body.slice(0, 300)}`);
+        }
+        const json = await response.json();
+        if (json.features?.length !== group.length) {
+            throw new Error(`Valhalla gave ${json.features?.length ?? 0} contours for ${group.length} asked (${school.shortName})`);
+        }
+        // Contours come back rounded (0.7 km as 0.69), so match each to the nearest.
+        group.forEach(metres => {
+            const {geometry} = json.features.reduce((best, f) =>
+                Math.abs(f.properties.contour * 1000 - metres) < Math.abs(best.properties.contour * 1000 - metres) ? f : best);
+            polygons.push(round(mainPolygon(geometry, school.centre)));
+        });
+        console.log(`  ${group.join(', ')} m`);
+        await pause(PAUSE_MS);
+    }
+    return polygons;
+}
+
+function ringContains([lng, lat], ring) {
+    let inside = false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+        const [xi, yi] = ring[i];
+        const [xj, yj] = ring[j];
+        if ((yi > lat) !== (yj > lat) && lng < (xj - xi) * (lat - yi) / (yj - yi) + xi) inside = !inside;
+    }
+    return inside;
+}
+
+function mainPolygon(geometry, centre) {
+    if (geometry.type === 'Polygon') return geometry.coordinates;
+    if (geometry.type !== 'MultiPolygon') throw new Error(`Unexpected ${geometry.type}`);
+    const point = [centre.lng, centre.lat];
+    return geometry.coordinates.find(polygon => ringContains(point, polygon[0]))
+        || geometry.coordinates.reduce((a, b) => (b[0].length > a[0].length ? b : a));
+}
+
+// Polygons for each distance in metres, smallest first.
+async function isochrones(school, distances) {
+    if (provider === 'valhalla') return valhalla(school, distances);
+    // GraphHopper: evenly spaced buckets in one call, or one call per odd distance.
+    const evenly = distances.every((metres, i) => metres === (i + 1) * distances[0]);
+    if (evenly) return graphhopper(school, distances[distances.length - 1], distances.length);
+    const polygons = [];
+    for (const metres of distances) polygons.push((await graphhopper(school, metres, 1))[0]);
+    return polygons;
 }
 
 async function build(school) {
@@ -123,20 +203,19 @@ async function build(school) {
     console.log(`${school.shortName}: bands to ${limit} m in ${buckets} steps, ${Object.keys(metres).length} cut-off outlines`);
     if (dryRun) return;
 
-    const bandPolygons = await isochrone(school, limit, buckets);
-    const bands = bandPolygons.map((polygon, i) => ({metres: (i + 1) * step, polygon}));
+    const bandMetres = Array.from({length: buckets}, (_, i) => (i + 1) * step);
+    const bandPolygons = await isochrones(school, bandMetres);
+    const bands = bandPolygons.map((polygon, i) => ({metres: bandMetres[i], polygon}));
 
-    const outlines = {};
-    for (const [year, distance] of Object.entries(metres)) {
-        const [polygon] = await isochrone(school, distance, 1);
-        outlines[year] = {metres: distance, polygon};
-    }
+    const years = Object.keys(metres);
+    const outlinePolygons = await isochrones(school, years.map(year => metres[year]));
+    const outlines = Object.fromEntries(years.map((year, i) => [year, {metres: metres[year], polygon: outlinePolygons[i]}]));
 
     fs.mkdirSync(OUT_DIR, {recursive: true});
     fs.writeFileSync(file, JSON.stringify({
         school: school.name,
         generated: new Date().toISOString().slice(0, 10),
-        source: 'GraphHopper Isochrone API, foot profile, © OpenStreetMap contributors',
+        source: SOURCE,
         inputs,
         bands,
         cutoffs: outlines,
