@@ -49,7 +49,7 @@
       </section>
 
       <section class="col-map" aria-label="Map and school details">
-        <div class="card map-card o-map">
+        <div ref="mapCard" class="card map-card o-map">
           <div class="map-card__head">
             <div>
               <span class="eyebrow">Furthest distance offered for September</span>
@@ -57,7 +57,8 @@
             </div>
             <year-timeline v-model="year" :years="YEARS"/>
           </div>
-          <schools-map :schools="schools" :year="year" :home="home" :selected="selected"
+          <schools-map :schools="schools" :year="year" :home="home" :selected="selected" :focus="focused"
+                       @clear-focus="focused = null"
                        :api-promise="apiPromise" :maps-ready="mapsReady" :maps-failed="mapsFailed"
                        @select="s => selectSchool(s, true)" @set-home="p => setHome(p, 'your pin')"/>
           <div class="legend">
@@ -126,6 +127,8 @@ export default {
       schools,
       year: YEARS[YEARS.length - 1],
       selected: null,
+      // The school the map is zoomed to; only set when someone picks a school.
+      focused: null,
       nameFilter: '',
       homeName: readStored('homeName') || readStored('home')?.label || 'your home',
       showHelp: false,
@@ -185,11 +188,14 @@ export default {
     },
     selectSchool(school, fromMap) {
       this.selected = school;
-      // On narrow screens the detail panel sits above the list, so bring it into view
+      this.focused = school;
+      // On narrow screens the map sits above the list: bring it into view so the
+      // zoom is visible, with the school's details just below it.
       if (!fromMap && window.matchMedia('(max-width: 1019px)').matches) {
+        // An instant jump: smooth scrolling gets cancelled while the map animates its zoom.
         this.$nextTick(() => {
-          const el = this.$refs.detail && this.$refs.detail.$el;
-          if (el) el.scrollIntoView({behavior: 'smooth', block: 'start'});
+          const card = this.$refs.mapCard;
+          if (card) window.scrollTo({top: card.getBoundingClientRect().top + window.scrollY - 12});
         });
       }
     },
@@ -405,6 +411,7 @@ export default {
 @media (max-width: 1019px) {
   .app-main { flex-direction: column; gap: 16px; }
   .col-list, .col-map { display: contents; }
+  .o-picker, .o-map, .o-detail, .o-listhead, .o-list, .o-fine { min-width: 0; max-width: 100%; }
   .o-picker { order: 1; }
   .o-map { order: 2; }
   .o-detail { order: 3; scroll-margin-top: 12px; }
@@ -416,5 +423,7 @@ export default {
 
 @media (max-width: 600px) {
   .app-header, .app-main, .app-footer { padding-left: 16px; padding-right: 16px; }
+  .map-card { padding: 8px; }
+  .map-card__head { padding: 4px 4px 0; }
 }
 </style>

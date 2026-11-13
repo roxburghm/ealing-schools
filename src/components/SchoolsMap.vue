@@ -1,8 +1,8 @@
 <template>
   <div class="map-wrap">
-    <GoogleMap v-if="mapsReady" :api-promise="apiPromise" :center="center" :zoom="13" :styles="mapStyles"
+    <GoogleMap v-if="mapsReady" ref="gmap" :api-promise="apiPromise" :center="center" :zoom="13" :styles="mapStyles"
                :clickable-icons="false" :street-view-control="false" :map-type-control="false"
-               :fullscreen-control="true" class="map" @click="onMapClick">
+               :fullscreen-control="true" class="map" @click="onMapClick" @idle="onIdle">
       <Polygon v-for="r in rings" :key="'ring-' + r.key" :options="r.options"/>
 
       <CustomMarker v-for="pin in pins" :key="'pin-' + pin.school.name"
@@ -24,7 +24,14 @@
         </svg>
       </CustomMarker>
     </GoogleMap>
-    <div v-else class="map map--loading">{{ mapsFailed ? 'The map couldn’t load. You can still pick an area above to see your chances.' : 'Loading map…' }}</div>
+    <div v-else class="map map--loading">{{ mapsFailed ? 'The map couldn’t load. You can still enter your address above to see your chances.' : 'Loading map…' }}</div>
+    <button v-if="focus && mapsReady" type="button" class="show-all" @click="$emit('clear-focus')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>
+      </svg>
+      Show all schools
+    </button>
   </div>
 </template>
 
@@ -51,6 +58,8 @@ export default {
   name: 'SchoolsMap',
   components: {GoogleMap, CustomMarker, Polygon},
   props: {
+    // The school the map is zoomed to, or null for the whole area.
+    focus: {type: Object, default: null},
     schools: {type: Array, required: true},
     year: {type: String, required: true},
     home: {type: Object, default: null},
@@ -59,9 +68,10 @@ export default {
     mapsReady: {type: Boolean, default: false},
     mapsFailed: {type: Boolean, default: false},
   },
-  emits: ['select', 'set-home'],
+  emits: ['select', 'set-home', 'clear-focus'],
   data() {
     return {
+      fitted: false,
       center: {lat: 51.522, lng: -0.325},
       mapStyles: [
         {elementType: 'geometry', stylers: [{color: '#f5f5f5'}]},
@@ -85,10 +95,7 @@ export default {
           .filter(s => typeof s.intakeDist[this.year] === 'number' && s.intakeDist[this.year] > 0)
           .map(s => {
             const sel = this.isSelected(s);
-            const walk = walking.cutoffOutline(s, this.year) || (s.intakePath && s.intakePath[this.year]);
-            const path = walk
-                ? walk.map(([lng, lat]) => ({lat, lng}))
-                : circlePoints(s.centre, s.intakeDist[this.year]);
+            const path = this.catchmentPath(s);
             return {
               key: `${s.name}-${this.year}-${sel}`,
               options: {
@@ -116,7 +123,49 @@ export default {
       });
     },
   },
+  watch: {
+    focus() {
+      this.fitView();
+    },
+    year() {
+      if (this.focus) this.fitView();
+    },
+  },
   methods: {
+    catchmentPath(s) {
+      const walk = walking.cutoffOutline(s, this.year) || (s.intakePath && s.intakePath[this.year]);
+      return walk
+          ? walk.map(([lng, lat]) => ({lat, lng}))
+          : circlePoints(s.centre, s.intakeDist[this.year]);
+    },
+    onIdle() {
+      // First idle means the map exists: replace the fixed start view with a fit.
+      if (this.fitted) return;
+      this.fitted = true;
+      this.fitView();
+    },
+    // Zoom to the focused school's catchment (and home), or to every school.
+    fitView() {
+      const map = this.$refs.gmap?.map;
+      if (!map || !window.google) return;
+      const bounds = new window.google.maps.LatLngBounds();
+      const points = [];
+      if (this.focus) {
+        const cut = this.focus.intakeDist[this.year];
+        if (typeof cut === 'number' && cut > 0) points.push(...this.catchmentPath(this.focus));
+        else points.push(this.focus.centre);
+        if (this.home) points.push(this.home);
+      } else {
+        points.push(...this.schools.map(s => s.centre));
+      }
+      points.forEach(p => bounds.extend(p));
+      if (points.length === 1) {
+        map.panTo(points[0]);
+        map.setZoom(15);
+      } else {
+        map.fitBounds(bounds, 32);
+      }
+    },
     isSelected(s) {
       return !!this.selected && this.selected.name === s.name;
     },
@@ -169,4 +218,22 @@ export default {
 .pin--on .pin__dot { width: 18px; height: 18px; }
 .pin--on .pin__label { font-size: 13px; font-weight: 700; }
 .home-pin { display: block; pointer-events: none; }
+.show-all {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font: 600 13px var(--font);
+  box-shadow: 0 1px 2px rgba(22, 24, 29, .16), 0 4px 12px rgba(22, 24, 29, .12);
+  cursor: pointer;
+}
+.show-all:hover { background: var(--ground); }
 </style>

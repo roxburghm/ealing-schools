@@ -36,7 +36,7 @@ export default {
   display: grid;
   grid-template-columns: repeat(var(--n), minmax(0, 1fr));
   flex: 0 1 460px;
-  min-width: 300px;
+  min-width: 0;
 }
 .timeline__track, .timeline__fill {
   position: absolute;
@@ -82,4 +82,12 @@ export default {
 .timeline__label { font-size: 12px; font-weight: 500; color: var(--ink-3); }
 .timeline__label.is-on { font-weight: 700; color: var(--ink); }
 .timeline__step:hover .timeline__dot:not(.is-on) { border-color: var(--accent); }
+
+/* Phones: full width, and short year labels so eight fit */
+@media (max-width: 600px) {
+  .timeline { flex: 1 1 100%; }
+}
+@media (max-width: 380px) {
+  .timeline__label { font-size: 11px; letter-spacing: -0.01em; }
+}
 </style>
