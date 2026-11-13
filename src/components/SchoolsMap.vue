@@ -10,13 +10,11 @@
       <CustomMarker v-for="pin in pins" :key="'pin-' + pin.school.name"
                     :options="{position: pin.school.centre, anchorPoint: 'CENTER', zIndex: pin.selected ? 50 : 10}">
         <button type="button" class="pin" :class="{'pin--on': pin.selected, 'pin--open': pin.open}"
-                :aria-label="pin.open ? `${pin.school.name}: everyone who applied was offered a place` : pin.school.name"
+                :aria-label="`${pin.school.name}: ${pin.description}`"
                 @click.stop="$emit('select', pin.school)">
-          <span v-if="pin.open" class="pin__dot pin__dot--open">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"
-                 stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+          <span class="pin__dot" :style="{background: pin.colour, color: pin.ink}">
+            <school-icon :kind="pin.kind"/>
           </span>
-          <span v-else class="pin__dot" :style="{background: pin.colour}"></span>
           <span class="pin__label">
             {{ pin.school.shortName }}
             <!-- The tick says it at a glance; spell it out once the school is picked -->
@@ -46,6 +44,24 @@
 <script>
 import {CustomMarker, GoogleMap, Polygon} from 'vue3-google-map';
 import walking from '@/plugins/walking';
+import SchoolIcon from '@/components/SchoolIcon.vue';
+
+const PIN_DESCRIPTIONS = {
+  open: 'everyone who applied was offered a place',
+  walk: 'places offered by walking distance',
+  none: 'no places offered by distance',
+  distance: 'places offered by distance',
+};
+
+// Light school colours get a dark icon so it stays visible.
+function isLight(hex) {
+  const n = parseInt(hex.replace('#', ''), 16);
+  const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(c => {
+    const v = c / 255;
+    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.4;
+}
 
 const EARTH_RADIUS_M = 6371000;
 const METRES_PER_MILE = 1609.34;
@@ -68,7 +84,7 @@ function circlePoints(center, miles) {
 
 export default {
   name: 'SchoolsMap',
-  components: {GoogleMap, CustomMarker, Polygon},
+  components: {GoogleMap, CustomMarker, Polygon, SchoolIcon},
   props: {
     // The school the map is zoomed to, or null for the whole area.
     focus: {type: Object, default: null},
@@ -136,11 +152,18 @@ export default {
     pins() {
       return this.shown.map(s => {
         const cut = s.intakeDist[this.year];
+        let kind = 'distance';
+        if (cut === null) kind = 'open';
+        else if (cut === 0) kind = 'none';
+        else if (s.measure === 'walk') kind = 'walk';
         return {
           school: s,
+          kind,
+          description: PIN_DESCRIPTIONS[kind],
           selected: this.isSelected(s),
-          open: cut === null,
+          open: kind === 'open',
           colour: s.colour,
+          ink: isLight(s.colour) ? '#16181D' : '#fff',
         };
       });
     },
@@ -265,15 +288,17 @@ export default {
 }
 .pin__dot {
   position: absolute; left: 50%; top: 50%;
-  width: 12px; height: 12px;
+  width: 22px; height: 22px;
+  padding: 4px;
+  box-sizing: border-box;
   transform: translate(-50%, -50%);
   border-radius: 50%;
   border: 2px solid #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, .35);
-  transition: width .15s, height .15s;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .35);
+  transition: width .15s, height .15s, padding .15s;
 }
 .pin__label {
-  position: absolute; left: 50%; top: 32px;
+  position: absolute; left: 50%; top: 35px;
   transform: translateX(-50%);
   white-space: nowrap;
   font-size: 11px; font-weight: 600; color: var(--ink);
@@ -294,20 +319,8 @@ export default {
   text-shadow: none;
   box-shadow: 0 0 0 1px rgba(22, 101, 52, .25);
 }
-/* Everyone offered: no catchment to draw, so the marker carries it: a green tick badge */
-.pin__dot--open {
-  width: 22px; height: 22px;
-  display: flex; align-items: center; justify-content: center;
-  background: #16A34A;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, .35);
-}
-.pin__dot--open svg { width: 14px; height: 14px; }
-.pin--open .pin__label { top: 36px; }
-.pin--open.pin--on .pin__dot { width: 28px; height: 28px; }
-.pin--open.pin--on .pin__dot svg { width: 18px; height: 18px; }
-.pin--open.pin--on .pin__label { top: 40px; }
-.pin--on .pin__dot { width: 18px; height: 18px; }
-.pin--on .pin__label { font-size: 13px; font-weight: 700; }
+.pin--on .pin__dot { width: 30px; height: 30px; padding: 5px; }
+.pin--on .pin__label { top: 39px; font-size: 13px; font-weight: 700; }
 .home-pin { display: block; pointer-events: none; }
 .show-all {
   position: absolute;
