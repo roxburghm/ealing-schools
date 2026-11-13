@@ -43,6 +43,8 @@ import walking from '@/plugins/walking';
 
 const EARTH_RADIUS_M = 6371000;
 const METRES_PER_MILE = 1609.34;
+// The furthest out the all-schools view goes.
+const MIN_AREA_ZOOM = 12;
 
 function circlePoints(center, miles) {
   const radius = miles * METRES_PER_MILE;
@@ -158,7 +160,8 @@ export default {
     focus() {
       this.fitView();
     },
-    year() {
+    // No re-fit on year change: the zoomed view already covers every year.
+    home() {
       if (this.focus) this.fitView();
     },
     visible(now) {
@@ -166,11 +169,11 @@ export default {
     },
   },
   methods: {
-    catchmentPath(s) {
-      const walk = walking.cutoffOutline(s, this.year) || (s.intakePath && s.intakePath[this.year]);
+    catchmentPath(s, year = this.year) {
+      const walk = walking.cutoffOutline(s, year) || (s.intakePath && s.intakePath[year]);
       return walk
           ? walk.map(([lng, lat]) => ({lat, lng}))
-          : circlePoints(s.centre, s.intakeDist[this.year]);
+          : circlePoints(s.centre, s.intakeDist[year]);
     },
     onIdle() {
       // First idle means the map exists: replace the fixed start view with a fit.
@@ -178,16 +181,18 @@ export default {
       this.fitted = true;
       this.fitView();
     },
-    // Zoom to the focused school's catchment (and home), or to every school.
+    // Zoom to the focused school (every year's catchment, so moving through
+    // the years doesn't keep re-zooming) and home, or to every school.
     fitView() {
       const map = this.$refs.gmap?.map;
       if (!map || !window.google) return;
       const bounds = new window.google.maps.LatLngBounds();
       const points = [];
       if (this.focus) {
-        const cut = this.focus.intakeDist[this.year];
-        if (typeof cut === 'number' && cut > 0) points.push(...this.catchmentPath(this.focus));
-        else points.push(this.focus.centre);
+        points.push(this.focus.centre);
+        Object.entries(this.focus.intakeDist)
+            .filter(([year, cut]) => /^\d{4}$/.test(year) && typeof cut === 'number' && cut > 0)
+            .forEach(([year]) => points.push(...this.catchmentPath(this.focus, year)));
         if (this.home) points.push(this.home);
       } else {
         points.push(...this.schools.map(s => s.centre));
@@ -197,8 +202,18 @@ export default {
         map.panTo(points[0]);
         map.setZoom(15);
       } else {
-        // Extra room at the top for the home pin (it rises above its point) and the Show all button.
-        map.fitBounds(bounds, {top: 64, right: 32, bottom: 32, left: 32});
+        // Zoomed to a school: extra room at the top for the home pin (it rises
+        // above its point) and the Show all button.
+        map.fitBounds(bounds, this.focus ? {top: 64, right: 32, bottom: 32, left: 32} : 16);
+        if (!this.focus) {
+          // Whole-area view: on narrow screens fitting every school lands at a
+          // city-wide zoom. Stay at street-name scale, around home if we have one.
+          window.google.maps.event.addListenerOnce(map, 'bounds_changed', () => {
+            if (map.getZoom() >= MIN_AREA_ZOOM) return;
+            map.setZoom(MIN_AREA_ZOOM);
+            if (this.home) map.setCenter(this.home);
+          });
+        }
       }
     },
     isSelected(s) {
