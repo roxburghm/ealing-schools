@@ -16,7 +16,8 @@
       </div>
     </div>
 
-    <p v-if="yearLine" :class="['detail__year', `detail__year--${status.kind}`]">{{ yearLine }}</p>
+    <!-- Always present and a fixed height, so changing year doesn't move the content below -->
+    <p :class="['detail__year', `detail__year--${status.kind}`]" aria-live="polite">{{ yearLine }}</p>
 
     <p v-if="school.notes" class="detail__note"><strong>Note:</strong> {{ school.notes }}</p>
 
@@ -124,7 +125,7 @@ export default {
       if (s.kind === 'none') return `In ${this.year} no places were offered on distance.`;
       if (!this.home || s.kind === 'cutoff' || s.kind === 'unknown') return '';
       if (s.kind === 'pending') {
-        return `In ${this.year} the walking cut-off was ${m(s.cutoff)}. You're ${m(s.straight)} away in a straight line, so your walk is at least that; the exact walking distance isn't calculated yet.`;
+        return `In ${this.year} the walking cut-off was ${m(s.cutoff)}. Your walk is at least ${m(s.straight)} (the straight-line distance); the exact route isn't calculated yet.`;
       }
       if (s.kind === 'close') return `In ${this.year} your home was too close to the ${m(s.cutoff)} cut-off to call.`;
       if (s.margin === null || s.lowerBound) {
@@ -171,7 +172,16 @@ export default {
 .ofsted--warn { background: #FFF0E0; color: #8A3A00; }
 .ofsted--bad { background: #FDE8E8; color: #8B1C1C; }
 
-.detail__year { margin: 0; font-size: 14px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.detail__year {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 3em; /* two lines */
+  color: var(--ink-2);
+}
+@media (max-width: 600px) {
+  .detail__year { min-height: 4.5em; } /* three lines on phones */
+}
 .detail__year--in, .detail__year--all { color: #14532D; }
 .detail__year--out { color: #8B1C1C; }
 .detail__year--close { color: #8A3A00; }

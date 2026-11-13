@@ -36,9 +36,17 @@
         <section ref="rightPane" class="d-right" aria-label="Map and school details">
           <div class="card map-card">
             <div class="map-card__head">
-              <div>
+              <div class="map-card__titles">
                 <span class="map-card__label">Furthest distance offered for September</span>
                 <span class="big-year">{{ year }}</span>
+              </div>
+              <!-- The selected school's years at a glance, beside the year slider -->
+              <div v-if="selected" class="head-spark" :title="`${selected.shortName}: furthest distance offered each year`">
+                <mini-spark :school="selected" :year="year" :dist="assessments.get(selected).dist"
+                            :width="128" :height="32"/>
+                <span class="head-spark__name">
+                  <i :style="{background: selected.colour}"></i>{{ selected.shortName }}
+                </span>
               </div>
               <year-timeline v-model="year" :years="YEARS"/>
             </div>
@@ -168,6 +176,7 @@ import SchoolDetail from './components/SchoolDetail.vue';
 import SchoolTable from './components/SchoolTable.vue';
 import NameFilter from './components/NameFilter.vue';
 import MapLegend from './components/MapLegend.vue';
+import MiniSpark from './components/MiniSpark.vue';
 import Help from './Help.vue';
 
 // Below this width the two columns don't fit: switch to the List / Map tabs.
@@ -183,7 +192,7 @@ function readStored(key) {
 
 export default {
   name: 'App',
-  components: {SchoolsMap, HomePicker, RankedList, YearTimeline, SchoolDetail, SchoolTable, NameFilter, MapLegend, Help},
+  components: {SchoolsMap, HomePicker, RankedList, YearTimeline, SchoolDetail, SchoolTable, NameFilter, MapLegend, MiniSpark, Help},
   data() {
     return {
       YEARS,
@@ -542,6 +551,15 @@ export default {
   display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
   gap: 8px 24px; padding: 2px 6px 0;
 }
+.map-card__titles { flex: none; }
+.head-spark { flex: none; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.head-spark__name {
+  display: flex; align-items: center; gap: 5px;
+  max-width: 140px;
+  font-size: 11px; font-weight: 600; color: var(--ink-2);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.head-spark__name i { width: 8px; height: 8px; border-radius: 50%; flex: none; }
 .map-card__label { display: block; font-size: 12px; color: var(--ink-3); font-weight: 500; }
 .big-year { display: block; font-family: var(--font-display); font-size: 26px; font-weight: 700; line-height: 1.1; }
 
