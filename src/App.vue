@@ -23,7 +23,7 @@
             <name-filter v-model="nameFilter"/>
           </div>
 
-          <ranked-list :rows="rankedRows" :selected-name="selected && selected.name" :year="year"
+          <ranked-list :rows="rankedRows" :selected-name="focused && focused.name" :year="year"
                        @select="selectSchool"/>
 
           <p class="fine-print">{{ finePrint }}</p>
@@ -42,7 +42,7 @@
               </div>
               <year-timeline v-model="year" :years="YEARS"/>
             </div>
-            <schools-map :schools="schools" :year="year" :home="home" :selected="selected" :focus="focused"
+            <schools-map :schools="schools" :year="year" :home="home" :selected="focused" :focus="focused"
                          height="clamp(320px, 52vh, 640px)"
                          :api-promise="apiPromise" :maps-ready="mapsReady" :maps-failed="mapsFailed"
                          @clear-focus="focused = null"
@@ -112,7 +112,7 @@
           </p>
         </div>
         <div v-if="mapVisited" v-show="view === 'map'" class="m-map">
-          <schools-map :schools="schools" :year="year" :home="home" :selected="selected" :focus="focused"
+          <schools-map :schools="schools" :year="year" :home="home" :selected="focused" :focus="focused"
                        height="100%" :visible="view === 'map'"
                        :api-promise="apiPromise" :maps-ready="mapsReady" :maps-failed="mapsFailed"
                        @clear-focus="focused = null"
