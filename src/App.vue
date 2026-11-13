@@ -3,13 +3,26 @@
     <!-- Desktop: list on the left scrolls on its own; map pinned top right with the details scrolling under it -->
     <div v-if="!narrow" class="d-shell">
       <header class="app-header">
-        <div class="app-header__titles">
-          <h1>Ealing secondary schools</h1>
-          <p>How far away did each school stop offering places on distance? See where your home lands.</p>
+        <div class="brand">
+          <span class="brand__mark" aria-hidden="true"><school-icon kind="distance"/></span>
+          <div>
+            <h1>Ealing secondary school places</h1>
+            <p>How close did you need to live to get a place? Cut-off distances for every school, 2019–2026.</p>
+          </div>
         </div>
-        <nav class="app-header__links" aria-label="More">
-          <button type="button" class="text-btn" @click="showTable = true">All distances table</button>
-          <button type="button" class="text-btn" @click="showHelp = true">How this works</button>
+        <nav class="header-actions" aria-label="More">
+          <button type="button" class="header-btn" @click="showTable = true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 4v16"/>
+            </svg>
+            Compare schools
+          </button>
+          <button type="button" class="header-btn" @click="showHelp = true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+            How it works
+          </button>
         </nav>
       </header>
 
@@ -70,15 +83,16 @@
     <div v-else class="m-shell">
       <header class="m-bar">
         <div class="m-bar__top">
-          <h1>Ealing schools</h1>
-          <button type="button" class="icon-btn" aria-label="All distances table" @click="showTable = true">
+          <span class="brand__mark brand__mark--small" aria-hidden="true"><school-icon kind="distance"/></span>
+          <h1>Ealing school places</h1>
+          <button type="button" class="icon-btn" aria-label="Compare schools" @click="showTable = true">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <rect x="3" y="4" width="18" height="16" rx="2"/>
               <path d="M3 10h18M3 15h18M9 4v16"/>
             </svg>
           </button>
-          <button type="button" class="icon-btn" aria-label="How this works" @click="showHelp = true">
+          <button type="button" class="icon-btn" aria-label="How it works" @click="showHelp = true">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                  stroke-linecap="round" aria-hidden="true">
               <circle cx="12" cy="12" r="9"/>
@@ -177,6 +191,7 @@ import SchoolTable from './components/SchoolTable.vue';
 import NameFilter from './components/NameFilter.vue';
 import MapLegend from './components/MapLegend.vue';
 import MiniSpark from './components/MiniSpark.vue';
+import SchoolIcon from './components/SchoolIcon.vue';
 import Help from './Help.vue';
 
 // Below this width the two columns don't fit: switch to the List / Map tabs.
@@ -192,7 +207,7 @@ function readStored(key) {
 
 export default {
   name: 'App',
-  components: {SchoolsMap, HomePicker, RankedList, YearTimeline, SchoolDetail, SchoolTable, NameFilter, MapLegend, MiniSpark, Help},
+  components: {SchoolsMap, HomePicker, RankedList, YearTimeline, SchoolDetail, SchoolTable, NameFilter, MapLegend, MiniSpark, SchoolIcon, Help},
   data() {
     return {
       YEARS,
@@ -489,18 +504,6 @@ export default {
    coloured dots: 2px border + 14px padding, both sides */
 .list-note { padding: 0 16px; }
 
-.text-btn {
-  min-height: 40px;
-  padding: 0 12px;
-  border: 0;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--ink-2);
-  font: 600 13px var(--font);
-  cursor: pointer;
-}
-.text-btn:hover { background: #F0F2F5; }
-
 .icon-btn {
   flex: none;
   width: 44px;
@@ -535,15 +538,43 @@ export default {
   justify-content: space-between;
   gap: 8px 32px;
 }
-.app-header h1 {
+.brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.brand h1 {
   margin: 0;
   font-family: var(--font-display);
   font-size: 21px;
   font-weight: 700;
   letter-spacing: -0.01em;
+  line-height: 1.2;
 }
-.app-header p { margin: 2px 0 0; font-size: 14px; color: var(--ink-3); }
-.app-header__links { display: flex; gap: 4px; flex-wrap: wrap; }
+.brand p { margin: 2px 0 0; font-size: 14px; color: var(--ink-3); }
+.brand__mark {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  padding: 8px;
+  box-sizing: border-box;
+  border-radius: 11px;
+  background: var(--accent);
+  color: #fff;
+}
+.brand__mark--small { width: 30px; height: 30px; padding: 6px; border-radius: 9px; }
+.header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.header-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  font: 600 14px var(--font);
+  cursor: pointer;
+}
+.header-btn svg { color: var(--ink-3); }
+.header-btn:hover { background: var(--ground); }
 
 .d-main {
   flex: 1;
@@ -630,7 +661,7 @@ export default {
 .m-bar__top { display: flex; align-items: center; gap: 2px; }
 .m-bar__top h1 {
   flex: 1;
-  margin: 0 0 0 4px;
+  margin: 0 0 0 10px;
   font-family: var(--font-display);
   font-size: 19px;
   font-weight: 700;
