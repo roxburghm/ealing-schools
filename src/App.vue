@@ -166,10 +166,11 @@
       </transition>
     </div>
 
-    <v-dialog v-model="showHelp" max-width="780" :fullscreen="narrow" scrollable>
+    <!-- Desktop dialogs stop short of the window edges rather than filling its height -->
+    <v-dialog v-model="showHelp" max-width="780" :max-height="dialogMaxHeight" :fullscreen="narrow" scrollable>
       <Help @close="showHelp = false"/>
     </v-dialog>
-    <v-dialog v-model="showTable" max-width="1100" :fullscreen="narrow" scrollable>
+    <v-dialog v-model="showTable" max-width="1100" :max-height="dialogMaxHeight" :fullscreen="narrow" scrollable>
       <SchoolTable :years="YEARS" :year="year" :schools="schools" :home="home"
                    @close="showTable = false" @open="openFromTable"/>
     </v-dialog>
@@ -401,6 +402,9 @@ export default {
               (y.a.score - x.a.score) ||
               ((x.a.dist ?? 0) - (y.a.dist ?? 0)) ||
               x.school.shortName.localeCompare(y.school.shortName));
+    },
+    dialogMaxHeight() {
+      return this.narrow ? undefined : 'min(760px, calc(100vh - 128px))';
     },
     yearsNewestFirst() {
       return [...YEARS].reverse();
