@@ -33,7 +33,7 @@
           </p>
         </aside>
 
-        <section class="d-right" aria-label="Map and school details">
+        <section ref="rightPane" class="d-right" aria-label="Map and school details">
           <div class="card map-card">
             <div class="map-card__head">
               <div>
@@ -43,14 +43,14 @@
               <year-timeline v-model="year" :years="YEARS"/>
             </div>
             <schools-map :schools="schools" :year="year" :home="home" :selected="selected" :focus="focused"
-                         height="clamp(240px, 38vh, 520px)"
+                         height="clamp(320px, 52vh, 640px)"
                          :api-promise="apiPromise" :maps-ready="mapsReady" :maps-failed="mapsFailed"
                          @clear-focus="focused = null"
                          @select="selectSchool"/>
             <map-legend :year="year"/>
           </div>
 
-          <div ref="detailScroll" class="d-detail">
+          <div class="d-detail">
             <school-detail v-if="selected" :school="selected" :assessment="assessments.get(selected)"
                            :year="year" :home="home"/>
           </div>
@@ -271,7 +271,9 @@ export default {
       this.selected = school;
       this.focused = school;
       this.$nextTick(() => {
-        if (this.$refs.detailScroll) this.$refs.detailScroll.scrollTop = 0;
+        // Back to the top of the right-hand column so the map zoom is in view.
+        // An instant jump: smooth scrolling gets cancelled while the map animates.
+        if (this.$refs.rightPane) this.$refs.rightPane.scrollTop = 0;
       });
     },
     // Phones: open the school's own page. It sits in browser history so the
@@ -508,21 +510,19 @@ export default {
   scrollbar-gutter: stable;
 }
 
+/* Map and school details scroll together, separately from the list */
 .d-right {
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.d-detail {
-  flex: 1;
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 2px 6px 24px 2px;
   scrollbar-gutter: stable;
 }
+
+.d-detail { flex: none; }
 
 .list-head { display: flex; flex-direction: column; gap: 10px; }
 .list-head h2 { margin: 0; font-family: var(--font-display); font-size: 18px; font-weight: 600; }
@@ -538,7 +538,7 @@ export default {
 /* Short laptop screens: let the page scroll as a whole instead of squeezing the panes */
 @media (max-height: 700px) {
   .d-shell { height: auto; }
-  .d-list, .d-detail { overflow: visible; }
+  .d-list, .d-right { overflow: visible; }
 }
 
 /* ---------- Phones ---------- */
