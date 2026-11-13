@@ -15,11 +15,12 @@
               <span class="row__sub">{{ row.a.sub }}</span>
             </span>
           </span>
-          <svg class="row__spark" viewBox="0 0 80 36" preserveAspectRatio="none" aria-hidden="true">
+          <svg class="row__spark" viewBox="0 0 80 43" preserveAspectRatio="none" aria-hidden="true">
             <rect v-for="b in row.bars" :key="b.year" :x="b.x" :y="36 - b.h" :width="b.w" :height="b.h" rx="1.5"
                   :fill="row.school.colour" :fill-opacity="b.opacity"/>
             <line v-if="row.youY !== null" x1="0" x2="80" :y1="row.youY" :y2="row.youY" stroke="#E8590C"
                   stroke-width="2" vector-effect="non-scaling-stroke"/>
+            <polygon v-if="row.marker" :points="row.marker" class="row__marker"/>
           </svg>
         </button>
       </li>
@@ -55,7 +56,10 @@ export default {
           return {year: YEARS[i], x, w, h: Math.max(3, (c / top) * 36), opacity: hi ? 1 : 0.5};
         });
         const youY = row.a.dist === null ? null : Math.max(1, 36 - (row.a.dist / top) * 36);
-        return {...row, bars, youY};
+        // Small triangle under the chosen year's bar.
+        const on = bars.find(b => b.year === this.year);
+        const marker = on ? `${on.x + on.w / 2 - 3.5},43 ${on.x + on.w / 2 + 3.5},43 ${on.x + on.w / 2},38.5` : null;
+        return {...row, bars, youY, marker};
       });
     },
   },
@@ -89,7 +93,8 @@ export default {
 .row__dist { font-size: 13px; color: var(--ink-2); white-space: nowrap; }
 .row__verdict { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .row__sub { font-size: 12px; color: var(--ink-3); }
-.row__spark { width: 80px; height: 36px; flex: none; }
+.row__spark { width: 80px; height: 43px; flex: none; }
+.row__marker { fill: var(--ink-2); }
 .empty { margin: 0; font-size: 14px; color: var(--ink-3); }
 </style>
 
