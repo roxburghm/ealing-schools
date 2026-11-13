@@ -28,7 +28,7 @@
 
           <p class="fine-print">{{ finePrint }}</p>
           <p class="fine-print">
-            {{ sourceLine }} Issues: <a href="mailto:matt@roxburghm.com">matt@roxburghm.com</a>
+            {{ sourceLine }} Questions or corrections: <a href="mailto:matt@roxburghm.com">matt@roxburghm.com</a>
             <span v-if="buildDateTime"> · Build {{ buildDateTime }}</span>
           </p>
         </aside>
@@ -115,7 +115,7 @@
           <ranked-list :rows="rankedRows" :selected-name="null" :year="year" @select="openSchool"/>
           <p class="fine-print">{{ finePrint }}</p>
           <p class="fine-print">
-            {{ sourceLine }} Issues: <a href="mailto:matt@roxburghm.com">matt@roxburghm.com</a>
+            {{ sourceLine }} Questions or corrections: <a href="mailto:matt@roxburghm.com">matt@roxburghm.com</a>
             <span v-if="buildDateTime"> · Build {{ buildDateTime }}</span>
           </p>
         </div>
@@ -256,6 +256,12 @@ export default {
         // storage unavailable – keep the in-memory value
       }
     },
+    fetchWalks() {
+      if (!this.home) return;
+      const walkSchools = this.schools.filter(s => admission.measure(s) === 'walk');
+      walkSchools.forEach(walking.load);
+      if (this.mapsReady) walking.lookupWalks(walkSchools, this.home);
+    },
     matchesName(school) {
       const query = this.nameFilter.trim().toLowerCase();
       return !query || school.name.toLowerCase().includes(query) || school.shortName.toLowerCase().includes(query);
@@ -361,13 +367,13 @@ export default {
       return this.home ? `Your chances from ${this.homeName}` : 'Schools';
     },
     finePrint() {
-      return `Mini charts: each bar is the furthest distance offered in a year, ${YEARS[0]}–${YEARS[YEARS.length - 1]}. ` +
-          'The orange line is your home. Pale full-height bars mean everyone who applied got a place. ' +
-          'Distances are straight-line unless noted. Check each school’s admission rules before you apply.';
+      return `Each mini chart shows the furthest distance offered each year, ${YEARS[0]}–${YEARS[YEARS.length - 1]}, ` +
+          'with your home as the orange line. Pale full-height bars mean everyone who applied got a place. ' +
+          'Distances are straight-line unless a school notes otherwise.';
     },
     sourceLine() {
-      return `Source: Ealing Council “Starting High School” booklets and on-time offer reports, ${YEARS[0]}–${YEARS[YEARS.length - 1]}. ` +
-          'Ofsted and GCSE figures from GOV.UK. Past distances don’t guarantee future offers. Use at your own risk.';
+      return `Figures come from Ealing Council’s offer reports and booklets, ${YEARS[0]}–${YEARS[YEARS.length - 1]}, ` +
+          'and from GOV.UK. They’re estimates to help you plan; Ealing Council makes the admissions decisions.';
     },
     // The schools plus about 2 km either side, to steer address suggestions towards Ealing.
     searchArea() {
@@ -385,12 +391,16 @@ export default {
     },
   },
   watch: {
-    // Walking bands are only needed once there's a home to measure from.
+    // Walking data is only needed once there's a home to measure from: the
+    // walk itself from Google (once its script has loaded), outlines from CI.
     home: {
       immediate: true,
-      handler(home) {
-        if (home) this.schools.filter(s => admission.measure(s) === 'walk').forEach(walking.load);
+      handler() {
+        this.fetchWalks();
       }
+    },
+    mapsReady() {
+      this.fetchWalks();
     },
     rankedRows(rows) {
       if (!this.selected && rows.length) this.selected = rows[0].school;

@@ -37,9 +37,9 @@
           walking distance along pavements, so its area follows the street network rather than a circle.
         </p>
         <p>
-          Walking distances are worked out in advance from OpenStreetMap data using GraphHopper, then looked up on your
-          device. They're estimates: the council uses its own address points and routes. Results near the line are
-          marked <em>too close to call</em>.
+          Your walking distance comes from Google Maps walking directions to the school. It's an estimate: the
+          council uses its own address points and routes, so results within about 50 metres of the line are marked
+          <em>too close to call</em>.
         </p>
       </section>
 
@@ -64,7 +64,7 @@
         </ul>
         <p class="small">
           Exam results from the Department for Education. Ofsted grades from reports.ofsted.gov.uk.
-          Walking routes © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>,
+          Walking distances from Google Maps. Walking areas on the map © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>,
           calculated with <a href="https://www.graphhopper.com/" target="_blank" rel="noopener">GraphHopper</a>.
         </p>
       </section>
@@ -73,12 +73,14 @@
         <h3>Privacy</h3>
         <p>
           Your address is saved only in this browser so it's there next time. Google sees what you type in the address
-          box to suggest matches. Nothing else is sent anywhere.
+          box to suggest matches, and the location you pick, to work out walking distances to schools that use them.
+          Nothing is sent anywhere else.
         </p>
       </section>
 
       <p class="disclaimer">
-        Figures are approximate and for guidance only. Problems or corrections:
+        Every figure here is an estimate, for guidance only. Ealing Council’s admissions decisions are final.
+        Problems or corrections:
         <a href="mailto:matt@roxburghm.com">matt@roxburghm.com</a>
       </p>
     </v-card-text>

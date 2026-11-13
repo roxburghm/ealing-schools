@@ -64,8 +64,9 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 ### Walking distances
 
 Schools with `"measure": "walk"` in `src/plugins/schools.js` are judged on walking distance rather than a straight line.
-Their walking data is built from GraphHopper isochrones and saved to `public/data/walk/`, so a visitor's address never
-leaves their browser.
+The walk from a visitor's home is looked up with Google Maps walking directions (Distance Matrix, using the same Maps
+key) when they set an address. The walking *areas* drawn on the map are built from GraphHopper isochrones and saved to
+`public/data/walk/`; until those exist the hand-drawn `intakePath` outlines are used.
 
 ```
 GRAPHHOPPER_API_KEY=... node scripts/walking-bands.mjs            # only files whose inputs changed

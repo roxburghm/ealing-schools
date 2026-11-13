@@ -25,7 +25,7 @@
             :rx="compact ? 1 : 3" :fill="`url(#${patternId})`" class="all-bar"/>
 
       <template v-if="!compact">
-        <text v-if="bar.kind !== 'missing'" :x="x(i) + barWidth / 2"
+        <text v-if="bar.kind !== 'missing' && (!narrow || bar.year === selected)" :x="x(i) + barWidth / 2"
               :y="bar.kind === 'value' ? y(bar.value) - 6 : (bar.kind === 'all' ? pad.top - 6 : y(0) - 6)"
               text-anchor="middle" class="value">{{ bar.short }}</text>
         <text :x="x(i) + barWidth / 2" :y="height - 8" text-anchor="middle"
