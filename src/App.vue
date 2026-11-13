@@ -19,15 +19,23 @@
 
         <div class="list-head o-listhead">
           <h2>{{ home ? `Your chances from ${homeName}` : 'Schools' }}</h2>
-          <label class="name-filter">
-            <span class="visually-hidden">Filter schools by name</span>
+          <div class="name-filter">
+            <label for="name-filter" class="visually-hidden">Filter schools by name</label>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                  stroke-linecap="round" aria-hidden="true">
               <circle cx="11" cy="11" r="7"/>
               <path d="M20 20l-3.5-3.5"/>
             </svg>
-            <input type="search" v-model="nameFilter" placeholder="Filter by name" autocomplete="off">
-          </label>
+            <input id="name-filter" ref="nameFilter" type="search" v-model="nameFilter" placeholder="Filter by name"
+                   autocomplete="off" @keydown.esc="clearNameFilter">
+            <button v-if="nameFilter" type="button" class="name-filter__clear" aria-label="Clear filter"
+                    @click="clearNameFilter">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"
+                   stroke-linecap="round" aria-hidden="true">
+                <path d="M6 6l12 12M18 6L6 18"/>
+              </svg>
+            </button>
+          </div>
         </div>
 
         <ranked-list class="o-list" :rows="rankedRows" :selected-name="selected && selected.name" :year="year"
@@ -152,6 +160,10 @@ export default {
       } catch (e) {
         // storage unavailable – keep the in-memory value
       }
+    },
+    clearNameFilter() {
+      this.nameFilter = '';
+      this.$refs.nameFilter?.focus();
     },
     matchesName(school) {
       const query = this.nameFilter.trim().toLowerCase();
@@ -318,28 +330,43 @@ export default {
   border-radius: 14px;
 }
 
-.list-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.list-head { display: flex; flex-direction: column; gap: 10px; }
 .list-head h2 { margin: 0; font-family: var(--font-display); font-size: 18px; font-weight: 600; }
 .name-filter {
   position: relative;
   display: flex;
   align-items: center;
-  flex: 0 1 220px;
-  min-width: 160px;
+  width: 100%;
   color: var(--ink-3);
 }
-.name-filter svg { position: absolute; left: 12px; pointer-events: none; }
+.name-filter > svg { position: absolute; left: 14px; pointer-events: none; }
 .name-filter input {
   width: 100%;
-  height: 40px;
-  padding: 0 12px 0 34px;
+  height: 44px;
+  padding: 0 48px 0 40px;
   border: 1px solid #D5D9E0;
-  border-radius: 10px;
+  border-radius: 12px;
   background: #fff;
-  font: 14px var(--font);
+  font: 15px var(--font);
   color: var(--ink);
 }
+.name-filter input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
 .name-filter input:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
+.name-filter__clear {
+  position: absolute;
+  right: 2px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.name-filter__clear:hover { background: #F0F2F5; color: var(--ink); }
 .visually-hidden {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
