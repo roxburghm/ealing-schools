@@ -3,7 +3,7 @@
     <span><i class="lg-ring"></i>{{ compact ? `Cut-off ${year}` : `Furthest distance offered, ${year}` }}</span>
     <span><i class="lg-walk"></i>{{ compact ? 'Walking area' : 'Walking area (Drayton Manor)' }}</span>
     <span><i class="lg-open"></i>Everyone offered</span>
-    <span><i class="lg-home"></i>{{ compact ? 'Your home' : 'Your home (click the map to move it)' }}</span>
+    <span><i class="lg-home"></i>Your home</span>
   </div>
 </template>
 

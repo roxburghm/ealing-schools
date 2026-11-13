@@ -46,7 +46,7 @@
                          height="clamp(240px, 38vh, 520px)"
                          :api-promise="apiPromise" :maps-ready="mapsReady" :maps-failed="mapsFailed"
                          @clear-focus="focused = null"
-                         @select="selectSchool" @set-home="p => setHome(p, 'your pin')"/>
+                         @select="selectSchool"/>
             <map-legend :year="year"/>
           </div>
 
@@ -116,7 +116,7 @@
                        height="100%" :visible="view === 'map'"
                        :api-promise="apiPromise" :maps-ready="mapsReady" :maps-failed="mapsFailed"
                        @clear-focus="focused = null"
-                       @select="openSchool" @set-home="p => setHome(p, 'your pin')"/>
+                       @select="openSchool"/>
           <map-legend :year="year" compact class="m-map__legend"/>
         </div>
       </main>

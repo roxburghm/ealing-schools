@@ -4,7 +4,7 @@
                :clickable-icons="false" :street-view-control="false" :map-type-control="false"
                :fullscreen-control="interactive" :zoom-control="interactive" :disable-default-ui="!interactive"
                :gesture-handling="interactive ? 'greedy' : 'cooperative'"
-               class="map" :class="{'map--fill': height}" @click="onMapClick" @idle="onIdle">
+               class="map" :class="{'map--fill': height}" @idle="onIdle">
       <Polygon v-for="r in rings" :key="'ring-' + r.key" :options="r.options"/>
 
       <CustomMarker v-for="pin in pins" :key="'pin-' + pin.school.name"
@@ -71,12 +71,12 @@ export default {
     mapsFailed: {type: Boolean, default: false},
     // CSS height for the map, e.g. '100%' or '220px'. Defaults to a share of the viewport.
     height: {type: String, default: null},
-    // false for small preview maps: no clicking to set home, no controls.
+    // false for small preview maps: no controls, and two-finger panning.
     interactive: {type: Boolean, default: true},
     // Re-fit when a hidden map (another tab) becomes visible again.
     visible: {type: Boolean, default: true},
   },
-  emits: ['select', 'set-home', 'clear-focus'],
+  emits: ['select', 'clear-focus'],
   data() {
     return {
       fitted: false,
@@ -198,10 +198,6 @@ export default {
     },
     isSelected(s) {
       return !!this.selected && this.selected.name === s.name;
-    },
-    onMapClick(e) {
-      if (!this.interactive || !e || !e.latLng) return;
-      this.$emit('set-home', {lat: e.latLng.lat(), lng: e.latLng.lng()});
     },
   },
 };

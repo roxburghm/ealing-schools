@@ -44,7 +44,6 @@
     </div>
 
     <p v-if="error" class="home-picker__error" role="alert">{{ error }}</p>
-    <p v-if="!compact" class="home-picker__hint">Or click the map to put your home there.</p>
   </div>
 </template>
 
@@ -170,7 +169,6 @@ export default {
 .home-picker__locate:disabled { opacity: .5; cursor: progress; }
 .home-picker__actions { display: flex; justify-content: space-between; }
 .home-picker__error { margin: 0; font-size: 13px; color: #8A3A00; }
-.home-picker__hint { margin: 0; font-size: 13px; color: var(--ink-3); }
 
 .home-chip {
   display: flex;
