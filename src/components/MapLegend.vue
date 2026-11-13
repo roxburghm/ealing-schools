@@ -2,7 +2,12 @@
   <div class="legend" :class="{'legend--compact': compact}">
     <span><i class="lg-ring"></i>{{ compact ? `Cut-off ${year}` : `Furthest distance offered, ${year}` }}</span>
     <span><i class="lg-walk"></i>{{ compact ? 'Walking area' : 'Walking area (Drayton Manor)' }}</span>
-    <span><i class="lg-open"></i>Everyone offered</span>
+    <span>
+      <i class="lg-open">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"
+             stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+      </i>Everyone offered
+    </span>
     <span><i class="lg-home"></i>Your home</span>
   </div>
 </template>
@@ -35,7 +40,8 @@ export default {
 }
 .lg-ring { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--ink-2); background: rgba(58, 63, 72, .08); }
 .lg-walk { width: 16px; height: 12px; border: 2px dashed var(--ink-2); border-radius: 3px; }
-.lg-open { width: 10px; height: 10px; border-radius: 50%; background: var(--ink-2); box-shadow: 0 0 0 2px #fff, 0 0 0 4px #16A34A; margin: 0 2px; }
+.lg-open { width: 16px; height: 16px; border-radius: 50%; background: #16A34A; display: flex !important; align-items: center; justify-content: center; }
+.lg-open svg { width: 10px; height: 10px; }
 .lg-home { width: 10px; height: 10px; border-radius: 50%; background: var(--home); }
 .legend--compact .lg-ring { width: 12px; height: 12px; }
 .legend--compact .lg-walk { width: 13px; height: 10px; }

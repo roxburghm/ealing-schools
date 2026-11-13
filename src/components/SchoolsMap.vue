@@ -9,12 +9,18 @@
 
       <CustomMarker v-for="pin in pins" :key="'pin-' + pin.school.name"
                     :options="{position: pin.school.centre, anchorPoint: 'CENTER', zIndex: pin.selected ? 50 : 10}">
-        <button type="button" class="pin" :class="{'pin--on': pin.selected, 'pin--open': pin.open}" :aria-label="pin.school.name"
+        <button type="button" class="pin" :class="{'pin--on': pin.selected, 'pin--open': pin.open}"
+                :aria-label="pin.open ? `${pin.school.name}: everyone who applied was offered a place` : pin.school.name"
                 @click.stop="$emit('select', pin.school)">
-          <span class="pin__dot" :style="{background: pin.colour}"></span>
+          <span v-if="pin.open" class="pin__dot pin__dot--open">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"
+                 stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+          </span>
+          <span v-else class="pin__dot" :style="{background: pin.colour}"></span>
           <span class="pin__label">
             {{ pin.school.shortName }}
-            <span v-if="pin.open" class="pin__tag">All offered</span>
+            <!-- The tick says it at a glance; spell it out once the school is picked -->
+            <span v-if="pin.open && pin.selected" class="pin__tag">All offered</span>
           </span>
         </button>
       </CustomMarker>
@@ -275,13 +281,31 @@ export default {
   line-height: 1.25;
   text-align: center;
 }
-.pin__tag { display: block; font-size: 10px; font-weight: 700; color: #14532D; }
-/* Everyone offered: no catchment ring to draw, so make the pin itself stand out */
-.pin--open .pin__dot {
-  width: 14px; height: 14px;
-  box-shadow: 0 0 0 3px #16A34A, 0 1px 4px 3px rgba(0, 0, 0, .25);
+.pin__tag {
+  display: block;
+  width: max-content;
+  margin: 2px auto 0;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: #DCFCE7;
+  color: #14532D;
+  font-size: 10px;
+  font-weight: 700;
+  text-shadow: none;
+  box-shadow: 0 0 0 1px rgba(22, 101, 52, .25);
 }
-.pin--open.pin--on .pin__dot { width: 18px; height: 18px; }
+/* Everyone offered: no catchment to draw, so the marker carries it: a green tick badge */
+.pin__dot--open {
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+  background: #16A34A;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .35);
+}
+.pin__dot--open svg { width: 14px; height: 14px; }
+.pin--open .pin__label { top: 36px; }
+.pin--open.pin--on .pin__dot { width: 28px; height: 28px; }
+.pin--open.pin--on .pin__dot svg { width: 18px; height: 18px; }
+.pin--open.pin--on .pin__label { top: 40px; }
 .pin--on .pin__dot { width: 18px; height: 18px; }
 .pin--on .pin__label { font-size: 13px; font-weight: 700; }
 .home-pin { display: block; pointer-events: none; }
