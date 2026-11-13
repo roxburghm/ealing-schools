@@ -3,7 +3,7 @@
     <GoogleMap v-if="mapsReady" ref="gmap" :api-promise="apiPromise" :center="center" :zoom="12" :styles="mapStyles"
                :clickable-icons="false" :street-view-control="false" :map-type-control="false"
                :fullscreen-control="interactive" :zoom-control="interactive" :disable-default-ui="!interactive"
-               :gesture-handling="interactive ? 'greedy' : 'cooperative'" :is-fractional-zoom-enabled="true"
+               :gesture-handling="interactive ? gestures : 'cooperative'" :is-fractional-zoom-enabled="true"
                class="map" :class="{'map--fill': height}" @idle="onIdle">
       <Polygon v-for="r in rings" :key="'ring-' + r.key" :options="r.options"/>
 
@@ -99,6 +99,9 @@ export default {
     height: {type: String, default: null},
     // false for small preview maps: no controls, and two-finger panning.
     interactive: {type: Boolean, default: true},
+    // Google gestureHandling: 'greedy' for a full-screen map, 'cooperative' when
+    // the map sits in a scrolling page (wheel scrolls; Ctrl/⌘ + wheel zooms).
+    gestures: {type: String, default: 'greedy'},
     // Re-fit when a hidden map (another tab) becomes visible again.
     visible: {type: Boolean, default: true},
   },

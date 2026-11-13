@@ -51,7 +51,7 @@
               <year-timeline v-model="year" :years="YEARS"/>
             </div>
             <schools-map :schools="schools" :year="year" :home="home" :selected="focused" :focus="focused"
-                         height="clamp(320px, 52vh, 640px)"
+                         height="clamp(320px, 52vh, 640px)" gestures="cooperative"
                          :api-promise="apiPromise" :maps-ready="mapsReady" :maps-failed="mapsFailed"
                          @clear-focus="focused = null"
                          @select="selectSchool"/>
