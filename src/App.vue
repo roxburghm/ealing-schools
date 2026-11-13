@@ -109,17 +109,8 @@
             <button type="button" role="tab" :aria-selected="view === 'list'" @click="view = 'list'">List</button>
             <button type="button" role="tab" :aria-selected="view === 'map'" @click="view = 'map'">Map</button>
           </div>
-          <label class="year-select">
-            <span class="visually-hidden">Offer year</span>
-            <select v-model="year">
-              <option v-for="y in yearsNewestFirst" :key="y" :value="y">{{ y }}</option>
-            </select>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"
-                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M6 9l6 6 6-6"/>
-            </svg>
-          </label>
         </div>
+        <year-timeline v-model="year" :years="YEARS" class="m-bar__years"/>
       </header>
 
       <main class="m-content" :class="`m-content--${view}`">
@@ -153,6 +144,9 @@
               </svg>
             </button>
             <span class="m-page__title">{{ selected.shortName }}</span>
+          </div>
+          <div class="m-page__years">
+            <year-timeline v-model="year" :years="YEARS"/>
           </div>
           <div ref="pageBody" class="m-page__body">
             <schools-map :schools="schools" :year="year" :home="home" :selected="selected" :focus="selected"
@@ -405,9 +399,6 @@ export default {
     },
     dialogMaxHeight() {
       return this.narrow ? undefined : 'min(760px, calc(100vh - 128px))';
-    },
-    yearsNewestFirst() {
-      return [...YEARS].reverse();
     },
     listHeading() {
       return this.home ? `Your chances from ${this.homeName}` : 'Schools';
@@ -672,6 +663,7 @@ export default {
   letter-spacing: -0.01em;
 }
 .m-bar__controls { display: flex; gap: 8px; }
+.m-bar__years { margin: -2px 2px -6px; }
 
 .segmented {
   flex: 1;
@@ -697,20 +689,6 @@ export default {
   box-shadow: 0 1px 2px rgba(22, 24, 29, .12), 0 1px 4px rgba(22, 24, 29, .06);
 }
 
-.year-select { position: relative; flex: none; display: flex; align-items: center; }
-.year-select select {
-  height: 44px;
-  padding: 0 34px 0 14px;
-  border: 1px solid #D5D9E0;
-  border-radius: 12px;
-  background: #fff;
-  font: 600 16px var(--font);
-  font-variant-numeric: tabular-nums;
-  color: var(--ink);
-  appearance: none;
-  -webkit-appearance: none;
-}
-.year-select svg { position: absolute; right: 12px; pointer-events: none; color: var(--ink-3); }
 
 .m-content { flex: 1; min-height: 0; position: relative; }
 .m-content--list { overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
@@ -740,6 +718,8 @@ export default {
   border-bottom: 1px solid var(--line);
 }
 .m-page__title { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
+.m-page__bar + .m-page__years { margin-top: -1px; }
+.m-page__years { flex: none; padding: 0 14px 2px; border-bottom: 1px solid var(--line); background: #fff; }
 .m-page__body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
 .m-page__body .map { border-radius: 0 !important; }
 
