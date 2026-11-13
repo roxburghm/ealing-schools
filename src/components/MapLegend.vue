@@ -35,7 +35,7 @@ export default {
 }
 .lg-ring { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--ink-2); background: rgba(58, 63, 72, .08); }
 .lg-walk { width: 16px; height: 12px; border: 2px dashed var(--ink-2); border-radius: 3px; }
-.lg-open { width: 10px; height: 10px; border-radius: 50%; background: #9AA1AC; box-shadow: 0 0 0 2px #fff, 0 0 0 3px #9AA1AC; }
+.lg-open { width: 10px; height: 10px; border-radius: 50%; background: var(--ink-2); box-shadow: 0 0 0 2px #fff, 0 0 0 4px #16A34A; margin: 0 2px; }
 .lg-home { width: 10px; height: 10px; border-radius: 50%; background: var(--home); }
 .legend--compact .lg-ring { width: 12px; height: 12px; }
 .legend--compact .lg-walk { width: 13px; height: 10px; }

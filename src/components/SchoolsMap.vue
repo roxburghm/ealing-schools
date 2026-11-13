@@ -3,13 +3,13 @@
     <GoogleMap v-if="mapsReady" ref="gmap" :api-promise="apiPromise" :center="center" :zoom="12" :styles="mapStyles"
                :clickable-icons="false" :street-view-control="false" :map-type-control="false"
                :fullscreen-control="interactive" :zoom-control="interactive" :disable-default-ui="!interactive"
-               :gesture-handling="interactive ? 'greedy' : 'cooperative'"
+               :gesture-handling="interactive ? 'greedy' : 'cooperative'" :is-fractional-zoom-enabled="true"
                class="map" :class="{'map--fill': height}" @idle="onIdle">
       <Polygon v-for="r in rings" :key="'ring-' + r.key" :options="r.options"/>
 
       <CustomMarker v-for="pin in pins" :key="'pin-' + pin.school.name"
                     :options="{position: pin.school.centre, anchorPoint: 'CENTER', zIndex: pin.selected ? 50 : 10}">
-        <button type="button" class="pin" :class="{'pin--on': pin.selected}" :aria-label="pin.school.name"
+        <button type="button" class="pin" :class="{'pin--on': pin.selected, 'pin--open': pin.open}" :aria-label="pin.school.name"
                 @click.stop="$emit('select', pin.school)">
           <span class="pin__dot" :style="{background: pin.colour}"></span>
           <span class="pin__label">
@@ -45,6 +45,8 @@ const EARTH_RADIUS_M = 6371000;
 const METRES_PER_MILE = 1609.34;
 // The furthest out the all-schools view goes.
 const MIN_AREA_ZOOM = 12;
+// The closest in a school-and-home view goes.
+const MAX_FOCUS_ZOOM = 16;
 
 function circlePoints(center, miles) {
   const radius = miles * METRES_PER_MILE;
@@ -132,7 +134,7 @@ export default {
           school: s,
           selected: this.isSelected(s),
           open: cut === null,
-          colour: cut === null ? '#9AA1AC' : s.colour,
+          colour: s.colour,
         };
       });
     },
@@ -181,19 +183,22 @@ export default {
       this.fitted = true;
       this.fitView();
     },
-    // Zoom to the focused school (every year's catchment, so moving through
-    // the years doesn't keep re-zooming) and home, or to every school.
+    // Zoom to the focused school, or to every school. None of these depend on
+    // the year, so moving through the years never re-zooms the map.
+    //  - school + home: crop tight to the two, for the most street detail
+    //  - school only: fit its largest catchment across all the years
     fitView() {
       const map = this.$refs.gmap?.map;
       if (!map || !window.google) return;
       const bounds = new window.google.maps.LatLngBounds();
       const points = [];
-      if (this.focus) {
+      if (this.focus && this.home) {
+        points.push(this.focus.centre, this.home);
+      } else if (this.focus) {
         points.push(this.focus.centre);
         Object.entries(this.focus.intakeDist)
             .filter(([year, cut]) => /^\d{4}$/.test(year) && typeof cut === 'number' && cut > 0)
             .forEach(([year]) => points.push(...this.catchmentPath(this.focus, year)));
-        if (this.home) points.push(this.home);
       } else {
         points.push(...this.schools.map(s => s.centre));
       }
@@ -201,19 +206,28 @@ export default {
       if (points.length === 1) {
         map.panTo(points[0]);
         map.setZoom(15);
+        return;
+      }
+      if (this.focus) {
+        // Room at the top for the Show all button and the home pin (it rises
+        // above its point). With a home the school sits at the edge, so also
+        // leave room below and beside it for its name.
+        map.fitBounds(bounds, this.home
+            ? {top: 60, right: 56, bottom: 48, left: 56}
+            : {top: 60, right: 16, bottom: 16, left: 16});
+        // Home right next to the school: stop at street level.
+        window.google.maps.event.addListenerOnce(map, 'bounds_changed', () => {
+          if (map.getZoom() > MAX_FOCUS_ZOOM) map.setZoom(MAX_FOCUS_ZOOM);
+        });
       } else {
-        // Zoomed to a school: extra room at the top for the home pin (it rises
-        // above its point) and the Show all button.
-        map.fitBounds(bounds, this.focus ? {top: 64, right: 32, bottom: 32, left: 32} : 16);
-        if (!this.focus) {
-          // Whole-area view: on narrow screens fitting every school lands at a
-          // city-wide zoom. Stay at street-name scale, around home if we have one.
-          window.google.maps.event.addListenerOnce(map, 'bounds_changed', () => {
-            if (map.getZoom() >= MIN_AREA_ZOOM) return;
-            map.setZoom(MIN_AREA_ZOOM);
-            if (this.home) map.setCenter(this.home);
-          });
-        }
+        map.fitBounds(bounds, 16);
+        // Whole-area view: on narrow screens fitting every school lands at a
+        // city-wide zoom. Stay at street-name scale, around home if we have one.
+        window.google.maps.event.addListenerOnce(map, 'bounds_changed', () => {
+          if (map.getZoom() >= MIN_AREA_ZOOM) return;
+          map.setZoom(MIN_AREA_ZOOM);
+          if (this.home) map.setCenter(this.home);
+        });
       }
     },
     isSelected(s) {
@@ -262,6 +276,12 @@ export default {
   text-align: center;
 }
 .pin__tag { display: block; font-size: 10px; font-weight: 700; color: #14532D; }
+/* Everyone offered: no catchment ring to draw, so make the pin itself stand out */
+.pin--open .pin__dot {
+  width: 14px; height: 14px;
+  box-shadow: 0 0 0 3px #16A34A, 0 1px 4px 3px rgba(0, 0, 0, .25);
+}
+.pin--open.pin--on .pin__dot { width: 18px; height: 18px; }
 .pin--on .pin__dot { width: 18px; height: 18px; }
 .pin--on .pin__label { font-size: 13px; font-weight: 700; }
 .home-pin { display: block; pointer-events: none; }
