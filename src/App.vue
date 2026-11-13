@@ -3,13 +3,26 @@
     <!-- Desktop: list on the left scrolls on its own; map pinned top right with the details scrolling under it -->
     <div v-if="!narrow" class="d-shell">
       <header class="app-header">
-        <div class="app-header__titles">
-          <h1>Ealing secondary schools</h1>
-          <p>How far away did each school stop offering places on distance? See where your home lands.</p>
+        <div class="brand">
+          <span class="brand__mark" aria-hidden="true"><school-icon kind="distance"/></span>
+          <div>
+            <h1>Ealing secondary school places</h1>
+            <p>How close did you need to live to get a place? Cut-off distances for every school, 2019–2026.</p>
+          </div>
         </div>
-        <nav class="app-header__links" aria-label="More">
-          <button type="button" class="text-btn" @click="showTable = true">All distances table</button>
-          <button type="button" class="text-btn" @click="showHelp = true">How this works</button>
+        <nav class="header-actions" aria-label="More">
+          <button type="button" class="header-btn" @click="showTable = true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 4v16"/>
+            </svg>
+            Compare schools
+          </button>
+          <button type="button" class="header-btn" @click="showHelp = true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+            How it works
+          </button>
         </nav>
       </header>
 
@@ -26,8 +39,8 @@
           <ranked-list :rows="rankedRows" :selected-name="focused && focused.name" :year="year"
                        @select="selectSchool"/>
 
-          <p class="fine-print">{{ finePrint }}</p>
-          <p class="fine-print">
+          <p class="fine-print list-note">{{ finePrint }}</p>
+          <p class="fine-print list-note">
             {{ sourceLine }} Questions or corrections: <a href="mailto:matt@roxburghm.com">matt@roxburghm.com</a>
             <span v-if="buildDateTime"> · Build {{ buildDateTime }}</span>
           </p>
@@ -70,15 +83,16 @@
     <div v-else class="m-shell">
       <header class="m-bar">
         <div class="m-bar__top">
-          <h1>Ealing schools</h1>
-          <button type="button" class="icon-btn" aria-label="All distances table" @click="showTable = true">
+          <span class="brand__mark brand__mark--small" aria-hidden="true"><school-icon kind="distance"/></span>
+          <h1>Ealing school places</h1>
+          <button type="button" class="icon-btn" aria-label="Compare schools" @click="showTable = true">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <rect x="3" y="4" width="18" height="16" rx="2"/>
               <path d="M3 10h18M3 15h18M9 4v16"/>
             </svg>
           </button>
-          <button type="button" class="icon-btn" aria-label="How this works" @click="showHelp = true">
+          <button type="button" class="icon-btn" aria-label="How it works" @click="showHelp = true">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                  stroke-linecap="round" aria-hidden="true">
               <circle cx="12" cy="12" r="9"/>
@@ -95,17 +109,9 @@
             <button type="button" role="tab" :aria-selected="view === 'list'" @click="view = 'list'">List</button>
             <button type="button" role="tab" :aria-selected="view === 'map'" @click="view = 'map'">Map</button>
           </div>
-          <label class="year-select">
-            <span class="visually-hidden">Offer year</span>
-            <select v-model="year">
-              <option v-for="y in yearsNewestFirst" :key="y" :value="y">{{ y }}</option>
-            </select>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"
-                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M6 9l6 6 6-6"/>
-            </svg>
-          </label>
         </div>
+        <!-- Map tab only: the list's verdicts already cover every year -->
+        <year-timeline v-if="view === 'map'" v-model="year" :years="YEARS" class="m-bar__years"/>
       </header>
 
       <main class="m-content" :class="`m-content--${view}`">
@@ -113,8 +119,8 @@
           <p class="m-list__lead">{{ home ? 'Best chances first, from your address.' : 'Add your address to rank schools by your chances.' }}</p>
           <name-filter v-model="nameFilter" id="name-filter-m"/>
           <ranked-list :rows="rankedRows" :selected-name="null" :year="year" @select="openSchool"/>
-          <p class="fine-print">{{ finePrint }}</p>
-          <p class="fine-print">
+          <p class="fine-print list-note">{{ finePrint }}</p>
+          <p class="fine-print list-note">
             {{ sourceLine }} Questions or corrections: <a href="mailto:matt@roxburghm.com">matt@roxburghm.com</a>
             <span v-if="buildDateTime"> · Build {{ buildDateTime }}</span>
           </p>
@@ -140,6 +146,9 @@
             </button>
             <span class="m-page__title">{{ selected.shortName }}</span>
           </div>
+          <div class="m-page__years">
+            <year-timeline v-model="year" :years="YEARS"/>
+          </div>
           <div ref="pageBody" class="m-page__body">
             <schools-map :schools="schools" :year="year" :home="home" :selected="selected" :focus="selected"
                          height="220px" :interactive="false"
@@ -152,10 +161,11 @@
       </transition>
     </div>
 
-    <v-dialog v-model="showHelp" max-width="780" :fullscreen="narrow" scrollable>
+    <!-- Desktop dialogs stop short of the window edges rather than filling its height -->
+    <v-dialog v-model="showHelp" max-width="780" :max-height="dialogMaxHeight" :fullscreen="narrow" scrollable>
       <Help @close="showHelp = false"/>
     </v-dialog>
-    <v-dialog v-model="showTable" max-width="1100" :fullscreen="narrow" scrollable>
+    <v-dialog v-model="showTable" max-width="1100" :max-height="dialogMaxHeight" :fullscreen="narrow" scrollable>
       <SchoolTable :years="YEARS" :year="year" :schools="schools" :home="home"
                    @close="showTable = false" @open="openFromTable"/>
     </v-dialog>
@@ -177,6 +187,7 @@ import SchoolTable from './components/SchoolTable.vue';
 import NameFilter from './components/NameFilter.vue';
 import MapLegend from './components/MapLegend.vue';
 import MiniSpark from './components/MiniSpark.vue';
+import SchoolIcon from './components/SchoolIcon.vue';
 import Help from './Help.vue';
 
 // Below this width the two columns don't fit: switch to the List / Map tabs.
@@ -192,7 +203,7 @@ function readStored(key) {
 
 export default {
   name: 'App',
-  components: {SchoolsMap, HomePicker, RankedList, YearTimeline, SchoolDetail, SchoolTable, NameFilter, MapLegend, MiniSpark, Help},
+  components: {SchoolsMap, HomePicker, RankedList, YearTimeline, SchoolDetail, SchoolTable, NameFilter, MapLegend, MiniSpark, SchoolIcon, Help},
   data() {
     return {
       YEARS,
@@ -387,8 +398,8 @@ export default {
               ((x.a.dist ?? 0) - (y.a.dist ?? 0)) ||
               x.school.shortName.localeCompare(y.school.shortName));
     },
-    yearsNewestFirst() {
-      return [...YEARS].reverse();
+    dialogMaxHeight() {
+      return this.narrow ? undefined : 'min(760px, calc(100vh - 128px))';
     },
     listHeading() {
       return this.home ? `Your chances from ${this.homeName}` : 'Schools';
@@ -485,18 +496,9 @@ export default {
 }
 
 .fine-print { margin: 0; font-size: 12px; color: var(--ink-3); line-height: 1.5; }
-
-.text-btn {
-  min-height: 40px;
-  padding: 0 12px;
-  border: 0;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--ink-2);
-  font: 600 13px var(--font);
-  cursor: pointer;
-}
-.text-btn:hover { background: #F0F2F5; }
+/* Notes under the school list use the cards' inset, so they line up with the
+   coloured dots: 2px border + 14px padding, both sides */
+.list-note { padding: 0 16px; }
 
 .icon-btn {
   flex: none;
@@ -532,15 +534,43 @@ export default {
   justify-content: space-between;
   gap: 8px 32px;
 }
-.app-header h1 {
+.brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.brand h1 {
   margin: 0;
   font-family: var(--font-display);
   font-size: 21px;
   font-weight: 700;
   letter-spacing: -0.01em;
+  line-height: 1.2;
 }
-.app-header p { margin: 2px 0 0; font-size: 14px; color: var(--ink-3); }
-.app-header__links { display: flex; gap: 4px; flex-wrap: wrap; }
+.brand p { margin: 2px 0 0; font-size: 14px; color: var(--ink-3); }
+.brand__mark {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  padding: 8px;
+  box-sizing: border-box;
+  border-radius: 11px;
+  background: var(--accent);
+  color: #fff;
+}
+.brand__mark--small { width: 30px; height: 30px; padding: 6px; border-radius: 9px; }
+.header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.header-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  font: 600 14px var(--font);
+  cursor: pointer;
+}
+.header-btn svg { color: var(--ink-3); }
+.header-btn:hover { background: var(--ground); }
 
 .d-main {
   flex: 1;
@@ -627,13 +657,14 @@ export default {
 .m-bar__top { display: flex; align-items: center; gap: 2px; }
 .m-bar__top h1 {
   flex: 1;
-  margin: 0 0 0 4px;
+  margin: 0 0 0 10px;
   font-family: var(--font-display);
   font-size: 19px;
   font-weight: 700;
   letter-spacing: -0.01em;
 }
 .m-bar__controls { display: flex; gap: 8px; }
+.m-bar__years { margin: -2px 2px -6px; }
 
 .segmented {
   flex: 1;
@@ -659,20 +690,6 @@ export default {
   box-shadow: 0 1px 2px rgba(22, 24, 29, .12), 0 1px 4px rgba(22, 24, 29, .06);
 }
 
-.year-select { position: relative; flex: none; display: flex; align-items: center; }
-.year-select select {
-  height: 44px;
-  padding: 0 34px 0 14px;
-  border: 1px solid #D5D9E0;
-  border-radius: 12px;
-  background: #fff;
-  font: 600 16px var(--font);
-  font-variant-numeric: tabular-nums;
-  color: var(--ink);
-  appearance: none;
-  -webkit-appearance: none;
-}
-.year-select svg { position: absolute; right: 12px; pointer-events: none; color: var(--ink-3); }
 
 .m-content { flex: 1; min-height: 0; position: relative; }
 .m-content--list { overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
@@ -702,6 +719,8 @@ export default {
   border-bottom: 1px solid var(--line);
 }
 .m-page__title { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
+.m-page__bar + .m-page__years { margin-top: -1px; }
+.m-page__years { flex: none; padding: 0 14px 2px; border-bottom: 1px solid var(--line); background: #fff; }
 .m-page__body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
 .m-page__body .map { border-radius: 0 !important; }
 
