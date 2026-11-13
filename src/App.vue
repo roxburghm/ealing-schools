@@ -485,9 +485,9 @@ export default {
 }
 
 .fine-print { margin: 0; font-size: 12px; color: var(--ink-3); line-height: 1.5; }
-/* Notes under the school list line up with the school names in the cards:
-   2px border + 14px padding + 12px dot + 12px gap */
-.list-note { padding: 0 16px 0 40px; }
+/* Notes under the school list use the cards' inset, so they line up with the
+   coloured dots: 2px border + 14px padding, both sides */
+.list-note { padding: 0 16px; }
 
 .text-btn {
   min-height: 40px;
