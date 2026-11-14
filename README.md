@@ -52,10 +52,12 @@ There are two advert spaces, both drawn by `src/components/AdSlot.vue`:
 
 `src/data/adverts.js` gives each space a list of adverts (link, picture, description for screen readers). A space
 starts on one picked at random and moves to the next every 12 seconds, in a shuffled order, holding still while the
-pointer is on it. Pictures go in `public/adverts/` at twice the size they are shown, and every picture in a space must
+pointer is on it. An advert can have a short film (`film`, an .mp4) that builds up to its picture and stops there: it
+plays once each time the advert comes up, starting when the space is on screen. Visitors who ask for reduced motion,
+and phones that refuse to play video unasked, get the picture instead. Pictures go in `public/adverts/` at twice the size they are shown, and every picture in a space must
 be the same shape. Empty a space's list and it disappears, taking no room.
 
-The SquadCars adverts (five wordings, a picture each per space) are built in the squadcars repo
+The SquadCars adverts (five wordings, a picture and a film each per space) are built in the squadcars repo
 (`marketing/brand/schools-advert/`), which also writes `src/data/squadcars-adverts.json`: rebuild them there and copy
 both over. Each link carries `utm_content=<wording>`, so clicks can be told apart.
 
