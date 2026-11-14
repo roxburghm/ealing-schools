@@ -1,7 +1,8 @@
 <template>
   <div>
     <ol class="ranked">
-      <li v-for="row in rows" :key="row.school.name" :data-school="row.school.name">
+      <template v-for="(row, i) in rows" :key="row.school.name">
+      <li :data-school="row.school.name">
         <button type="button" :class="['row', {'row--on': row.school.name === selectedName}]"
                 :aria-pressed="row.school.name === selectedName" @click="$emit('select', row.school)">
           <span class="row__dot" aria-hidden="true" :style="{background: row.school.colour}"></span>
@@ -18,6 +19,8 @@
           <mini-spark :school="row.school" :year="year" :dist="row.a.dist"/>
         </button>
       </li>
+      <li v-if="$slots.advert && i === advertIndex" class="ranked__advert"><slot name="advert"/></li>
+      </template>
     </ol>
     <p v-if="!rows.length" class="empty">No school names match that.</p>
   </div>
@@ -35,8 +38,15 @@ export default {
     year: {type: String, required: true},
     // borough id → name, when rows should say which borough they're in
     boroughNames: {type: Object, default: null},
+    // The `advert` slot, when given, goes after this many schools (or after the last, if fewer are shown)
+    advertAfter: {type: Number, default: 3},
   },
   emits: ['select'],
+  computed: {
+    advertIndex() {
+      return Math.min(this.advertAfter, this.rows.length) - 1;
+    },
+  },
 };
 </script>
 

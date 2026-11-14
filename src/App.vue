@@ -33,6 +33,7 @@
       </header>
 
       <div class="d-main">
+        <div class="d-left">
         <aside class="d-list" aria-label="Schools ranked by your chances">
           <home-picker :maps-ready="mapsReady" :home-name="homeName" :has-home="!!home" :search-area="searchArea"
                        @set-home="setHome" @clear-home="clearHome"/>
@@ -55,6 +56,9 @@
             <span v-if="buildDateTime"> · Build {{ buildDateTime }}</span>
           </p>
         </aside>
+        <!-- Stays put under the list while the list scrolls -->
+        <ad-slot space="desktop" class="d-advert"/>
+        </div>
 
         <section ref="rightPane" class="d-right" aria-label="Map and school details">
           <div class="card map-card">
@@ -136,7 +140,9 @@
           </div>
           <name-filter v-model="nameFilter" id="name-filter-m"/>
           <ranked-list :rows="rankedRows" :selected-name="null" :year="year" :borough-names="rowBoroughNames"
-                       @select="openSchool"/>
+                       @select="openSchool">
+            <template #advert><ad-slot space="mobile"/></template>
+          </ranked-list>
           <p class="fine-print list-note">{{ finePrint }}</p>
           <p class="fine-print list-note">
             {{ sourceLine }} Questions or corrections: <a href="mailto:matt@roxburghm.com">matt@roxburghm.com</a>
@@ -208,6 +214,7 @@ import MapLegend from './components/MapLegend.vue';
 import MiniSpark from './components/MiniSpark.vue';
 import SchoolIcon from './components/SchoolIcon.vue';
 import BoroughPicker from './components/BoroughPicker.vue';
+import AdSlot from './components/AdSlot.vue';
 import Help from './Help.vue';
 
 // Below this width the two columns don't fit: switch to the List / Map tabs.
@@ -248,7 +255,7 @@ function readStored(key) {
 
 export default {
   name: 'App',
-  components: {SchoolsMap, HomePicker, RankedList, YearTimeline, SchoolDetail, SchoolTable, NameFilter, MapLegend, MiniSpark, SchoolIcon, BoroughPicker, Help},
+  components: {SchoolsMap, HomePicker, RankedList, YearTimeline, SchoolDetail, SchoolTable, NameFilter, MapLegend, MiniSpark, SchoolIcon, BoroughPicker, AdSlot, Help},
   data() {
     return {
       YEARS,
@@ -706,7 +713,10 @@ export default {
   gap: 20px;
 }
 
+/* The list scrolls; the advert under it does not */
+.d-left { min-height: 0; display: flex; flex-direction: column; }
 .d-list {
+  flex: 1;
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -730,6 +740,15 @@ export default {
 }
 
 .d-detail { flex: none; }
+
+/* Same inset as the list, with the same room kept for a scrollbar, so the advert lines up with the school rows */
+.d-advert {
+  flex: none;
+  padding: 10px 6px 14px 2px;
+  border-top: 1px solid var(--line);
+  overflow: hidden auto;
+  scrollbar-gutter: stable;
+}
 
 .list-head { display: flex; flex-direction: column; gap: 10px; }
 .borough-bar {
@@ -774,6 +793,7 @@ export default {
 @media (max-height: 700px) {
   .d-shell { height: auto; }
   .d-list, .d-right { overflow: visible; }
+  .d-advert { border-top: 0; padding-bottom: 24px; }
 }
 
 /* ---------- Phones ---------- */
