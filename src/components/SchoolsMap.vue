@@ -31,13 +31,22 @@
       </CustomMarker>
     </GoogleMap>
     <div v-else class="map map--loading" :class="{'map--fill': height}">{{ mapsFailed ? 'The map couldn’t load. You can still enter your address above to see your chances.' : 'Loading map…' }}</div>
-    <button v-if="focus && mapsReady && interactive" type="button" class="show-all" @click="$emit('clear-focus')">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>
-      </svg>
-      Show all schools
-    </button>
+    <div v-if="focus && mapsReady && interactive" class="map-actions">
+      <button type="button" class="map-action" @click="$emit('clear-focus')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>
+        </svg>
+        Show all schools
+      </button>
+      <button v-if="hasCatchment" type="button" class="map-action" :aria-pressed="intakeView" @click="showIntake">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="8.5" stroke-dasharray="3 2.6"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/>
+        </svg>
+        Show intake
+      </button>
+    </div>
   </div>
 </template>
 
@@ -112,6 +121,8 @@ export default {
   data() {
     return {
       fitted: false,
+      // Zoomed to the focused school's whole intake area (and home), not just school and home.
+      intakeView: false,
       center: {lat: 51.522, lng: -0.325},
       mapStyles: [
         {elementType: 'geometry', stylers: [{color: '#f5f5f5'}]},
@@ -133,6 +144,16 @@ export default {
     // While zoomed to a school, hide the others so its catchment stands out.
     shown() {
       return this.focus ? this.schools.filter(s => s.name === this.focus.name) : this.schools;
+    },
+    // Years in which the focused school drew a cut-off line on the map.
+    catchmentYears() {
+      if (!this.focus) return [];
+      return Object.entries(this.focus.intakeDist)
+          .filter(([year, cut]) => /^\d{4}$/.test(year) && typeof cut === 'number' && cut > 0)
+          .map(([year]) => year);
+    },
+    hasCatchment() {
+      return this.catchmentYears.length > 0;
     },
     rings() {
       return this.shown
@@ -196,6 +217,7 @@ export default {
   },
   watch: {
     focus() {
+      this.intakeView = false;
       this.fitView();
     },
     // No re-fit on year change: the zoomed view already covers every year.
@@ -213,6 +235,10 @@ export default {
           ? walk.map(([lng, lat]) => ({lat, lng}))
           : circlePoints(s.centre, s.intakeDist[year]);
     },
+    showIntake() {
+      this.intakeView = true;
+      this.fitView();
+    },
     onIdle() {
       // First idle means the map exists: replace the fixed start view with a fit.
       if (this.fitted) return;
@@ -222,19 +248,19 @@ export default {
     // Zoom to the focused school, or to every school. None of these depend on
     // the year, so moving through the years never re-zooms the map.
     //  - school + home: crop tight to the two, for the most street detail
-    //  - school only: fit its largest catchment across all the years
+    //  - school only, or "Show intake": fit its largest catchment across all
+    //    the years, plus home if we have one
     fitView() {
       const map = this.$refs.gmap?.map;
       if (!map || !window.google) return;
       const bounds = new window.google.maps.LatLngBounds();
       const points = [];
-      if (this.focus && this.home) {
+      if (this.focus && this.home && !this.intakeView) {
         points.push(this.focus.centre, this.home);
       } else if (this.focus) {
         points.push(this.focus.centre);
-        Object.entries(this.focus.intakeDist)
-            .filter(([year, cut]) => /^\d{4}$/.test(year) && typeof cut === 'number' && cut > 0)
-            .forEach(([year]) => points.push(...this.catchmentPath(this.focus, year)));
+        if (this.home) points.push(this.home);
+        this.catchmentYears.forEach(year => points.push(...this.catchmentPath(this.focus, year)));
       } else {
         points.push(...this.schools.map(s => s.centre));
       }
@@ -248,9 +274,11 @@ export default {
         // Room at the top for the Show all button and the home pin (it rises
         // above its point). With a home the school sits at the edge, so also
         // leave room below and beside it for its name.
-        map.fitBounds(bounds, this.home
-            ? {top: 60, right: 56, bottom: 48, left: 56}
-            : {top: 60, right: 16, bottom: 16, left: 16});
+        let padding = {top: 60, right: 16, bottom: 16, left: 16};
+        if (this.home) padding = this.intakeView
+            ? {top: 60, right: 32, bottom: 24, left: 32}
+            : {top: 60, right: 56, bottom: 48, left: 56};
+        map.fitBounds(bounds, padding);
         // Home right next to the school: stop at street level.
         window.google.maps.event.addListenerOnce(map, 'bounds_changed', () => {
           if (map.getZoom() > MAX_FOCUS_ZOOM) map.setZoom(MAX_FOCUS_ZOOM);
@@ -330,10 +358,18 @@ export default {
 .pin--on .pin__dot { width: 30px; height: 30px; padding: 5px; }
 .pin--on .pin__label { top: 39px; font-size: 13px; font-weight: 700; }
 .home-pin { display: block; pointer-events: none; }
-.show-all {
+.map-actions {
   position: absolute;
   top: 10px;
   left: 10px;
+  right: 60px; /* clear of the full-screen control */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  pointer-events: none;
+}
+.map-action {
+  pointer-events: auto;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -347,5 +383,6 @@ export default {
   box-shadow: 0 1px 2px rgba(22, 24, 29, .16), 0 4px 12px rgba(22, 24, 29, .12);
   cursor: pointer;
 }
-.show-all:hover { background: var(--ground); }
+.map-action:hover { background: var(--ground); }
+.map-action[aria-pressed="true"] { color: var(--accent); }
 </style>
