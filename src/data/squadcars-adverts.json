@@ -1,0 +1,92 @@
+[
+  {
+    "id": "carpool-app",
+    "alt": "SquadCars. The carpool app for kids’ sport. Share lifts to training and matches with parents you know. Get the app, 90 days free.",
+    "desktop": {
+      "file": "squadcars-schools-desktop-carpool-app.png",
+      "film": "squadcars-schools-desktop-carpool-app.mp4",
+      "seconds": 3.4,
+      "width": 760,
+      "height": 240
+    },
+    "mobile": {
+      "file": "squadcars-schools-mobile-carpool-app.png",
+      "film": "squadcars-schools-mobile-carpool-app.mp4",
+      "seconds": 5,
+      "width": 720,
+      "height": 360
+    }
+  },
+  {
+    "id": "whos-driving",
+    "alt": "SquadCars. Who’s driving to training? Carpooling for kids’ teams and clubs. Every seat confirmed. Get the app, 90 days free.",
+    "desktop": {
+      "file": "squadcars-schools-desktop-whos-driving.png",
+      "film": "squadcars-schools-desktop-whos-driving.mp4",
+      "seconds": 3.4,
+      "width": 760,
+      "height": 240
+    },
+    "mobile": {
+      "file": "squadcars-schools-mobile-whos-driving.png",
+      "film": "squadcars-schools-mobile-whos-driving.mp4",
+      "seconds": 5,
+      "width": 720,
+      "height": 360
+    }
+  },
+  {
+    "id": "share-the-lifts",
+    "alt": "SquadCars. Share the lifts to kids’ sport. Less chasing. Every seat confirmed. Get the app, 90 days free.",
+    "desktop": {
+      "file": "squadcars-schools-desktop-share-the-lifts.png",
+      "film": "squadcars-schools-desktop-share-the-lifts.mp4",
+      "seconds": 3.4,
+      "width": 760,
+      "height": 240
+    },
+    "mobile": {
+      "file": "squadcars-schools-mobile-share-the-lifts.png",
+      "film": "squadcars-schools-mobile-share-the-lifts.mp4",
+      "seconds": 5,
+      "width": 720,
+      "height": 360
+    }
+  },
+  {
+    "id": "group-chat",
+    "alt": "SquadCars. Swap the group chat for a plan. The carpool app for kids’ football, swimming and rugby. Get the app, 90 days free.",
+    "desktop": {
+      "file": "squadcars-schools-desktop-group-chat.png",
+      "film": "squadcars-schools-desktop-group-chat.mp4",
+      "seconds": 3.4,
+      "width": 760,
+      "height": 240
+    },
+    "mobile": {
+      "file": "squadcars-schools-mobile-group-chat.png",
+      "film": "squadcars-schools-mobile-group-chat.mp4",
+      "seconds": 5,
+      "width": 720,
+      "height": 360
+    }
+  },
+  {
+    "id": "new-school",
+    "alt": "SquadCars. New school. New clubs. More lifts. Share lifts to training and matches with parents you know. Get the app, 90 days free.",
+    "desktop": {
+      "file": "squadcars-schools-desktop-new-school.png",
+      "film": "squadcars-schools-desktop-new-school.mp4",
+      "seconds": 3.4,
+      "width": 760,
+      "height": 240
+    },
+    "mobile": {
+      "file": "squadcars-schools-mobile-new-school.png",
+      "film": "squadcars-schools-mobile-new-school.mp4",
+      "seconds": 5,
+      "width": 720,
+      "height": 360
+    }
+  }
+]
