@@ -10,16 +10,16 @@
     <h2 class="picker__ask">Choose a borough</h2>
     <ul class="picker__grid">
       <li v-for="card in cards" :key="card.id">
-        <button type="button" class="card" @click="$emit('pick', [card.id])">
+        <button type="button" :class="['card', {'card--all': card.all}]" @click="$emit('pick', card.ids)">
           <svg class="card__map" :viewBox="card.viewBox" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-            <path :d="card.path" class="card__shape"/>
-            <circle v-for="dot in card.dots" :key="dot.name" :cx="dot.x" :cy="dot.y" r="4.5" :fill="dot.colour"
-                    class="card__dot"/>
+            <path v-for="piece in card.pieces" :key="piece.id" :d="piece.d" class="card__shape"/>
+            <circle v-for="dot in card.dots" :key="dot.name" :cx="dot.x" :cy="dot.y" :r="card.all ? 3 : 4.5"
+                    :fill="dot.colour" class="card__dot"/>
           </svg>
           <span class="card__text">
             <span class="card__name">{{ card.name }}</span>
             <span class="card__meta">{{ card.count }} schools · {{ card.years }}</span>
-            <span class="card__council">Figures from {{ card.council }}</span>
+            <span class="card__council">{{ card.source }}</span>
           </span>
           <svg class="card__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -28,10 +28,6 @@
         </button>
       </li>
     </ul>
-
-    <button v-if="cards.length > 1" type="button" class="picker__all" @click="$emit('pick', cards.map(c => c.id))">
-      Or see all {{ total }} schools together
-    </button>
 
     <p class="picker__foot">
       Figures are estimates worked out from the councils' published offers, to help you plan. The councils and schools
@@ -42,12 +38,45 @@
 
 <script>
 // The first screen: one card per borough, each drawn as its outline with its
-// schools as dots in their map colours.
+// schools as dots in their map colours, then one card with every borough
+// fitted together for seeing all the schools at once.
 import SchoolIcon from '@/components/SchoolIcon.vue';
 import outlines from '@/data/outlines';
 import {YEARS} from '@/plugins/assess';
 
-const SIZE = 200; // each outline is scaled so its longer side is this many viewBox units
+const SIZE = 200; // each map is scaled so its longer side is this many viewBox units
+const PAD = 8;
+
+// Draws one or more borough outlines in a shared flat projection (squashed
+// east–west by the latitude so shapes look right), with schools as dots.
+function drawMap(rings, schools) {
+  const points = rings.flatMap(r => r.ring);
+  const lat0 = points.length ? points.reduce((t, p) => t + p[1], 0) / points.length : 51.5;
+  const k = Math.cos(lat0 * Math.PI / 180);
+  const xs = points.map(p => p[0] * k);
+  const ys = points.map(p => -p[1]);
+  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+  const scale = SIZE / (Math.max(maxX - minX, maxY - minY) || 1);
+  const project = (lng, lat) => [(lng * k - minX) * scale, (-lat - minY) * scale];
+  const width = (maxX - minX) * scale;
+  const height = (maxY - minY) * scale;
+  return {
+    viewBox: `${-PAD} ${-PAD} ${width + PAD * 2} ${height + PAD * 2}`,
+    pieces: rings.filter(r => r.ring.length).map(r => ({
+      id: r.id,
+      d: 'M' + r.ring.map(([lng, lat]) => project(lng, lat).map(n => n.toFixed(1)).join(' ')).join('L') + 'Z',
+    })),
+    dots: schools.map(s => {
+      const [x, y] = project(s.centre.lng, s.centre.lat);
+      return {name: s.name, x: x.toFixed(1), y: y.toFixed(1), colour: s.colour};
+    }),
+  };
+}
+
+function yearRange(schools) {
+  const years = YEARS.filter(y => schools.some(s => y in s.intakeDist));
+  return years.length ? `${years[0]}–${years[years.length - 1]}` : 'no figures yet';
+}
 
 export default {
   name: 'BoroughPicker',
@@ -58,41 +87,30 @@ export default {
   },
   emits: ['pick'],
   computed: {
-    total() {
-      return this.schools.length;
-    },
     cards() {
-      return this.boroughs.map(b => {
+      const cards = this.boroughs.map(b => {
         const schools = this.schools.filter(s => s.borough === b.id);
-        const years = YEARS.filter(y => schools.some(s => y in s.intakeDist));
-        const ring = outlines[b.id] || [];
-        // Flat projection, squashed east–west by the latitude so shapes look right.
-        const lat0 = ring.length ? ring.reduce((t, p) => t + p[1], 0) / ring.length : 51.5;
-        const k = Math.cos(lat0 * Math.PI / 180);
-        const xs = ring.map(p => p[0] * k);
-        const ys = ring.map(p => -p[1]);
-        const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
-        const scale = SIZE / (Math.max(maxX - minX, maxY - minY) || 1);
-        const project = (lng, lat) => [(lng * k - minX) * scale, (-lat - minY) * scale];
-        const width = (maxX - minX) * scale;
-        const height = (maxY - minY) * scale;
-        const pad = 8;
         return {
           id: b.id,
+          ids: [b.id],
           name: b.name,
-          council: b.council,
+          source: `Figures from ${b.council}`,
           count: schools.length,
-          years: years.length ? `${years[0]}–${years[years.length - 1]}` : 'no figures yet',
-          viewBox: `${-pad} ${-pad} ${width + pad * 2} ${height + pad * 2}`,
-          path: ring.length
-              ? 'M' + ring.map(([lng, lat]) => project(lng, lat).map(n => n.toFixed(1)).join(' ')).join('L') + 'Z'
-              : '',
-          dots: schools.map(s => {
-            const [x, y] = project(s.centre.lng, s.centre.lat);
-            return {name: s.name, x: x.toFixed(1), y: y.toFixed(1), colour: s.colour};
-          }),
+          years: yearRange(schools),
+          ...drawMap([{id: b.id, ring: outlines[b.id] || []}], schools),
         };
       });
+      if (this.boroughs.length < 2) return cards;
+      return [...cards, {
+        id: 'all',
+        all: true,
+        ids: this.boroughs.map(b => b.id),
+        name: 'All boroughs',
+        source: `Figures from all ${this.boroughs.length} councils`,
+        count: this.schools.length,
+        years: yearRange(this.schools),
+        ...drawMap(this.boroughs.map(b => ({id: b.id, ring: outlines[b.id] || []})), this.schools),
+      }];
     },
   },
 };
@@ -174,23 +192,17 @@ export default {
 .card:hover .card__shape { fill: #E6EEFE; stroke: #9DB5EE; }
 .card__dot { stroke: #fff; stroke-width: 1.5; }
 
+/* The jigsaw: every borough as one piece, white seams between them */
+.card--all .card__shape { fill: #E3E8EF; stroke: #fff; stroke-width: 1.75; }
+.card--all:hover .card__shape { fill: #DCE6FB; stroke: #fff; }
+.card--all .card__dot { stroke-width: 1; }
+
 .card__text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .card__name { font-family: var(--font-display); font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
 .card__meta { font-size: 14px; font-weight: 500; color: var(--ink-2); }
 .card__council { font-size: 13px; color: var(--ink-3); }
 .card__arrow { align-self: end; color: var(--ink-3); transition: color .15s, transform .15s; }
 .card:hover .card__arrow { color: var(--accent); transform: translateX(3px); }
-
-.picker__all {
-  margin-top: 20px;
-  padding: 10px 0;
-  border: 0;
-  background: none;
-  font: 600 15px var(--font);
-  color: var(--accent);
-  cursor: pointer;
-}
-.picker__all:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 .picker__foot { margin: 40px 0 0; max-width: 620px; font-size: 13px; line-height: 1.5; color: var(--ink-3); }
 
@@ -210,6 +222,7 @@ export default {
   }
   .card__map { grid-column: auto; height: 80px; }
   .card__dot { r: 7px; stroke-width: 2; } /* the outline is drawn much smaller here */
+  .card--all .card__dot { r: 4px; stroke-width: 1; }
   .card__arrow { align-self: center; }
   .card__name { font-size: 19px; }
 }
