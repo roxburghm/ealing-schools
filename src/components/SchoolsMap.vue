@@ -2,7 +2,7 @@
   <div class="map-wrap" :style="height ? {height} : null">
     <GoogleMap v-if="mapsReady" ref="gmap" :api-promise="apiPromise" :center="center" :zoom="12" :styles="mapStyles"
                :clickable-icons="false" :street-view-control="false" :map-type-control="false"
-               :fullscreen-control="interactive" :zoom-control="interactive" :disable-default-ui="!interactive"
+               :fullscreen-control="interactive && !collapsible" :zoom-control="interactive" :disable-default-ui="!interactive"
                :gesture-handling="interactive ? gestures : 'cooperative'" :is-fractional-zoom-enabled="true"
                class="map" :class="{'map--fill': height}" @idle="onIdle">
       <Polygon v-for="r in rings" :key="'ring-' + r.key" :options="r.options"/>
@@ -31,7 +31,31 @@
       </CustomMarker>
     </GoogleMap>
     <div v-else class="map map--loading" :class="{'map--fill': height}">{{ mapsFailed ? 'The map couldn’t load. You can still enter your address above to see your chances.' : 'Loading map…' }}</div>
-    <div v-if="focus && mapsReady && interactive" class="map-actions">
+    <!-- Phone school page: the small map grows (expand) and shrinks back (collapse)
+         with an icon in the same corner; the big map also has a reset-zoom icon. -->
+    <div v-if="focus && mapsReady && (expandable || collapsible)" class="map-corner">
+      <button v-if="expandable" type="button" class="map-icon" aria-label="Make the map bigger" @click="$emit('expand')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M15 4h5v5M9 20H4v-5M20 4l-6.5 6.5M4 20l6.5-6.5"/>
+        </svg>
+      </button>
+      <template v-if="collapsible">
+        <button type="button" class="map-icon" aria-label="Make the map smaller" @click="$emit('collapse')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M14 10l6-6M14 10V5M14 10h5M10 14l-6 6M10 14v5M10 14H5"/>
+          </svg>
+        </button>
+        <button type="button" class="map-icon" aria-label="Reset the zoom" @click="resetView">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>
+          </svg>
+        </button>
+      </template>
+    </div>
+    <div v-if="focus && mapsReady && interactive && !collapsible" class="map-actions">
       <button type="button" class="map-action" @click="$emit('clear-focus')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -116,13 +140,21 @@ export default {
     gestures: {type: String, default: 'greedy'},
     // Re-fit when a hidden map (another tab) becomes visible again.
     visible: {type: Boolean, default: true},
+    // Start each school at the intake view (its whole intake area plus home)
+    // rather than the tight school-and-home crop.
+    intakeFirst: {type: Boolean, default: false},
+    // Small preview map: an icon that asks to make the map bigger.
+    expandable: {type: Boolean, default: false},
+    // The bigger map: icons to shrink it back and to reset the zoom, in place
+    // of the Show buttons and Google's full-screen control.
+    collapsible: {type: Boolean, default: false},
   },
-  emits: ['select', 'clear-focus'],
+  emits: ['select', 'clear-focus', 'expand', 'collapse'],
   data() {
     return {
       fitted: false,
       // Zoomed to the focused school's whole intake area (and home), not just school and home.
-      intakeView: false,
+      intakeView: this.intakeFirst,
       center: {lat: 51.522, lng: -0.325},
       mapStyles: [
         {elementType: 'geometry', stylers: [{color: '#f5f5f5'}]},
@@ -217,7 +249,7 @@ export default {
   },
   watch: {
     focus() {
-      this.intakeView = false;
+      this.intakeView = this.intakeFirst;
       this.fitView();
     },
     // No re-fit on year change: the zoomed view already covers every year.
@@ -234,6 +266,10 @@ export default {
       return walk
           ? walk.map(([lng, lat]) => ({lat, lng}))
           : circlePoints(s.centre, s.intakeDist[year]);
+    },
+    resetView() {
+      this.intakeView = this.intakeFirst;
+      this.fitView();
     },
     showIntake() {
       this.intakeView = true;
@@ -383,6 +419,27 @@ export default {
   box-shadow: 0 1px 2px rgba(22, 24, 29, .16), 0 4px 12px rgba(22, 24, 29, .12);
   cursor: pointer;
 }
-.map-action:hover { background: var(--ground); }
+.map-action:hover, .map-icon:hover { background: var(--ground); }
+.map-corner {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.map-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 1px 2px rgba(22, 24, 29, .16), 0 4px 12px rgba(22, 24, 29, .12);
+  cursor: pointer;
+}
 .map-action[aria-pressed="true"] { color: var(--accent); }
 </style>

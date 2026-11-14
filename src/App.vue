@@ -169,11 +169,37 @@
           </div>
           <div ref="pageBody" class="m-page__body">
             <schools-map :schools="schools" :year="year" :home="home" :selected="selected" :focus="selected"
-                         height="220px" :interactive="false"
+                         height="220px" :interactive="false" expandable
                          :api-promise="apiPromise" :maps-ready="mapsReady" :maps-failed="mapsFailed"
-                         @select="openSchool"/>
+                         @select="openSchool" @expand="openFullMap"/>
             <school-detail flat :school="selected" :assessment="assessments.get(selected)"
                            :year="year" :home="home"/>
+          </div>
+        </section>
+      </transition>
+
+      <!-- The school page's map made bigger: same header, the map fills the rest,
+           starting at the intake view -->
+      <transition name="grow">
+        <section v-if="fullMap && pageOpen && selected" class="m-page m-full" role="dialog" aria-modal="true"
+                 :aria-label="`${selected.name} map`">
+          <div class="m-page__bar">
+            <button type="button" class="icon-btn" aria-label="Back" @click="closeFullMap">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M15 18l-6-6 6-6"/>
+              </svg>
+            </button>
+            <span class="m-page__title">{{ selected.shortName }}</span>
+          </div>
+          <div class="m-page__years">
+            <year-timeline v-model="year" :years="YEARS"/>
+          </div>
+          <div class="m-full__map">
+            <schools-map :schools="schools" :year="year" :home="home" :selected="selected" :focus="selected"
+                         height="100%" intake-first collapsible @collapse="closeFullMap"
+                         :api-promise="apiPromise" :maps-ready="mapsReady" :maps-failed="mapsFailed"/>
+            <map-legend compact class="m-map__legend"/>
           </div>
         </section>
       </transition>
@@ -275,6 +301,7 @@ export default {
       // created while hidden has no size and draws without its streets.
       mapVisited: false,
       pageOpen: false,
+      fullMap: false, // the school page's map, full screen
     };
   },
   created() {
@@ -330,10 +357,10 @@ export default {
       }
     },
     fetchWalks() {
-      if (!this.home) return;
       const walkSchools = this.allSchools.filter(s => admission.measure(s) === 'walk');
+      // Outlines are drawn on the map with or without a home (load skips ones it has).
       walkSchools.forEach(walking.load);
-      if (this.mapsReady) walking.lookupWalks(walkSchools, this.home);
+      if (this.home && this.mapsReady) walking.lookupWalks(walkSchools, this.home);
     },
     matchesName(school) {
       const query = this.nameFilter.trim().toLowerCase();
@@ -423,6 +450,14 @@ export default {
         this.pageOpen = true;
       }
     },
+    openFullMap() {
+      history.pushState({school: this.selected.name, map: true}, '');
+      this.fullMap = true;
+    },
+    closeFullMap() {
+      if (history.state && history.state.map) history.back();
+      else this.fullMap = false;
+    },
     closeSchool() {
       if (history.state && history.state.school) {
         history.back();
@@ -434,6 +469,7 @@ export default {
     syncPageWithHistory(event) {
       const name = event.state && event.state.school;
       const school = name && this.allSchools.find(s => s.name === name);
+      this.fullMap = !!(school && event.state.map);
       if (school) {
         this.selected = school;
         this.focused = school;
@@ -538,8 +574,8 @@ export default {
         this.selected = this.rankedRows.length ? this.rankedRows[0].school : null;
       }
     },
-    // Walking data is only needed once there's a home to measure from: the
-    // walk itself from Google (once its script has loaded), outlines from CI.
+    // Walking outlines (from CI) load straight away for the map; the walk from
+    // home comes from Google once there's a home and its script has loaded.
     home: {
       immediate: true,
       handler() {
@@ -558,6 +594,7 @@ export default {
     // Leaving the phone layout with a school page open: drop it.
     narrow(now) {
       if (!now && this.pageOpen) this.pageOpen = false;
+      if (!now) this.fullMap = false;
     },
   }
 };
@@ -862,12 +899,17 @@ export default {
 .m-page__bar + .m-page__years { margin-top: -1px; }
 .m-page__years { flex: none; padding: 0 14px 2px; border-bottom: 1px solid var(--line); background: #fff; }
 .m-page__body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.m-full { z-index: 1001; }
+.m-full__map { position: relative; flex: 1; min-height: 0; }
+.m-full__map .map { border-radius: 0 !important; }
 .m-page__body .map { border-radius: 0 !important; }
 
 .page-enter-active, .page-leave-active { transition: transform .26s cubic-bezier(0.22, 1, 0.36, 1), opacity .26s; }
 .page-enter-from, .page-leave-to { transform: translateX(24px); opacity: 0; }
+.grow-enter-active, .grow-leave-active { transition: opacity .18s; }
+.grow-enter-from, .grow-leave-to { opacity: 0; }
 
 @media (prefers-reduced-motion: reduce) {
-  .page-enter-active, .page-leave-active { transition: none; }
+  .page-enter-active, .page-leave-active, .grow-enter-active, .grow-leave-active { transition: none; }
 }
 </style>
