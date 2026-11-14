@@ -13,6 +13,10 @@
         <button type="button" :class="['card', {'card--all': card.all}]" @click="$emit('pick', card.ids)">
           <svg class="card__map" :viewBox="card.viewBox" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <path v-for="piece in card.pieces" :key="piece.id" :d="piece.d" class="card__shape"/>
+            <!-- Seams drawn over every fill, so where outlines overlap slightly each border still shows in full -->
+            <template v-if="card.all">
+              <path v-for="piece in card.pieces" :key="`seam-${piece.id}`" :d="piece.d" class="card__seam"/>
+            </template>
             <circle v-for="dot in card.dots" :key="dot.name" :cx="dot.x" :cy="dot.y" :r="card.all ? 3 : 4.5"
                     :fill="dot.colour" class="card__dot"/>
           </svg>
@@ -49,9 +53,7 @@ const PAD = 8;
 
 // Draws one or more borough outlines in a shared flat projection (squashed
 // east–west by the latitude so shapes look right), with schools as dots.
-// With `gap`, each piece shrinks slightly and moves that many units out from the
-// middle of the group, so several boroughs read as a jigsaw pulled apart.
-function drawMap(rings, schools, gap = 0) {
+function drawMap(rings, schools) {
   const points = rings.flatMap(r => r.ring);
   const lat0 = points.length ? points.reduce((t, p) => t + p[1], 0) / points.length : 51.5;
   const k = Math.cos(lat0 * Math.PI / 180);
@@ -60,36 +62,16 @@ function drawMap(rings, schools, gap = 0) {
   const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
   const scale = SIZE / (Math.max(maxX - minX, maxY - minY) || 1);
   const project = (lng, lat) => [(lng * k - minX) * scale, (-lat - minY) * scale];
-
-  // Each piece shrinks a little about its own centre (so seams open even for
-  // the piece in the middle) and moves outward from the middle of the group.
-  const midX = (maxX - minX) * scale / 2, midY = (maxY - minY) * scale / 2;
-  const moves = {};
-  for (const r of rings) {
-    if (!gap || !r.ring.length) continue;
-    const pts = r.ring.map(([lng, lat]) => project(lng, lat));
-    const cx = pts.reduce((t, p) => t + p[0], 0) / pts.length;
-    const cy = pts.reduce((t, p) => t + p[1], 0) / pts.length;
-    const len = Math.hypot(cx - midX, cy - midY) || 1;
-    moves[r.id] = {cx, cy, dx: (cx - midX) / len * gap, dy: (cy - midY) / len * gap};
-  }
-  const SHRINK = 0.9;
-  const place = (id, lng, lat) => {
-    const [x, y] = project(lng, lat);
-    const m = moves[id];
-    if (!m) return [x, y];
-    return [m.cx + (x - m.cx) * SHRINK + m.dx, m.cy + (y - m.cy) * SHRINK + m.dy];
-  };
-
-  const pieces = rings.filter(r => r.ring.length).map(r => ({id: r.id, pts: r.ring.map(([lng, lat]) => place(r.id, lng, lat))}));
-  const all = pieces.flatMap(p => p.pts);
-  const left = Math.min(...all.map(p => p[0])), right = Math.max(...all.map(p => p[0]));
-  const top = Math.min(...all.map(p => p[1])), bottom = Math.max(...all.map(p => p[1]));
+  const width = (maxX - minX) * scale;
+  const height = (maxY - minY) * scale;
   return {
-    viewBox: `${left - PAD} ${top - PAD} ${right - left + PAD * 2} ${bottom - top + PAD * 2}`,
-    pieces: pieces.map(p => ({id: p.id, d: 'M' + p.pts.map(pt => pt.map(n => n.toFixed(1)).join(' ')).join('L') + 'Z'})),
+    viewBox: `${-PAD} ${-PAD} ${width + PAD * 2} ${height + PAD * 2}`,
+    pieces: rings.filter(r => r.ring.length).map(r => ({
+      id: r.id,
+      d: 'M' + r.ring.map(([lng, lat]) => project(lng, lat).map(n => n.toFixed(1)).join(' ')).join('L') + 'Z',
+    })),
     dots: schools.map(s => {
-      const [x, y] = place(s.borough, s.centre.lng, s.centre.lat);
+      const [x, y] = project(s.centre.lng, s.centre.lat);
       return {name: s.name, x: x.toFixed(1), y: y.toFixed(1), colour: s.colour};
     }),
   };
@@ -131,7 +113,7 @@ export default {
         source: `Figures from all ${this.boroughs.length} councils`,
         count: this.schools.length,
         years: yearRange(this.schools),
-        ...drawMap(this.boroughs.map(b => ({id: b.id, ring: outlines[b.id] || []})), this.schools, 8),
+        ...drawMap(this.boroughs.map(b => ({id: b.id, ring: outlines[b.id] || []})), this.schools),
       }];
     },
   },
@@ -214,9 +196,10 @@ export default {
 .card:hover .card__shape { fill: #E6EEFE; stroke: #9DB5EE; }
 .card__dot { stroke: #fff; stroke-width: 1.5; }
 
-/* The jigsaw: every borough as its own piece, pulled slightly apart */
-.card--all .card__shape { fill: #E3E8EF; stroke: var(--line-strong); stroke-width: 1; }
-.card--all:hover .card__shape { fill: #DCE6FB; stroke: #9DB5EE; }
+/* The jigsaw: every borough in its real place, wide white seams along the shared borders */
+.card--all .card__shape { fill: #D9DFE8; stroke: none; }
+.card--all:hover .card__shape { fill: #D8E3FA; }
+.card__seam { fill: none; stroke: #fff; stroke-width: 5px; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 .card--all .card__dot { stroke-width: 1; }
 
 .card__text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
@@ -245,6 +228,7 @@ export default {
   .card__map { grid-column: auto; height: 80px; }
   .card__dot { r: 7px; stroke-width: 2; } /* the outline is drawn much smaller here */
   .card--all .card__dot { r: 4px; stroke-width: 1; }
+  .card__seam { stroke-width: 3px; }
   .card__arrow { align-self: center; }
   .card__name { font-size: 19px; }
 }
