@@ -6,8 +6,8 @@
         <div class="brand">
           <span class="brand__mark" aria-hidden="true"><school-icon kind="cap"/></span>
           <div>
-            <h1>Ealing secondary school places</h1>
-            <p>How close did you need to live to get a place? Cut-off distances for every school, 2019–2026.</p>
+            <h1>Secondary school places</h1>
+            <p>How close did you need to live to get a place? Cut-off distances for {{ boroughNames }} schools, 2019–2026.</p>
           </div>
         </div>
         <nav class="header-actions" aria-label="More">
@@ -33,11 +33,12 @@
 
           <div class="list-head">
             <h2>{{ listHeading }}</h2>
+            <borough-filter v-if="boroughs.length > 1" v-model="boroughIds" :boroughs="boroughs" :counts="boroughCounts"/>
             <name-filter v-model="nameFilter"/>
           </div>
 
           <ranked-list :rows="rankedRows" :selected-name="focused && focused.name" :year="year"
-                       @select="selectSchool"/>
+                       :borough-names="rowBoroughNames" @select="selectSchool"/>
 
           <p class="fine-print list-note">{{ finePrint }}</p>
           <p class="fine-print list-note">
@@ -84,7 +85,7 @@
       <header class="m-bar">
         <div class="m-bar__top">
           <span class="brand__mark brand__mark--small" aria-hidden="true"><school-icon kind="cap"/></span>
-          <h1>Ealing school places</h1>
+          <h1>School places</h1>
           <button type="button" class="icon-btn" aria-label="Compare schools" @click="showTable = true">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -117,8 +118,10 @@
       <main class="m-content" :class="`m-content--${view}`">
         <div v-show="view === 'list'" class="m-list">
           <p class="m-list__lead">{{ home ? 'Best chances first, from your address.' : 'Add your address to rank schools by your chances.' }}</p>
+          <borough-filter v-if="boroughs.length > 1" v-model="boroughIds" :boroughs="boroughs" :counts="boroughCounts"/>
           <name-filter v-model="nameFilter" id="name-filter-m"/>
-          <ranked-list :rows="rankedRows" :selected-name="null" :year="year" @select="openSchool"/>
+          <ranked-list :rows="rankedRows" :selected-name="null" :year="year" :borough-names="rowBoroughNames"
+                       @select="openSchool"/>
           <p class="fine-print list-note">{{ finePrint }}</p>
           <p class="fine-print list-note">
             {{ sourceLine }} Questions or corrections: <a href="mailto:matt@roxburghm.com">matt@roxburghm.com</a>
@@ -177,6 +180,7 @@ import {Loader} from '@googlemaps/js-api-loader';
 import walking from '@/plugins/walking';
 import admission from '@/plugins/admission';
 import schools from '@/plugins/schools';
+import boroughs from '@/data/boroughs';
 import {YEARS, KIND_ORDER, assess} from '@/plugins/assess';
 import SchoolsMap from './components/SchoolsMap.vue';
 import HomePicker from './components/HomePicker.vue';
@@ -188,10 +192,18 @@ import NameFilter from './components/NameFilter.vue';
 import MapLegend from './components/MapLegend.vue';
 import MiniSpark from './components/MiniSpark.vue';
 import SchoolIcon from './components/SchoolIcon.vue';
+import BoroughFilter from './components/BoroughFilter.vue';
 import Help from './Help.vue';
 
 // Below this width the two columns don't fit: switch to the List / Map tabs.
 const NARROW = '(max-width: 1019px)';
+
+function storedBoroughs() {
+  const ids = boroughs.map(b => b.id);
+  const stored = readStored('boroughs');
+  const kept = Array.isArray(stored) ? ids.filter(id => stored.includes(id)) : [];
+  return kept.length ? kept : ids;
+}
 
 function readStored(key) {
   try {
@@ -203,11 +215,14 @@ function readStored(key) {
 
 export default {
   name: 'App',
-  components: {SchoolsMap, HomePicker, RankedList, YearTimeline, SchoolDetail, SchoolTable, NameFilter, MapLegend, MiniSpark, SchoolIcon, Help},
+  components: {SchoolsMap, HomePicker, RankedList, YearTimeline, SchoolDetail, SchoolTable, NameFilter, MapLegend, MiniSpark, SchoolIcon, BoroughFilter, Help},
   data() {
     return {
       YEARS,
-      schools,
+      allSchools: schools,
+      boroughs,
+      // Boroughs whose schools are shown. Remembered between visits.
+      boroughIds: storedBoroughs(),
       year: YEARS[YEARS.length - 1],
       selected: null,
       // The school the map is zoomed to; only set when someone picks a school.
@@ -272,7 +287,7 @@ export default {
     },
     fetchWalks() {
       if (!this.home) return;
-      const walkSchools = this.schools.filter(s => admission.measure(s) === 'walk');
+      const walkSchools = this.allSchools.filter(s => admission.measure(s) === 'walk');
       walkSchools.forEach(walking.load);
       if (this.mapsReady) walking.lookupWalks(walkSchools, this.home);
     },
@@ -359,7 +374,7 @@ export default {
     },
     syncPageWithHistory(event) {
       const name = event.state && event.state.school;
-      const school = name && this.schools.find(s => s.name === name);
+      const school = name && this.allSchools.find(s => s.name === name);
       if (school) {
         this.selected = school;
         this.focused = school;
@@ -380,9 +395,28 @@ export default {
         this.$store.commit('homeLocation', value);
       }
     },
+    // The schools in the boroughs picked.
+    schools() {
+      return this.allSchools.filter(s => this.boroughIds.includes(s.borough));
+    },
+    boroughCounts() {
+      const counts = {};
+      this.allSchools.forEach(s => counts[s.borough] = (counts[s.borough] || 0) + 1);
+      return counts;
+    },
+    // "Ealing and Hounslow", or "Ealing, Hounslow and Brent".
+    boroughNames() {
+      const names = this.boroughs.map(b => b.name);
+      return names.length > 1 ? `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}` : names[0];
+    },
+    // Label each list row with its borough only while more than one is shown.
+    rowBoroughNames() {
+      if (this.boroughIds.length < 2) return null;
+      return Object.fromEntries(this.boroughs.map(b => [b.id, b.name]));
+    },
     assessments() {
       const map = new Map();
-      this.schools.forEach(s => map.set(s, assess(s, this.home)));
+      this.allSchools.forEach(s => map.set(s, assess(s, this.home)));
       return map;
     },
     rankedRows() {
@@ -410,13 +444,14 @@ export default {
           'Distances are straight-line unless a school notes otherwise.';
     },
     sourceLine() {
-      return `Figures come from Ealing Council’s offer reports and booklets, ${YEARS[0]}–${YEARS[YEARS.length - 1]}, ` +
-          'and from GOV.UK. They’re estimates to help you plan; Ealing Council makes the admissions decisions.';
+      return `Figures come from ${this.boroughNames} councils’ offer reports and booklets, ` +
+          `${YEARS[0]}–${YEARS[YEARS.length - 1]}, and from GOV.UK. They’re estimates to help you plan; ` +
+          'the councils and schools make the admissions decisions.';
     },
-    // The schools plus about 2 km either side, to steer address suggestions towards Ealing.
+    // Every school plus about 2 km either side, to steer address suggestions towards the area.
     searchArea() {
-      const lats = this.schools.map(s => s.centre.lat);
-      const lngs = this.schools.map(s => s.centre.lng);
+      const lats = this.allSchools.map(s => s.centre.lat);
+      const lngs = this.allSchools.map(s => s.centre.lng);
       return {
         north: Math.max(...lats) + 0.02,
         south: Math.min(...lats) - 0.02,
@@ -429,6 +464,18 @@ export default {
     },
   },
   watch: {
+    // Remember the boroughs picked, and let go of a school that's no longer shown.
+    boroughIds(ids) {
+      try {
+        localStorage.setItem('boroughs', JSON.stringify(ids));
+      } catch (e) {
+        // storage unavailable – the choice lasts this visit
+      }
+      if (this.focused && !ids.includes(this.focused.borough)) this.focused = null;
+      if (this.selected && !ids.includes(this.selected.borough)) {
+        this.selected = this.rankedRows.length ? this.rankedRows[0].school : null;
+      }
+    },
     // Walking data is only needed once there's a home to measure from: the
     // walk itself from Google (once its script has loaded), outlines from CI.
     home: {

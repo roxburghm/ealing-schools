@@ -63,7 +63,7 @@ export function assess(school, home) {
 
     let kind, verdict, sub;
     if (counted === 0 && unknown === 0) {
-        kind = 'none'; verdict = 'No data'; sub = 'No distance offers recorded';
+        kind = 'none'; verdict = 'No data'; sub = 'No cut-off distance published';
     } else if (counted > 0 && open === counted && unknown === 0) {
         kind = 'open'; verdict = 'Everyone offered'; sub = `Places for all applicants, ${YEARS[0]}–${YEARS[YEARS.length - 1].slice(2)}`;
     } else if (!home) {

@@ -16,7 +16,7 @@ on:
     branches:
       - main
     paths:
-      - src/plugins/schools.js
+      - src/data/**
       - scripts/walking-bands.mjs
 
 permissions:

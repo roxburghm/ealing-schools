@@ -50,6 +50,7 @@ const PIN_DESCRIPTIONS = {
   open: 'everyone who applied was offered a place',
   walk: 'places offered by walking distance',
   none: 'no places offered by distance',
+  unknown: 'no cut-off published',
   distance: 'places offered by distance',
 };
 
@@ -65,8 +66,10 @@ function isLight(hex) {
 
 const EARTH_RADIUS_M = 6371000;
 const METRES_PER_MILE = 1609.34;
-// The furthest out the all-schools view goes.
-const MIN_AREA_ZOOM = 12;
+// The furthest out the all-schools view goes: wide enough on a desktop for every
+// borough at once, but kept to street-name scale on a narrow phone map.
+const MIN_AREA_ZOOM = 11;
+const MIN_AREA_ZOOM_NARROW = 12;
 // The closest in a school-and-home view goes.
 const MAX_FOCUS_ZOOM = 16;
 
@@ -158,6 +161,7 @@ export default {
         let kind = 'distance';
         if (cut === null) kind = 'open';
         else if (cut === 0) kind = 'none';
+        else if (cut === undefined) kind = 'unknown';
         else if (s.measure === 'walk') kind = 'walk';
         return {
           school: s,
@@ -256,8 +260,9 @@ export default {
         // Whole-area view: on narrow screens fitting every school lands at a
         // city-wide zoom. Stay at street-name scale, around home if we have one.
         window.google.maps.event.addListenerOnce(map, 'bounds_changed', () => {
-          if (map.getZoom() >= MIN_AREA_ZOOM) return;
-          map.setZoom(MIN_AREA_ZOOM);
+          const min = map.getDiv().offsetWidth < 600 ? MIN_AREA_ZOOM_NARROW : MIN_AREA_ZOOM;
+          if (map.getZoom() >= min) return;
+          map.setZoom(min);
           if (this.home) map.setCenter(this.home);
         });
       }

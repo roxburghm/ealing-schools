@@ -57,14 +57,20 @@ const SOURCE = provider === 'graphhopper'
     : 'Valhalla (FOSSGIS), pedestrian costing, © OpenStreetMap contributors';
 
 async function loadSchools() {
-    // schools.js is an ES module inside a CommonJS package, so import a copy as .mjs.
-    const copy = path.join(os.tmpdir(), `schools-${process.pid}.mjs`);
-    fs.copyFileSync(path.join(ROOT, 'src/plugins/schools.js'), copy);
-    try {
-        return (await import(pathToFileURL(copy).href)).default;
-    } finally {
-        fs.rmSync(copy, {force: true});
+    // Each borough's list is an ES module inside a CommonJS package, so import a copy as .mjs.
+    const dir = path.join(ROOT, 'src/data');
+    const files = fs.readdirSync(dir).filter(name => name.endsWith('.js') && name !== 'boroughs.js');
+    const schools = [];
+    for (const name of files) {
+        const copy = path.join(os.tmpdir(), `schools-${process.pid}-${name.replace(/\.js$/, '.mjs')}`);
+        fs.copyFileSync(path.join(dir, name), copy);
+        try {
+            schools.push(...(await import(pathToFileURL(copy).href)).default);
+        } finally {
+            fs.rmSync(copy, {force: true});
+        }
     }
+    return schools;
 }
 
 function schoolKey(school) {

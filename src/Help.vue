@@ -26,7 +26,7 @@
 
       <section>
         <h3>How your chances are worked out</h3>
-        <p>We count how many years since 2019 your home was inside each school's ring.</p>
+        <p>We count how many of the published years since 2019 your home was inside each school's ring.</p>
         <dl class="verdicts">
           <div><dt><span class="pill pill--likely">Very likely</span></dt><dd>Inside every year</dd></div>
           <div><dt><span class="pill pill--possible">Possible</span></dt><dd>Inside at least half the years</dd></div>
@@ -51,8 +51,9 @@
       <section>
         <h3>Schools with extra rules</h3>
         <p>
-          Faith schools, specialist places and priority for children whose nearest school it is all change who the
-          ring applies to. These schools have a note in their details: read it before relying on the ring.
+          Faith places, single-sex schools, specialist places, catchment areas and priority for children whose
+          nearest school it is all change who the ring applies to. These schools have a note in their details: read
+          it before relying on the ring. Some faith schools don't publish a cut-off distance at all.
         </p>
       </section>
 
@@ -67,15 +68,19 @@
 
       <section>
         <h3>Sources</h3>
-        <p>Cut-off distances come from Ealing Council. Each year's figures are in:</p>
-        <ul class="sources">
-          <li v-for="row in sources" :key="row.year">
-            <span class="sources__year">{{ row.year }}</span>
-            <span class="sources__links">
-              <a v-for="doc in row.docs" :key="doc.href" :href="doc.href" target="_blank" rel="noopener">{{ doc.title }}</a>
-            </span>
-          </li>
-        </ul>
+        <p>Cut-off distances come from each borough's council. Each year's figures are in:</p>
+        <template v-for="borough in boroughs" :key="borough.id">
+          <h4>{{ borough.council }}</h4>
+          <ul class="sources">
+            <li v-for="row in borough.sources" :key="row.year">
+              <span class="sources__year">{{ row.year }}</span>
+              <span class="sources__links">
+                <a v-for="doc in row.docs" :key="doc.href" :href="doc.href" target="_blank" rel="noopener">{{ doc.title }}</a>
+              </span>
+            </li>
+          </ul>
+        </template>
+        <p class="aside">Hounslow's figures start in 2020: we haven't found its 2019 report.</p>
         <p class="aside">
           GCSE results from the Department for Education, Ofsted grades from reports.ofsted.gov.uk, and walking
           distances from Google Maps. Walking areas on the map ©
@@ -92,7 +97,7 @@
       </section>
 
       <footer class="help-foot">
-        These figures are estimates to help you plan. Ealing Council makes all admissions decisions.
+        These figures are estimates to help you plan. The councils and schools make all admissions decisions.
         Questions or corrections: <a href="mailto:matt@roxburghm.com">matt@roxburghm.com</a>
       </footer>
     </div>
@@ -101,28 +106,14 @@
 
 <script>
 import SchoolIcon from '@/components/SchoolIcon.vue';
-
-const offers = year => ({title: 'Offers report', href: `/Documents/High_school_on_time_offers_${year}.pdf`});
-const booklet = (year, title = `Starting High School ${year}`) => ({title, href: `/Documents/Starting_High_School_${year}.pdf`});
+import boroughs from '@/data/boroughs';
 
 export default {
   name: 'Help',
   components: {SchoolIcon},
   emits: ['close'],
   data() {
-    return {
-      // Each "Starting High School" booklet prints the previous year's figures.
-      sources: [
-        {year: '2026', docs: [offers(2026), booklet(2027)]},
-        {year: '2025', docs: [offers(2025), booklet(2026)]},
-        {year: '2024', docs: [offers(2024), booklet(2025)]},
-        {year: '2023', docs: [booklet(2024)]},
-        {year: '2022', docs: [{title: 'Offers report', href: '/Documents/Other/High_School_ontime_offers_2022.pdf'}, booklet(2023)]},
-        {year: '2021', docs: [booklet(2022)]},
-        {year: '2020', docs: [booklet(2021)]},
-        {year: '2019', docs: [booklet(2020)]},
-      ],
-    };
+    return {boroughs};
   },
 };
 </script>
@@ -170,7 +161,8 @@ h3 {
   color: var(--ink);
 }
 p { margin: 0; }
-p + p, p + .sources, .sources + p, dl + p, ul + p { margin-top: 10px; }
+p + p, .sources + p, dl + p, ul + p { margin-top: 10px; }
+h4 { margin: 14px 0 4px; font-size: 14px; font-weight: 600; color: var(--ink); }
 .aside { font-size: 13.5px; color: var(--ink-3); }
 
 a { color: var(--accent); text-decoration: none; }
