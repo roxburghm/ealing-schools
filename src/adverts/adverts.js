@@ -1,3 +1,4 @@
+// Kept out of src/data/ on purpose: scripts/walking-bands.mjs loads every .js file there as school data.
 // The adverts shown in each advert space (src/components/AdSlot.vue):
 //   desktop  pinned under the school list on wide screens; shown about 380 x 120
 //   mobile   in the school list on phones, after the third school; shown about 360 x 180
