@@ -79,8 +79,8 @@
               </span>
             </li>
           </ul>
+          <p v-if="borough.sourceNote" class="aside sources__note">{{ borough.sourceNote }}</p>
         </template>
-        <p class="aside">Hounslow's figures start in 2020: we haven't found its 2019 report.</p>
         <p class="aside">
           GCSE results from the Department for Education, Ofsted grades from reports.ofsted.gov.uk, and walking
           distances from Google Maps. Walking areas on the map ©
@@ -197,6 +197,7 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 }
 .sources__year { font-weight: 600; color: var(--ink); }
 .sources__links { display: flex; flex-wrap: wrap; gap: 4px 18px; }
+.sources__note { margin-top: 6px; }
 
 .help-foot {
   margin-top: 28px;

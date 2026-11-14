@@ -37,10 +37,12 @@ function distance(school, home) {
 export function assess(school, home) {
     const {dist, label} = distance(school, home);
     let counted = 0, inside = 0, open = 0, close = 0, unknown = 0;
+    const openYears = [];
 
     YEARS.forEach(year => {
         const cut = school.intakeDist[year];
         if (cut === undefined || cut === 0) return;
+        if (cut === null) openYears.push(year);
         if (cut === null) {
             counted++;
             open++;
@@ -63,9 +65,12 @@ export function assess(school, home) {
 
     let kind, verdict, sub;
     if (counted === 0 && unknown === 0) {
-        kind = 'none'; verdict = 'No data'; sub = 'No cut-off distance published';
+        // Schools that give places some other way (bands, faith, ballot) explain it in their note.
+        kind = 'none'; verdict = school.notes ? 'See notes' : 'No data'; sub = 'No cut-off distance published';
     } else if (counted > 0 && open === counted && unknown === 0) {
-        kind = 'open'; verdict = 'Everyone offered'; sub = `Places for all applicants, ${YEARS[0]}–${YEARS[YEARS.length - 1].slice(2)}`;
+        const first = openYears[0], last = openYears[openYears.length - 1];
+        kind = 'open'; verdict = 'Everyone offered';
+        sub = `Places for all applicants, ${first === last ? first : `${first}–${last.slice(2)}`}`;
     } else if (!home) {
         kind = 'nohome'; verdict = 'Set your home'; sub = 'Add your home to see your chances';
     } else if (counted === 0) {
@@ -83,7 +88,7 @@ export function assess(school, home) {
         if (unknown > 0) sub += `; ${unknown} not yet known`;
     }
     if (admission.measure(school) === 'walk') sub += ' (walking distance)';
-    else if (school.notes) sub += ' · see notes';
+    else if (school.notes && kind !== 'none') sub += ' · see notes';
 
     let score = 0;
     if (counted) score = (inside + close / 2) / counted;

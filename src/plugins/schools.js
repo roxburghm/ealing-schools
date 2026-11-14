@@ -5,7 +5,8 @@
 import boroughs from '@/data/boroughs';
 import ealing from '@/data/ealing';
 import hounslow from '@/data/hounslow';
+import hammersmithFulham from '@/data/hammersmith-fulham';
 
-const lists = {ealing, hounslow};
+const lists = {ealing, hounslow, 'hammersmith-fulham': hammersmithFulham};
 
 export default boroughs.flatMap(borough => lists[borough.id].map(school => ({...school, borough: borough.id})));

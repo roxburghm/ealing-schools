@@ -59,13 +59,14 @@ const SOURCE = provider === 'graphhopper'
 async function loadSchools() {
     // Each borough's list is an ES module inside a CommonJS package, so import a copy as .mjs.
     const dir = path.join(ROOT, 'src/data');
-    const files = fs.readdirSync(dir).filter(name => name.endsWith('.js') && name !== 'boroughs.js');
+    const files = fs.readdirSync(dir).filter(name => name.endsWith('.js'));
     const schools = [];
     for (const name of files) {
         const copy = path.join(os.tmpdir(), `schools-${process.pid}-${name.replace(/\.js$/, '.mjs')}`);
         fs.copyFileSync(path.join(dir, name), copy);
         try {
-            schools.push(...(await import(pathToFileURL(copy).href)).default);
+            const list = (await import(pathToFileURL(copy).href)).default;
+            if (Array.isArray(list)) schools.push(...list); // skip boroughs.js, outlines.js and the like
         } finally {
             fs.rmSync(copy, {force: true});
         }

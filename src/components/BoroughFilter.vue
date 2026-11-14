@@ -3,14 +3,15 @@
     <span class="boroughs__label" aria-hidden="true">Boroughs</span>
     <button v-for="b in boroughs" :key="b.id" type="button" class="chip"
             :class="{'chip--on': isOn(b.id)}" :aria-pressed="isOn(b.id)"
-            :title="isOn(b.id) && modelValue.length === 1 ? 'At least one borough stays on' : ''"
+            :title="isOn(b.id) && modelValue.length === 1 ? 'At least one borough stays on' : b.name"
+            :aria-label="`${b.name}, ${counts[b.id] || 0} schools`"
             @click="toggle(b.id)">
       <svg v-if="isOn(b.id)" class="chip__tick" width="14" height="14" viewBox="0 0 24 24" fill="none"
            stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M5 12.5l4.5 4.5L19 7.5"/>
       </svg>
-      {{ b.name }}
-      <span class="chip__count">{{ counts[b.id] || 0 }}</span>
+      {{ b.shortName || b.name }}
+      <span class="chip__count" aria-hidden="true">{{ counts[b.id] || 0 }}</span>
     </button>
   </div>
 </template>

@@ -1,7 +1,7 @@
 # ealing-schools
 
 How close did you need to live to get a secondary school place? Cut-off distances, Ofsted and GCSE results for
-schools in Ealing and Hounslow, 2019–2026.
+schools in Ealing, Hounslow and Hammersmith & Fulham, 2019–2026.
 
 Live at https://schools.roxb.in
 

@@ -1,13 +1,19 @@
 <template>
   <v-app class="app-root">
+    <!-- First visit, or back via the logo: pick a borough -->
+    <borough-picker v-if="picking" :boroughs="boroughs" :schools="allSchools" @pick="pickBoroughs"/>
+
     <!-- Desktop: list on the left scrolls on its own; map pinned top right with the details scrolling under it -->
-    <div v-if="!narrow" class="d-shell">
+    <div v-else-if="!narrow" class="d-shell">
       <header class="app-header">
         <div class="brand">
-          <span class="brand__mark" aria-hidden="true"><school-icon kind="cap"/></span>
+          <button type="button" class="brand__home" title="Choose a borough" aria-label="Choose a borough"
+                  @click="goToPicker">
+            <span class="brand__mark" aria-hidden="true"><school-icon kind="cap"/></span>
+          </button>
           <div>
             <h1>Secondary school places</h1>
-            <p>How close did you need to live to get a place? Cut-off distances for {{ boroughNames }} schools, 2019–2026.</p>
+            <p>How close did you need to live to get a place? Cut-off distances for {{ shownBoroughNames }} schools.</p>
           </div>
         </div>
         <nav class="header-actions" aria-label="More">
@@ -84,7 +90,10 @@
     <div v-else class="m-shell">
       <header class="m-bar">
         <div class="m-bar__top">
-          <span class="brand__mark brand__mark--small" aria-hidden="true"><school-icon kind="cap"/></span>
+          <button type="button" class="brand__home" title="Choose a borough" aria-label="Choose a borough"
+                  @click="goToPicker">
+            <span class="brand__mark brand__mark--small" aria-hidden="true"><school-icon kind="cap"/></span>
+          </button>
           <h1>School places</h1>
           <button type="button" class="icon-btn" aria-label="Compare schools" @click="showTable = true">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -193,16 +202,33 @@ import MapLegend from './components/MapLegend.vue';
 import MiniSpark from './components/MiniSpark.vue';
 import SchoolIcon from './components/SchoolIcon.vue';
 import BoroughFilter from './components/BoroughFilter.vue';
+import BoroughPicker from './components/BoroughPicker.vue';
 import Help from './Help.vue';
 
 // Below this width the two columns don't fit: switch to the List / Map tabs.
 const NARROW = '(max-width: 1019px)';
 
-function storedBoroughs() {
+// Boroughs named in the link (?borough=ealing,hounslow), else the ones picked last
+// visit. null when neither: the visitor starts on the borough picker.
+function initialBoroughs() {
   const ids = boroughs.map(b => b.id);
-  const stored = readStored('boroughs');
-  const kept = Array.isArray(stored) ? ids.filter(id => stored.includes(id)) : [];
-  return kept.length ? kept : ids;
+  const known = list => (Array.isArray(list) ? ids.filter(id => list.includes(id)) : []);
+  const fromLink = known((new URLSearchParams(location.search).get('borough') || '').split(','));
+  if (fromLink.length) return fromLink;
+  const stored = known(readStored('boroughs'));
+  return stored.length ? stored : null;
+}
+
+// Keep ?borough= in the address bar in step with what's shown, so the link can be shared.
+function writeBoroughsToLink(ids) {
+  const url = new URL(location.href);
+  if (ids) url.searchParams.set('borough', ids.join(','));
+  else url.searchParams.delete('borough');
+  history.replaceState(history.state, '', url);
+}
+
+function joinNames(names) {
+  return names.length > 1 ? `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}` : names[0];
 }
 
 function readStored(key) {
@@ -215,14 +241,16 @@ function readStored(key) {
 
 export default {
   name: 'App',
-  components: {SchoolsMap, HomePicker, RankedList, YearTimeline, SchoolDetail, SchoolTable, NameFilter, MapLegend, MiniSpark, SchoolIcon, BoroughFilter, Help},
+  components: {SchoolsMap, HomePicker, RankedList, YearTimeline, SchoolDetail, SchoolTable, NameFilter, MapLegend, MiniSpark, SchoolIcon, BoroughFilter, BoroughPicker, Help},
   data() {
     return {
       YEARS,
       allSchools: schools,
       boroughs,
-      // Boroughs whose schools are shown. Remembered between visits.
-      boroughIds: storedBoroughs(),
+      // Boroughs whose schools are shown: from the link, else remembered from last time.
+      boroughIds: initialBoroughs() || boroughs.map(b => b.id),
+      // No borough chosen yet: show the borough picker first.
+      picking: !initialBoroughs(),
       year: YEARS[YEARS.length - 1],
       selected: null,
       // The school the map is zoomed to; only set when someone picks a school.
@@ -253,6 +281,15 @@ export default {
     }).catch(() => {
       this.mapsFailed = true;
     });
+
+    if (!this.picking) {
+      writeBoroughsToLink(this.boroughIds);
+      try {
+        localStorage.setItem('boroughs', JSON.stringify(this.boroughIds)); // a shared link's choice sticks too
+      } catch (e) {
+        // storage unavailable
+      }
+    }
 
     const storedHome = readStored('home');
     if (storedHome && typeof storedHome.lat === 'number') this.home = storedHome;
@@ -304,6 +341,21 @@ export default {
       } catch (e) {
         // nothing stored
       }
+    },
+    pickBoroughs(ids) {
+      this.boroughIds = ids;
+      this.picking = false;
+      this.focused = null;
+      this.selected = this.rankedRows.length ? this.rankedRows[0].school : null;
+      this.view = 'list';
+      writeBoroughsToLink(ids);
+      window.scrollTo(0, 0);
+    },
+    goToPicker() {
+      this.picking = true;
+      this.focused = null;
+      writeBoroughsToLink(null);
+      window.scrollTo(0, 0);
     },
     openFromTable(school) {
       this.showTable = false;
@@ -406,13 +458,15 @@ export default {
     },
     // "Ealing and Hounslow", or "Ealing, Hounslow and Brent".
     boroughNames() {
-      const names = this.boroughs.map(b => b.name);
-      return names.length > 1 ? `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}` : names[0];
+      return joinNames(this.boroughs.map(b => b.name));
+    },
+    shownBoroughNames() {
+      return joinNames(this.boroughs.filter(b => this.boroughIds.includes(b.id)).map(b => b.name));
     },
     // Label each list row with its borough only while more than one is shown.
     rowBoroughNames() {
       if (this.boroughIds.length < 2) return null;
-      return Object.fromEntries(this.boroughs.map(b => [b.id, b.name]));
+      return Object.fromEntries(this.boroughs.map(b => [b.id, b.shortName || b.name]));
     },
     assessments() {
       const map = new Map();
@@ -471,6 +525,7 @@ export default {
       } catch (e) {
         // storage unavailable – the choice lasts this visit
       }
+      if (!this.picking) writeBoroughsToLink(ids);
       if (this.focused && !ids.includes(this.focused.borough)) this.focused = null;
       if (this.selected && !ids.includes(this.selected.borough)) {
         this.selected = this.rankedRows.length ? this.rankedRows[0].school : null;
@@ -591,6 +646,18 @@ export default {
   line-height: 1.2;
 }
 .brand p { margin: 2px 0 0; font-size: 14px; color: var(--ink-3); }
+.brand__home {
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  cursor: pointer;
+  display: block;
+  transition: transform .15s;
+}
+.brand__home:hover { transform: scale(1.05); }
+.brand__home .brand__mark { display: block; }
 .brand__mark {
   flex: none;
   width: 38px;
