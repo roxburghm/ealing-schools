@@ -31,23 +31,24 @@
       </CustomMarker>
     </GoogleMap>
     <div v-else class="map map--loading" :class="{'map--fill': height}">{{ mapsFailed ? 'The map couldn’t load. You can still enter your address above to see your chances.' : 'Loading map…' }}</div>
-    <div v-if="focus && mapsReady && (interactive || expandable)" class="map-actions">
-      <!-- Small preview map: one button that opens the full-screen map at the intake view -->
-      <button v-if="expandable" type="button" class="map-action" @click="$emit('expand')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M15 4h5v5M9 20H4v-5M20 4l-6.5 6.5M4 20l6.5-6.5"/>
-        </svg>
-        {{ hasCatchment ? 'Show intake' : 'Full map' }}
-      </button>
-      <button v-if="interactive && showAll" type="button" class="map-action" @click="$emit('clear-focus')">
+    <!-- Small preview map: one button that opens the full-screen map at the intake view -->
+    <button v-if="focus && mapsReady && expandable" type="button" class="map-expand"
+            :aria-label="hasCatchment ? 'Show the intake area full screen' : 'Show the map full screen'"
+            @click="$emit('expand')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 4h5v5M9 20H4v-5M20 4l-6.5 6.5M4 20l6.5-6.5"/>
+      </svg>
+    </button>
+    <div v-if="focus && mapsReady && interactive" class="map-actions">
+      <button v-if="showAll" type="button" class="map-action" @click="$emit('clear-focus')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>
         </svg>
         Show all schools
       </button>
-      <button v-if="interactive && hasCatchment" type="button" class="map-action" :aria-pressed="intakeView" @click="showIntake">
+      <button v-if="hasCatchment" type="button" class="map-action" :aria-pressed="intakeView" @click="showIntake">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <circle cx="12" cy="12" r="8.5" stroke-dasharray="3 2.6"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/>
@@ -398,6 +399,22 @@ export default {
   box-shadow: 0 1px 2px rgba(22, 24, 29, .16), 0 4px 12px rgba(22, 24, 29, .12);
   cursor: pointer;
 }
-.map-action:hover { background: var(--ground); }
+.map-action:hover, .map-expand:hover { background: var(--ground); }
+.map-expand {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 1px 2px rgba(22, 24, 29, .16), 0 4px 12px rgba(22, 24, 29, .12);
+  cursor: pointer;
+}
 .map-action[aria-pressed="true"] { color: var(--accent); }
 </style>
