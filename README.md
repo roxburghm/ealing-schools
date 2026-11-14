@@ -15,7 +15,7 @@ figure comes from is in [SOURCES.md](SOURCES.md).
 
 1. Put its schools in `src/data/<id>.js` (same shape as below) and its source PDFs in `public/Documents/<Borough>/`.
 2. Add it to `src/data/boroughs.js` and to `lists` in `src/plugins/schools.js`.
-3. Add its sources to SOURCES.md. The borough filter, list labels, "How it works" sources and search area pick it
+3. Add its sources to SOURCES.md. The landing page (add its outline to `src/data/outlines.js`), list labels, "How it works" sources and search area pick it
    up from there.
 
 ### A school

@@ -3,7 +3,7 @@
 //
 // sources: where each year's cut-offs come from, newest first, for "How it works".
 // sourceNote: optional line under them, e.g. about missing years.
-// shortName: optional, for the filter chips and list rows when the name is long.
+// shortName: optional, for list rows when the name is long.
 
 const ealingOffers = year => ({title: 'Offers report', href: `/Documents/High_school_on_time_offers_${year}.pdf`});
 const ealingBooklet = year => ({title: `Starting High School ${year}`, href: `/Documents/Starting_High_School_${year}.pdf`});

@@ -39,7 +39,10 @@
 
           <div class="list-head">
             <h2>{{ listHeading }}</h2>
-            <borough-filter v-if="boroughs.length > 1" v-model="boroughIds" :boroughs="boroughs" :counts="boroughCounts"/>
+            <div v-if="boroughs.length > 1" class="borough-bar">
+              <span>{{ shownBoroughLabel }}</span>
+              <button type="button" class="borough-bar__change" @click="goToPicker">Change borough</button>
+            </div>
             <name-filter v-model="nameFilter"/>
           </div>
 
@@ -127,7 +130,10 @@
       <main class="m-content" :class="`m-content--${view}`">
         <div v-show="view === 'list'" class="m-list">
           <p class="m-list__lead">{{ home ? 'Best chances first, from your address.' : 'Add your address to rank schools by your chances.' }}</p>
-          <borough-filter v-if="boroughs.length > 1" v-model="boroughIds" :boroughs="boroughs" :counts="boroughCounts"/>
+          <div v-if="boroughs.length > 1" class="borough-bar">
+            <span>{{ shownBoroughLabel }}</span>
+            <button type="button" class="borough-bar__change" @click="goToPicker">Change borough</button>
+          </div>
           <name-filter v-model="nameFilter" id="name-filter-m"/>
           <ranked-list :rows="rankedRows" :selected-name="null" :year="year" :borough-names="rowBoroughNames"
                        @select="openSchool"/>
@@ -201,7 +207,6 @@ import NameFilter from './components/NameFilter.vue';
 import MapLegend from './components/MapLegend.vue';
 import MiniSpark from './components/MiniSpark.vue';
 import SchoolIcon from './components/SchoolIcon.vue';
-import BoroughFilter from './components/BoroughFilter.vue';
 import BoroughPicker from './components/BoroughPicker.vue';
 import Help from './Help.vue';
 
@@ -241,7 +246,7 @@ function readStored(key) {
 
 export default {
   name: 'App',
-  components: {SchoolsMap, HomePicker, RankedList, YearTimeline, SchoolDetail, SchoolTable, NameFilter, MapLegend, MiniSpark, SchoolIcon, BoroughFilter, BoroughPicker, Help},
+  components: {SchoolsMap, HomePicker, RankedList, YearTimeline, SchoolDetail, SchoolTable, NameFilter, MapLegend, MiniSpark, SchoolIcon, BoroughPicker, Help},
   data() {
     return {
       YEARS,
@@ -451,14 +456,14 @@ export default {
     schools() {
       return this.allSchools.filter(s => this.boroughIds.includes(s.borough));
     },
-    boroughCounts() {
-      const counts = {};
-      this.allSchools.forEach(s => counts[s.borough] = (counts[s.borough] || 0) + 1);
-      return counts;
-    },
     // "Ealing and Hounslow", or "Ealing, Hounslow and Brent".
     boroughNames() {
       return joinNames(this.boroughs.map(b => b.name));
+    },
+    // "Ealing schools", or "All 46 schools" when every borough is shown.
+    shownBoroughLabel() {
+      if (this.boroughIds.length === this.boroughs.length) return `All ${this.allSchools.length} schools`;
+      return `${this.shownBoroughNames} schools`;
     },
     shownBoroughNames() {
       return joinNames(this.boroughs.filter(b => this.boroughIds.includes(b.id)).map(b => b.name));
@@ -725,6 +730,25 @@ export default {
 .d-detail { flex: none; }
 
 .list-head { display: flex; flex-direction: column; gap: 10px; }
+.borough-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.borough-bar .borough-bar__change {
+  padding: 6px 0;
+  border: 0;
+  background: none;
+  font: 600 14px var(--font);
+  color: var(--accent);
+  cursor: pointer;
+}
+.borough-bar .borough-bar__change:hover { text-decoration: underline; text-underline-offset: 3px; }
 .list-head h2 { margin: 0; font-family: var(--font-display); font-size: 18px; font-weight: 600; }
 
 .map-card { flex: none; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
