@@ -14,8 +14,8 @@
     <path v-else-if="kind === 'cap'" fill="currentColor"
           d="M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z"/>
 
-    <!-- No places by distance: a dash -->
-    <path v-else-if="kind === 'none'" d="M6.5 12h11" fill="none" stroke="currentColor" stroke-width="3.5"
+    <!-- No places by distance, or no figure published: a dash -->
+    <path v-else-if="kind === 'none' || kind === 'unknown'" d="M6.5 12h11" fill="none" stroke="currentColor" stroke-width="3.5"
           stroke-linecap="round"/>
 
     <!-- Straight-line distance cut-off: a radius -->
@@ -31,7 +31,7 @@
 export default {
   name: 'SchoolIcon',
   props: {
-    // 'open' | 'walk' | 'none' | 'distance' | 'cap'
+    // 'open' | 'walk' | 'none' | 'unknown' | 'distance' | 'cap'
     kind: {type: String, required: true},
   },
 };

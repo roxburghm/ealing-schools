@@ -12,7 +12,7 @@
             </span>
             <span class="row__verdict">
               <span :class="['pill', `pill--${row.a.kind}`]">{{ row.a.verdict }}</span>
-              <span class="row__sub">{{ row.a.sub }}</span>
+              <span class="row__sub"><span v-if="boroughNames" class="row__borough">{{ boroughNames[row.school.borough] }} · </span>{{ row.a.sub }}</span>
             </span>
           </span>
           <mini-spark :school="row.school" :year="year" :dist="row.a.dist"/>
@@ -33,6 +33,8 @@ export default {
     rows: {type: Array, required: true},
     selectedName: {type: String, default: null},
     year: {type: String, required: true},
+    // borough id → name, when rows should say which borough they're in
+    boroughNames: {type: Object, default: null},
   },
   emits: ['select'],
 };
@@ -63,6 +65,7 @@ export default {
 .row__top { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
 .row__name { font-weight: 600; font-size: 15px; }
 .row__dist { font-size: 13px; color: var(--ink-2); white-space: nowrap; }
+.row__borough { font-weight: 600; color: var(--ink-2); }
 .row__verdict { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .row__sub { font-size: 12px; color: var(--ink-3); }
 .empty { margin: 0; font-size: 14px; color: var(--ink-3); }

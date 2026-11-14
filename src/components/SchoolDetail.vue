@@ -23,7 +23,7 @@
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
            stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
       <span><strong>Estimates only.</strong> These figures are worked out from past offers and our own distance
-        measurements. Ealing Council’s admissions decisions are final.</span>
+        measurements. {{ council }} and the school make the admissions decisions.</span>
     </p>
 
     <p v-if="school.notes" class="detail__note"><strong>Note:</strong> {{ school.notes }}</p>
@@ -81,6 +81,7 @@ import {YEARS} from '@/plugins/assess';
 import admission from '@/plugins/admission';
 import ofsted from '@/plugins/ofsted';
 import DistanceUtils from '@/plugins/distanceUtils';
+import boroughs from '@/data/boroughs';
 import IntakeChart from '@/components/IntakeChart.vue';
 
 export default {
@@ -98,6 +99,9 @@ export default {
     return {YEARS};
   },
   computed: {
+    council() {
+      return boroughs.find(b => b.id === this.school.borough)?.council || 'The council';
+    },
     ofsted() {
       return ofsted.summary(this.school);
     },
@@ -130,6 +134,7 @@ export default {
       const m = this.miles;
       if (s.kind === 'all') return `In ${this.year} everyone who applied was offered a place.`;
       if (s.kind === 'none') return `In ${this.year} no places were offered on distance.`;
+      if (s.kind === 'unknown') return `No cut-off distance was published for ${this.year}.`;
       if (!this.home || s.kind === 'cutoff' || s.kind === 'unknown') return '';
       if (s.kind === 'pending') {
         return `In ${this.year} the walking cut-off was ${m(s.cutoff)}. Your walk is at least ${m(s.straight)} (the straight-line distance); the exact route isn't calculated yet.`;

@@ -45,7 +45,8 @@
       </table>
       <p class="compare-foot">
         “All” means everyone who applied was offered a place. “–” means no places were offered on distance.
-        Figures are estimates; Ealing Council makes all admissions decisions.
+        A blank means no figure was published. Figures are estimates; the councils and schools make the
+        admissions decisions.
       </p>
     </div>
   </v-card>

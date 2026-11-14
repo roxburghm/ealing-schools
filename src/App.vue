@@ -1,13 +1,19 @@
 <template>
   <v-app class="app-root">
+    <!-- First visit, or back via the logo: pick a borough -->
+    <borough-picker v-if="picking" :boroughs="boroughs" :schools="allSchools" @pick="pickBoroughs"/>
+
     <!-- Desktop: list on the left scrolls on its own; map pinned top right with the details scrolling under it -->
-    <div v-if="!narrow" class="d-shell">
+    <div v-else-if="!narrow" class="d-shell">
       <header class="app-header">
         <div class="brand">
-          <span class="brand__mark" aria-hidden="true"><school-icon kind="cap"/></span>
+          <button type="button" class="brand__home" title="Choose a borough" aria-label="Choose a borough"
+                  @click="goToPicker">
+            <span class="brand__mark" aria-hidden="true"><school-icon kind="cap"/></span>
+          </button>
           <div>
-            <h1>Ealing secondary school places</h1>
-            <p>How close did you need to live to get a place? Cut-off distances for every school, 2019–2026.</p>
+            <h1>Secondary school places</h1>
+            <p>How close did you need to live to get a place? Cut-off distances for {{ shownBoroughNames }} schools.</p>
           </div>
         </div>
         <nav class="header-actions" aria-label="More">
@@ -33,11 +39,15 @@
 
           <div class="list-head">
             <h2>{{ listHeading }}</h2>
+            <div v-if="boroughs.length > 1" class="borough-bar">
+              <span>{{ shownBoroughLabel }}</span>
+              <button type="button" class="borough-bar__change" @click="goToPicker">Change borough</button>
+            </div>
             <name-filter v-model="nameFilter"/>
           </div>
 
           <ranked-list :rows="rankedRows" :selected-name="focused && focused.name" :year="year"
-                       @select="selectSchool"/>
+                       :borough-names="rowBoroughNames" @select="selectSchool"/>
 
           <p class="fine-print list-note">{{ finePrint }}</p>
           <p class="fine-print list-note">
@@ -83,8 +93,11 @@
     <div v-else class="m-shell">
       <header class="m-bar">
         <div class="m-bar__top">
-          <span class="brand__mark brand__mark--small" aria-hidden="true"><school-icon kind="cap"/></span>
-          <h1>Ealing school places</h1>
+          <button type="button" class="brand__home" title="Choose a borough" aria-label="Choose a borough"
+                  @click="goToPicker">
+            <span class="brand__mark brand__mark--small" aria-hidden="true"><school-icon kind="cap"/></span>
+          </button>
+          <h1>School places</h1>
           <button type="button" class="icon-btn" aria-label="Compare schools" @click="showTable = true">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -117,8 +130,13 @@
       <main class="m-content" :class="`m-content--${view}`">
         <div v-show="view === 'list'" class="m-list">
           <p class="m-list__lead">{{ home ? 'Best chances first, from your address.' : 'Add your address to rank schools by your chances.' }}</p>
+          <div v-if="boroughs.length > 1" class="borough-bar">
+            <span>{{ shownBoroughLabel }}</span>
+            <button type="button" class="borough-bar__change" @click="goToPicker">Change borough</button>
+          </div>
           <name-filter v-model="nameFilter" id="name-filter-m"/>
-          <ranked-list :rows="rankedRows" :selected-name="null" :year="year" @select="openSchool"/>
+          <ranked-list :rows="rankedRows" :selected-name="null" :year="year" :borough-names="rowBoroughNames"
+                       @select="openSchool"/>
           <p class="fine-print list-note">{{ finePrint }}</p>
           <p class="fine-print list-note">
             {{ sourceLine }} Questions or corrections: <a href="mailto:matt@roxburghm.com">matt@roxburghm.com</a>
@@ -177,6 +195,7 @@ import {Loader} from '@googlemaps/js-api-loader';
 import walking from '@/plugins/walking';
 import admission from '@/plugins/admission';
 import schools from '@/plugins/schools';
+import boroughs from '@/data/boroughs';
 import {YEARS, KIND_ORDER, assess} from '@/plugins/assess';
 import SchoolsMap from './components/SchoolsMap.vue';
 import HomePicker from './components/HomePicker.vue';
@@ -188,10 +207,36 @@ import NameFilter from './components/NameFilter.vue';
 import MapLegend from './components/MapLegend.vue';
 import MiniSpark from './components/MiniSpark.vue';
 import SchoolIcon from './components/SchoolIcon.vue';
+import BoroughPicker from './components/BoroughPicker.vue';
 import Help from './Help.vue';
 
 // Below this width the two columns don't fit: switch to the List / Map tabs.
 const NARROW = '(max-width: 1019px)';
+
+// Boroughs named in the link (?borough=ealing, ?borough=all), else the ones picked last
+// visit. null when neither: the visitor starts on the borough picker.
+function initialBoroughs() {
+  const ids = boroughs.map(b => b.id);
+  const known = list => (Array.isArray(list) ? ids.filter(id => list.includes(id)) : []);
+  const param = new URLSearchParams(location.search).get('borough') || '';
+  if (param === 'all') return ids;
+  const fromLink = known(param.split(','));
+  if (fromLink.length) return fromLink;
+  const stored = known(readStored('boroughs'));
+  return stored.length ? stored : null;
+}
+
+// Keep ?borough= in the address bar in step with what's shown, so the link can be shared.
+function writeBoroughsToLink(ids) {
+  const url = new URL(location.href);
+  if (ids) url.searchParams.set('borough', ids.length === boroughs.length ? 'all' : ids.join(','));
+  else url.searchParams.delete('borough');
+  history.replaceState(history.state, '', url);
+}
+
+function joinNames(names) {
+  return names.length > 1 ? `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}` : names[0];
+}
 
 function readStored(key) {
   try {
@@ -203,11 +248,16 @@ function readStored(key) {
 
 export default {
   name: 'App',
-  components: {SchoolsMap, HomePicker, RankedList, YearTimeline, SchoolDetail, SchoolTable, NameFilter, MapLegend, MiniSpark, SchoolIcon, Help},
+  components: {SchoolsMap, HomePicker, RankedList, YearTimeline, SchoolDetail, SchoolTable, NameFilter, MapLegend, MiniSpark, SchoolIcon, BoroughPicker, Help},
   data() {
     return {
       YEARS,
-      schools,
+      allSchools: schools,
+      boroughs,
+      // Boroughs whose schools are shown: from the link, else remembered from last time.
+      boroughIds: initialBoroughs() || boroughs.map(b => b.id),
+      // No borough chosen yet: show the borough picker first.
+      picking: !initialBoroughs(),
       year: YEARS[YEARS.length - 1],
       selected: null,
       // The school the map is zoomed to; only set when someone picks a school.
@@ -238,6 +288,15 @@ export default {
     }).catch(() => {
       this.mapsFailed = true;
     });
+
+    if (!this.picking) {
+      writeBoroughsToLink(this.boroughIds);
+      try {
+        localStorage.setItem('boroughs', JSON.stringify(this.boroughIds)); // a shared link's choice sticks too
+      } catch (e) {
+        // storage unavailable
+      }
+    }
 
     const storedHome = readStored('home');
     if (storedHome && typeof storedHome.lat === 'number') this.home = storedHome;
@@ -272,7 +331,7 @@ export default {
     },
     fetchWalks() {
       if (!this.home) return;
-      const walkSchools = this.schools.filter(s => admission.measure(s) === 'walk');
+      const walkSchools = this.allSchools.filter(s => admission.measure(s) === 'walk');
       walkSchools.forEach(walking.load);
       if (this.mapsReady) walking.lookupWalks(walkSchools, this.home);
     },
@@ -289,6 +348,21 @@ export default {
       } catch (e) {
         // nothing stored
       }
+    },
+    pickBoroughs(ids) {
+      this.boroughIds = ids;
+      this.picking = false;
+      this.focused = null;
+      this.selected = this.rankedRows.length ? this.rankedRows[0].school : null;
+      this.view = 'list';
+      writeBoroughsToLink(ids);
+      window.scrollTo(0, 0);
+    },
+    goToPicker() {
+      this.picking = true;
+      this.focused = null;
+      writeBoroughsToLink(null);
+      window.scrollTo(0, 0);
     },
     openFromTable(school) {
       this.showTable = false;
@@ -359,7 +433,7 @@ export default {
     },
     syncPageWithHistory(event) {
       const name = event.state && event.state.school;
-      const school = name && this.schools.find(s => s.name === name);
+      const school = name && this.allSchools.find(s => s.name === name);
       if (school) {
         this.selected = school;
         this.focused = school;
@@ -380,9 +454,30 @@ export default {
         this.$store.commit('homeLocation', value);
       }
     },
+    // The schools in the boroughs picked.
+    schools() {
+      return this.allSchools.filter(s => this.boroughIds.includes(s.borough));
+    },
+    // "Ealing and Hounslow", or "Ealing, Hounslow and Brent".
+    boroughNames() {
+      return joinNames(this.boroughs.map(b => b.name));
+    },
+    // "Ealing schools", or "All 46 schools" when every borough is shown.
+    shownBoroughLabel() {
+      if (this.boroughIds.length === this.boroughs.length) return `All ${this.allSchools.length} schools`;
+      return `${this.shownBoroughNames} schools`;
+    },
+    shownBoroughNames() {
+      return joinNames(this.boroughs.filter(b => this.boroughIds.includes(b.id)).map(b => b.name));
+    },
+    // Label each list row with its borough only while more than one is shown.
+    rowBoroughNames() {
+      if (this.boroughIds.length < 2) return null;
+      return Object.fromEntries(this.boroughs.map(b => [b.id, b.shortName || b.name]));
+    },
     assessments() {
       const map = new Map();
-      this.schools.forEach(s => map.set(s, assess(s, this.home)));
+      this.allSchools.forEach(s => map.set(s, assess(s, this.home)));
       return map;
     },
     rankedRows() {
@@ -410,13 +505,14 @@ export default {
           'Distances are straight-line unless a school notes otherwise.';
     },
     sourceLine() {
-      return `Figures come from Ealing Council’s offer reports and booklets, ${YEARS[0]}–${YEARS[YEARS.length - 1]}, ` +
-          'and from GOV.UK. They’re estimates to help you plan; Ealing Council makes the admissions decisions.';
+      return `Figures come from ${this.boroughNames} councils’ offer reports and booklets, ` +
+          `${YEARS[0]}–${YEARS[YEARS.length - 1]}, and from GOV.UK. They’re estimates to help you plan; ` +
+          'the councils and schools make the admissions decisions.';
     },
-    // The schools plus about 2 km either side, to steer address suggestions towards Ealing.
+    // Every school plus about 2 km either side, to steer address suggestions towards the area.
     searchArea() {
-      const lats = this.schools.map(s => s.centre.lat);
-      const lngs = this.schools.map(s => s.centre.lng);
+      const lats = this.allSchools.map(s => s.centre.lat);
+      const lngs = this.allSchools.map(s => s.centre.lng);
       return {
         north: Math.max(...lats) + 0.02,
         south: Math.min(...lats) - 0.02,
@@ -429,6 +525,19 @@ export default {
     },
   },
   watch: {
+    // Remember the boroughs picked, and let go of a school that's no longer shown.
+    boroughIds(ids) {
+      try {
+        localStorage.setItem('boroughs', JSON.stringify(ids));
+      } catch (e) {
+        // storage unavailable – the choice lasts this visit
+      }
+      if (!this.picking) writeBoroughsToLink(ids);
+      if (this.focused && !ids.includes(this.focused.borough)) this.focused = null;
+      if (this.selected && !ids.includes(this.selected.borough)) {
+        this.selected = this.rankedRows.length ? this.rankedRows[0].school : null;
+      }
+    },
     // Walking data is only needed once there's a home to measure from: the
     // walk itself from Google (once its script has loaded), outlines from CI.
     home: {
@@ -544,6 +653,18 @@ export default {
   line-height: 1.2;
 }
 .brand p { margin: 2px 0 0; font-size: 14px; color: var(--ink-3); }
+.brand__home {
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  cursor: pointer;
+  display: block;
+  transition: transform .15s;
+}
+.brand__home:hover { transform: scale(1.05); }
+.brand__home .brand__mark { display: block; }
 .brand__mark {
   flex: none;
   width: 38px;
@@ -611,6 +732,25 @@ export default {
 .d-detail { flex: none; }
 
 .list-head { display: flex; flex-direction: column; gap: 10px; }
+.borough-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.borough-bar .borough-bar__change {
+  padding: 6px 0;
+  border: 0;
+  background: none;
+  font: 600 14px var(--font);
+  color: var(--accent);
+  cursor: pointer;
+}
+.borough-bar .borough-bar__change:hover { text-decoration: underline; text-underline-offset: 3px; }
 .list-head h2 { margin: 0; font-family: var(--font-display); font-size: 18px; font-weight: 600; }
 
 .map-card { flex: none; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
