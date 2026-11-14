@@ -31,15 +31,23 @@
       </CustomMarker>
     </GoogleMap>
     <div v-else class="map map--loading" :class="{'map--fill': height}">{{ mapsFailed ? 'The map couldn’t load. You can still enter your address above to see your chances.' : 'Loading map…' }}</div>
-    <div v-if="focus && mapsReady && interactive" class="map-actions">
-      <button type="button" class="map-action" @click="$emit('clear-focus')">
+    <div v-if="focus && mapsReady && (interactive || expandable)" class="map-actions">
+      <!-- Small preview map: one button that opens the full-screen map at the intake view -->
+      <button v-if="expandable" type="button" class="map-action" @click="$emit('expand')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M15 4h5v5M9 20H4v-5M20 4l-6.5 6.5M4 20l6.5-6.5"/>
+        </svg>
+        {{ hasCatchment ? 'Show intake' : 'Full map' }}
+      </button>
+      <button v-if="interactive && showAll" type="button" class="map-action" @click="$emit('clear-focus')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>
         </svg>
         Show all schools
       </button>
-      <button v-if="hasCatchment" type="button" class="map-action" :aria-pressed="intakeView" @click="showIntake">
+      <button v-if="interactive && hasCatchment" type="button" class="map-action" :aria-pressed="intakeView" @click="showIntake">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <circle cx="12" cy="12" r="8.5" stroke-dasharray="3 2.6"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/>
@@ -116,13 +124,20 @@ export default {
     gestures: {type: String, default: 'greedy'},
     // Re-fit when a hidden map (another tab) becomes visible again.
     visible: {type: Boolean, default: true},
+    // Start each school at the intake view (its whole intake area plus home)
+    // rather than the tight school-and-home crop.
+    intakeFirst: {type: Boolean, default: false},
+    // Offer "Show all schools" while zoomed to a school.
+    showAll: {type: Boolean, default: true},
+    // Non-interactive preview: offer a button that asks to open the full map.
+    expandable: {type: Boolean, default: false},
   },
-  emits: ['select', 'clear-focus'],
+  emits: ['select', 'clear-focus', 'expand'],
   data() {
     return {
       fitted: false,
       // Zoomed to the focused school's whole intake area (and home), not just school and home.
-      intakeView: false,
+      intakeView: this.intakeFirst,
       center: {lat: 51.522, lng: -0.325},
       mapStyles: [
         {elementType: 'geometry', stylers: [{color: '#f5f5f5'}]},
@@ -217,7 +232,7 @@ export default {
   },
   watch: {
     focus() {
-      this.intakeView = false;
+      this.intakeView = this.intakeFirst;
       this.fitView();
     },
     // No re-fit on year change: the zoomed view already covers every year.
