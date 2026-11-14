@@ -8,7 +8,7 @@
 const ealingOffers = year => ({title: 'Offers report', href: `/Documents/High_school_on_time_offers_${year}.pdf`});
 const ealingBooklet = year => ({title: `Starting High School ${year}`, href: `/Documents/Starting_High_School_${year}.pdf`});
 const hounslow = (year, title = 'Allocations report') => ({title, href: `/Documents/Hounslow/Secondary_places_allocated_${year}.pdf`});
-const hf = year => ({title: 'How places were offered', href: `/Documents/Hammersmith_Fulham/Secondary_places_offered_${year}.pdf`});
+const hf = (year, title = 'How places were offered') => ({title, href: `/Documents/Hammersmith_Fulham/Secondary_places_offered_${year}.pdf`});
 
 export default [
     {
@@ -46,12 +46,15 @@ export default [
         name: 'Hammersmith & Fulham',
         shortName: 'H&F',
         council: 'Hammersmith & Fulham Council',
-        sourceNote: 'Hammersmith & Fulham\u2019s figures start in 2022: earlier reports are no longer online.',
+        sourceNote: 'Hammersmith & Fulham\u2019s figures start in 2020: we haven\u2019t found its 2019 report.',
         sources: [
+            {year: '2026', docs: [hf(2026, 'Moving on up 2027, offer pages')]},
             {year: '2025', docs: [hf(2025)]},
             {year: '2024', docs: [hf(2024)]},
             {year: '2023', docs: [hf(2023)]},
             {year: '2022', docs: [hf(2022)]},
+            {year: '2021', docs: [hf(2021)]},
+            {year: '2020', docs: [hf(2020)]},
         ],
     },
 ];

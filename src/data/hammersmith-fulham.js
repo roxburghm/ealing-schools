@@ -8,12 +8,15 @@ export default
         "name": "Ark Burlington Danes Academy",
         "shortName": "Burlington Danes",
         "intakeDist": {
+            "2020": 3.741,
+            "2021": null,
             "2022": null,
             "2023": null,
             "2024": null,
-            "2025": null
+            "2025": null,
+            "2026": null
         },
-        "notes": "Church of England academy: up to a quarter of places go to children at named Church of England primaries and a quarter to three Ark feeder primaries. Everyone who applied got a place in 2022–2025.",
+        "notes": "Church of England academy: up to a quarter of places go to children at named Church of England primaries and a quarter to three Ark feeder primaries. Everyone who applied got a place in 2021–2026.",
         "rating": "good",
         "ratingDate": "2022-07-13",
         "ofsted": {
@@ -39,7 +42,7 @@ export default
         "name": "The Fulham Boys School",
         "shortName": "Fulham Boys",
         "intakeDist": {},
-        "notes": "Boys only. Church of England free school: after up to 15 sports aptitude places, half the places are for Christian applicants and half are open, and within each group places go by random tie-breaker to boys in the school’s 2-mile priority zone, so there’s no cut-off distance. Boys outside the zone weren’t offered places in 2022–2025.",
+        "notes": "Boys only. Church of England free school: after up to 15 sports aptitude places, half the places are for Christian applicants and half are open, and within each group places go by random tie-breaker to boys in the school’s 2-mile priority zone, so there’s no cut-off distance. Boys outside the zone weren’t offered places in 2020–2025.",
         "rating": "good",
         "ratingDate": "2022-10-11",
         "ofsted": {
@@ -65,10 +68,13 @@ export default
         "name": "Fulham Cross Academy",
         "shortName": "Fulham Cross",
         "intakeDist": {
+            "2020": null,
+            "2021": null,
             "2022": null,
             "2023": null,
             "2024": null,
-            "2025": null
+            "2025": null,
+            "2026": null
         },
         "notes": null,
         "rating": "good",
@@ -101,10 +107,13 @@ export default
         "name": "Fulham Cross Girls' School and Language College",
         "shortName": "Fulham Cross Girls",
         "intakeDist": {
+            "2020": 2.35,
+            "2021": null,
             "2022": null,
             "2023": null,
             "2024": null,
-            "2025": null
+            "2025": null,
+            "2026": null
         },
         "notes": "Girls only. Up to 12 places go through a languages aptitude test.",
         "rating": "good",
@@ -145,7 +154,7 @@ export default
         "name": "Hammersmith Academy",
         "shortName": "Hammersmith Academy",
         "intakeDist": {},
-        "notes": "Applicants sit a reasoning test that puts them in one of five ability bands, and each band has its own cut-off and priority area, so there’s no single ring. The bands’ cut-offs ran from 0.69 to 1.34 miles in 2022, 0.39 to 1.33 in 2023, 0.69 to 1.20 in 2024 and 0.39 to 1.05 in 2025.",
+        "notes": "Applicants sit a reasoning test that puts them in one of five ability bands, and each band has its own cut-off and priority area, so there’s no single ring. Band cut-offs have ranged from 0.39 to 2.94 miles since 2020; in 2026 they ran from 0.78 to 2.94 miles.",
         "rating": "good",
         "ratingDate": "2013-02-06",
         "ofsted": {
@@ -185,10 +194,13 @@ export default
         "name": "The Hurlingham Academy",
         "shortName": "Hurlingham",
         "intakeDist": {
+            "2020": null,
+            "2021": 3.103,
             "2022": null,
             "2023": 5.056,
             "2024": 1.952,
-            "2025": 1.268
+            "2025": 1.268,
+            "2026": 1.221
         },
         "notes": null,
         "rating": "outstanding",
@@ -216,7 +228,7 @@ export default
         "name": "Lady Margaret School",
         "shortName": "Lady Margaret",
         "intakeDist": {},
-        "notes": "Girls only. Church of England school: 67 foundation (faith) places and 53 open places, each split into three ability bands from a test with its own cut-off, so there’s no single ring. Open places went to girls living within about 0.1–0.55 miles in 2022–2025; foundation places reached 2–10 miles.",
+        "notes": "Girls only. Church of England school: 67 foundation (faith) places and 53 open places, each split into three ability bands from a test with its own cut-off, so there’s no single ring. Open places went to girls living within about 0.1–0.55 miles in 2020–2026; foundation places reached 1.3–10 miles.",
         "rating": "outstanding",
         "ratingDate": "2023-11-22",
         "ofsted": {
@@ -268,10 +280,13 @@ export default
         "name": "Phoenix Academy",
         "shortName": "Phoenix",
         "intakeDist": {
+            "2020": null,
+            "2021": null,
             "2022": null,
             "2023": null,
             "2024": null,
-            "2025": null
+            "2025": null,
+            "2026": null
         },
         "notes": null,
         "rating": "good",
@@ -341,7 +356,7 @@ export default
         "name": "West London Free School",
         "shortName": "West London Free",
         "intakeDist": {},
-        "notes": "Places go to priority groups (pupil premium, feeder primaries, siblings, music aptitude) and then by random ballot to children within 2 miles, so no cut-off distance is published. In 2022–2025 the open ballot itself offered no places.",
+        "notes": "Places go to priority groups (pupil premium, feeder primaries, siblings, music aptitude) and then by random ballot to children within 2 miles, so no cut-off distance is published. In 2021–2026 no places were left for the open ballot.",
         "rating": "good",
         "ratingDate": "2022-06-21",
         "ofsted": {

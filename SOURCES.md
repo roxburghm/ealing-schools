@@ -75,16 +75,20 @@ came from the Internet Archive. Council page: [Secondary school admissions downl
 
 ## Hammersmith & Fulham admission distances (`src/data/hammersmith-fulham.js`, `intakeDist`)
 
-H&F publishes "How places were offered for LBHF secondary schools" each year. Its website was rebuilt and the old
-file links no longer work, so these copies came from the Internet Archive.
+H&F publishes "How places were offered for LBHF secondary schools" each year, and its "Moving on up" brochure
+repeats the previous year's figures. The council's site rejects some automated downloads (a plain `Mozilla/5.0`
+user agent gets a 404 page), so fetch with a full browser user agent.
 
 | Offer year | Source | Copy in this repo |
 |---|---|---|
-| 2019–2021 | Not found: the 2019 and 2021 reports are known by name but weren't archived | – |
-| 2022 | how-hf-school-places-were-offered-2022.pdf (archived 21 April 2022) | [`public/Documents/Hammersmith_Fulham/Secondary_places_offered_2022.pdf`](public/Documents/Hammersmith_Fulham/Secondary_places_offered_2022.pdf) |
-| 2023 | how_lbhf_school_places_were_offered_2023.pdf (archived 17 May 2024) | [`public/Documents/Hammersmith_Fulham/Secondary_places_offered_2023.pdf`](public/Documents/Hammersmith_Fulham/Secondary_places_offered_2023.pdf) |
-| 2024 | secondary-school-allocations-places-2024.pdf (archived 18 June 2024) | [`public/Documents/Hammersmith_Fulham/Secondary_places_offered_2024.pdf`](public/Documents/Hammersmith_Fulham/Secondary_places_offered_2024.pdf) |
-| 2025 | how-lbhf-school-places-were-offered-2025_0.pdf (archived 13 April 2025) | [`public/Documents/Hammersmith_Fulham/Secondary_places_offered_2025.pdf`](public/Documents/Hammersmith_Fulham/Secondary_places_offered_2025.pdf) |
+| 2019 | Not found | – |
+| 2020 | hf_secondary_outcomes_-_2019.pdf (live). Despite the name it's the 2020 offers: created 26 February 2020, and the Moving on up 2021 brochure gives the same figures as "How places were offered in 2020" | [`public/Documents/Hammersmith_Fulham/Secondary_places_offered_2020.pdf`](public/Documents/Hammersmith_Fulham/Secondary_places_offered_2020.pdf) |
+| 2021 | sec_offer_outcomes_2021.pdf (live) | [`public/Documents/Hammersmith_Fulham/Secondary_places_offered_2021.pdf`](public/Documents/Hammersmith_Fulham/Secondary_places_offered_2021.pdf) |
+| 2022 | how-hf-school-places-were-offered-2022.pdf (Internet Archive, 21 April 2022) | [`public/Documents/Hammersmith_Fulham/Secondary_places_offered_2022.pdf`](public/Documents/Hammersmith_Fulham/Secondary_places_offered_2022.pdf) |
+| 2023 | how_lbhf_school_places_were_offered_2023.pdf (Internet Archive, 17 May 2024) | [`public/Documents/Hammersmith_Fulham/Secondary_places_offered_2023.pdf`](public/Documents/Hammersmith_Fulham/Secondary_places_offered_2023.pdf) |
+| 2024 | secondary-school-allocations-places-2024.pdf (Internet Archive, 18 June 2024) | [`public/Documents/Hammersmith_Fulham/Secondary_places_offered_2024.pdf`](public/Documents/Hammersmith_Fulham/Secondary_places_offered_2024.pdf) |
+| 2025 | how-lbhf-school-places-were-offered-2025_0.pdf (Internet Archive, 13 April 2025) | [`public/Documents/Hammersmith_Fulham/Secondary_places_offered_2025.pdf`](public/Documents/Hammersmith_Fulham/Secondary_places_offered_2025.pdf) |
+| 2026 | "How places were offered in 2026" boxes in the [Moving on up 2027 brochure](https://www.lbhf.gov.uk/sites/default/files/2026-09/moving-on-up-2027-brochure.pdf). The standalone 2026 report (…/2026-03/how-lbhf-school-places-were-offered-2026-v2.pdf) has been taken down and wasn't archived | [`public/Documents/Hammersmith_Fulham/Secondary_places_offered_2026.pdf`](public/Documents/Hammersmith_Fulham/Secondary_places_offered_2026.pdf) (the 11 school pages only) |
 
 ### Notes on the distances
 
@@ -100,7 +104,8 @@ note instead:
   categories; no distances are published.
 - **West London Free School** gives places to priority groups and then by random ballot within 2 miles.
 - **Burlington Danes**, **Fulham Cross Academy**, **Fulham Cross Girls'** and **Phoenix** offered everyone a place in
-  2022–2025 (`null`). **Hurlingham** offered everyone a place in 2022 and published cut-offs from 2023.
+  2021–2026 (`null`); Burlington Danes (3.741 mi) and Fulham Cross Girls' (2.350 mi) had cut-offs in 2020.
+  **Hurlingham** offered everyone a place in 2020 and 2022, with cut-offs in the other years.
 
 School details, Ofsted and GCSE figures for H&F come from the same sources as Hounslow's (GIAS, reports.ofsted.gov.uk,
 DfE performance tables data 2025/26, Progress 8 from 2023/24).
