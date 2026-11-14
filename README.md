@@ -50,10 +50,14 @@ There are two advert spaces, both drawn by `src/components/AdSlot.vue`:
 | `desktop` | Pinned under the school list on wide screens; stays put while the list scrolls | about 380 x 120 | 760 x 240 |
 | `mobile` | In the school list on phones and small tablets, after the third school | about 360 x 180 | 720 x 360 |
 
-`src/data/adverts.js` says what fills each space (link, picture, description for screen readers); pictures go in
-`public/adverts/` at twice the size they are shown. Set a space to `null` there and it disappears, taking no room.
-The SquadCars pictures are built in the squadcars repo (`marketing/brand/schools-advert/`): rebuild them there and
-copy them over.
+`src/data/adverts.js` gives each space a list of adverts (link, picture, description for screen readers). A space
+starts on one picked at random and moves to the next every 12 seconds, in a shuffled order, holding still while the
+pointer is on it. Pictures go in `public/adverts/` at twice the size they are shown, and every picture in a space must
+be the same shape. Empty a space's list and it disappears, taking no room.
+
+The SquadCars adverts (five wordings, a picture each per space) are built in the squadcars repo
+(`marketing/brand/schools-advert/`), which also writes `src/data/squadcars-adverts.json`: rebuild them there and copy
+both over. Each link carries `utm_content=<wording>`, so clicks can be told apart.
 
 ## Project setup
 ```
