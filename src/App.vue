@@ -178,8 +178,9 @@
         </section>
       </transition>
 
-      <!-- The school's map full screen, opened from its page, starting at the intake view -->
-      <transition name="page">
+      <!-- The school page's map made bigger: same header, the map fills the rest,
+           starting at the intake view -->
+      <transition name="grow">
         <section v-if="fullMap && pageOpen && selected" class="m-page m-full" role="dialog" aria-modal="true"
                  :aria-label="`${selected.name} map`">
           <div class="m-page__bar">
@@ -196,7 +197,7 @@
           </div>
           <div class="m-full__map">
             <schools-map :schools="schools" :year="year" :home="home" :selected="selected" :focus="selected"
-                         height="100%" intake-first :show-all="false"
+                         height="100%" intake-first collapsible @collapse="closeFullMap"
                          :api-promise="apiPromise" :maps-ready="mapsReady" :maps-failed="mapsFailed"/>
             <map-legend compact class="m-map__legend"/>
           </div>
@@ -356,10 +357,10 @@ export default {
       }
     },
     fetchWalks() {
-      if (!this.home) return;
       const walkSchools = this.allSchools.filter(s => admission.measure(s) === 'walk');
+      // Outlines are drawn on the map with or without a home (load skips ones it has).
       walkSchools.forEach(walking.load);
-      if (this.mapsReady) walking.lookupWalks(walkSchools, this.home);
+      if (this.home && this.mapsReady) walking.lookupWalks(walkSchools, this.home);
     },
     matchesName(school) {
       const query = this.nameFilter.trim().toLowerCase();
@@ -573,8 +574,8 @@ export default {
         this.selected = this.rankedRows.length ? this.rankedRows[0].school : null;
       }
     },
-    // Walking data is only needed once there's a home to measure from: the
-    // walk itself from Google (once its script has loaded), outlines from CI.
+    // Walking outlines (from CI) load straight away for the map; the walk from
+    // home comes from Google once there's a home and its script has loaded.
     home: {
       immediate: true,
       handler() {
@@ -905,8 +906,10 @@ export default {
 
 .page-enter-active, .page-leave-active { transition: transform .26s cubic-bezier(0.22, 1, 0.36, 1), opacity .26s; }
 .page-enter-from, .page-leave-to { transform: translateX(24px); opacity: 0; }
+.grow-enter-active, .grow-leave-active { transition: opacity .18s; }
+.grow-enter-from, .grow-leave-to { opacity: 0; }
 
 @media (prefers-reduced-motion: reduce) {
-  .page-enter-active, .page-leave-active { transition: none; }
+  .page-enter-active, .page-leave-active, .grow-enter-active, .grow-leave-active { transition: none; }
 }
 </style>
