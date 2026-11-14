@@ -110,6 +110,70 @@ note instead:
 School details, Ofsted and GCSE figures for H&F come from the same sources as Hounslow's (GIAS, reports.ofsted.gov.uk,
 DfE performance tables data 2025/26, Progress 8 from 2023/24).
 
+## Hillingdon admission distances (`src/data/hillingdon.js`, `intakeDist`)
+
+Hillingdon publishes "Secondary allocation data" each year, with the furthest distance offered **in metres**
+(converted to miles, 3 dp). Each year's figures were cross-checked against the "intake for secondary schools" page of
+the following year's admissions brochure, which repeats the March allocations; they match. The 2024–2026 files are
+images with no text, so they were read by eye and checked against the brochures.
+
+| Offer year | Source | Copy in this repo |
+|---|---|---|
+| 2019 | Secondary allocation data 2019 (hillingdon.gov.uk/media/7411/Secondary-allocation-data-2019) | [`public/Documents/Hillingdon/Secondary_allocation_data_2019.pdf`](public/Documents/Hillingdon/Secondary_allocation_data_2019.pdf) |
+| 2020 | Secondary allocation data 2020 (hillingdon.gov.uk/media/7410/Secondary-allocation-data-2020) | [`public/Documents/Hillingdon/Secondary_allocation_data_2020.pdf`](public/Documents/Hillingdon/Secondary_allocation_data_2020.pdf) |
+| 2021 | Secondary allocation data 2021 (hillingdon.gov.uk/media/7409/Secondary-allocation-data-2021) | [`public/Documents/Hillingdon/Secondary_allocation_data_2021.pdf`](public/Documents/Hillingdon/Secondary_allocation_data_2021.pdf) |
+| 2022 | Secondary allocation data 2022 (hillingdon.gov.uk/media/8518/Secondary-allocation-data-2022) | [`public/Documents/Hillingdon/Secondary_allocation_data_2022.pdf`](public/Documents/Hillingdon/Secondary_allocation_data_2022.pdf) |
+| 2023 | Secondary allocation data 2023 ([Secondary school statistics](https://pre.hillingdon.gov.uk/downloads/download/296/secondary-school-statistics)) | [`public/Documents/Hillingdon/Secondary_allocation_data_2023.pdf`](public/Documents/Hillingdon/Secondary_allocation_data_2023.pdf) |
+| 2024 | Secondary allocation data 2024 ([Secondary school statistics](https://pre.hillingdon.gov.uk/downloads/download/296/secondary-school-statistics)) | [`public/Documents/Hillingdon/Secondary_allocation_data_2024.pdf`](public/Documents/Hillingdon/Secondary_allocation_data_2024.pdf) |
+| 2025 | Secondary allocation data 2025 ([Secondary school statistics](https://pre.hillingdon.gov.uk/downloads/download/296/secondary-school-statistics)) | [`public/Documents/Hillingdon/Secondary_allocation_data_2025.pdf`](public/Documents/Hillingdon/Secondary_allocation_data_2025.pdf) |
+| 2026 | Secondary allocation data 2026 ([Secondary school statistics](https://pre.hillingdon.gov.uk/downloads/download/296/secondary-school-statistics)) | [`public/Documents/Hillingdon/Secondary_allocation_data_2026.pdf`](public/Documents/Hillingdon/Secondary_allocation_data_2026.pdf) |
+
+### Notes on the distances
+
+- "N/A (U)" (undersubscribed) is `null`. Park Academy, Rosedale and Harlington are sometimes marked undersubscribed
+  with no places left; the data follows the council and uses `null`.
+- **Bishop Ramsey**, **Douay Martyrs**, **Guru Nanak** (faith) and **Swakeleys** (nine ability bands) are marked
+  "N/A (F)" / "N/A (B)" every year: no years, and a note. Swakeleys doesn't publish band cut-offs.
+- **Oak Wood 2019**: the published figure is 17,198 m (10.686 mi), in both the 2019 and 2020 files. Kept, with a note.
+- **2020**: the council notes Slough later made 13 extra offers, which may have changed some furthest distances. The
+  figures are as published.
+- **2023**: the file online is a reissue (created 31 August 2023); it matches the March 2023 table in the brochure.
+- **Barnhill**, **Hewens** and **Rosedale** give priority to children at linked primary schools; their notes say so.
+
+## Brent admission distances (`src/data/brent.js`, `intakeDist`)
+
+Brent publishes "How places were allocated" each year, with distances **in metres** (converted to miles, 3 dp).
+Older files live on `legacy.brent.gov.uk` and were recovered from the Internet Archive.
+
+| Offer year | Source | Copy in this repo |
+|---|---|---|
+| 2019 | how-places-were-allocated-2019.pdf (Internet Archive, 17 October 2019) | [`public/Documents/Brent/Secondary_places_allocated_2019.pdf`](public/Documents/Brent/Secondary_places_allocated_2019.pdf) |
+| 2020 | how-places-were-allocated-2020-publish-copy.pdf (Internet Archive, 14 March 2020) | [`public/Documents/Brent/Secondary_places_allocated_2020.pdf`](public/Documents/Brent/Secondary_places_allocated_2020.pdf) |
+| 2021 | No standalone report found; page 16 of the September 2022 admissions brochure repeats the 2021 offers (Internet Archive, 4 October 2021) | [`public/Documents/Brent/Secondary_places_allocated_2021.pdf`](public/Documents/Brent/Secondary_places_allocated_2021.pdf) |
+| 2022 | how-places-were-allocated-2022.pdf (Internet Archive, 22 October 2022) | [`public/Documents/Brent/Secondary_places_allocated_2022.pdf`](public/Documents/Brent/Secondary_places_allocated_2022.pdf) |
+| 2023 | how-places-were-allocated-2023-publish-copy-v3.pdf (Internet Archive, 7 July 2024); a later v4 only renames Capital City Academy | [`public/Documents/Brent/Secondary_places_allocated_2023.pdf`](public/Documents/Brent/Secondary_places_allocated_2023.pdf) |
+| 2024 | how-secondary-school-places-were-allocated-2024.pdf (brent.gov.uk) | [`public/Documents/Brent/Secondary_places_allocated_2024.pdf`](public/Documents/Brent/Secondary_places_allocated_2024.pdf) |
+| 2025 | how-places-were-offered---secondary-2025.pdf (brent.gov.uk) | [`public/Documents/Brent/Secondary_places_allocated_2025.pdf`](public/Documents/Brent/Secondary_places_allocated_2025.pdf) |
+| 2026 | how-secondary-school-places-were-allocated---2026---publish-v2.pdf (brent.gov.uk) | [`public/Documents/Brent/Secondary_places_allocated_2026.pdf`](public/Documents/Brent/Secondary_places_allocated_2026.pdf) |
+
+### Notes on the distances
+
+- Undersubscribed schools, and years where places went to "nearest school with a vacancy", are `null`. "999999" in
+  the tables means everyone in that category was offered.
+- **Wembley High** never had places left for distance (`0` every year): siblings and five feeder primaries fill it.
+  **Claremont** is `0` in 2019 and 2025 for the same reason.
+- **JFS** (religious practice test, random allocation), **Michaela** (random ballot within 5 miles) and
+  **St Gregory's** (Catholic categories, distance only as a tie-break) have no years and a note.
+- **North Brent** measures three-quarters of its places from Wembley High (Zone A) and a quarter from its own site
+  (Zone B), so it has no single ring; the note gives both zones' cut-offs. It first appears in the 2021 report.
+- **Queens Park**: the ring is the cut-off for its 12 distance places (children not at its partnership primaries).
+  2021 is left out: the brochure table's columns are shifted and the distance figure can't be read reliably.
+- **Ark Academy 2019** was split into two zones (593.86 m and 933.06 m) whose definitions aren't given: left out, in
+  the note.
+- **Kingsbury 2023**: the report gives 21,275 m (13.2 mi) for distance offers. Kept as published, in the note.
+- Old names: Capital City Academy (now Harris Lowe, to 2023), Convent of Jesus and Mary Language College (St
+  Claudine's, to 2021), The Crest Academy (E-ACT Crest, to 2021).
+
 ## Ofsted (`rating`, `ratingDate`, `ofsted`)
 
 `rating` / `ratingDate` are the last overall grade and its inspection date. `ofsted.latest` holds anything newer:

@@ -213,12 +213,14 @@ import Help from './Help.vue';
 // Below this width the two columns don't fit: switch to the List / Map tabs.
 const NARROW = '(max-width: 1019px)';
 
-// Boroughs named in the link (?borough=ealing,hounslow), else the ones picked last
+// Boroughs named in the link (?borough=ealing, ?borough=all), else the ones picked last
 // visit. null when neither: the visitor starts on the borough picker.
 function initialBoroughs() {
   const ids = boroughs.map(b => b.id);
   const known = list => (Array.isArray(list) ? ids.filter(id => list.includes(id)) : []);
-  const fromLink = known((new URLSearchParams(location.search).get('borough') || '').split(','));
+  const param = new URLSearchParams(location.search).get('borough') || '';
+  if (param === 'all') return ids;
+  const fromLink = known(param.split(','));
   if (fromLink.length) return fromLink;
   const stored = known(readStored('boroughs'));
   return stored.length ? stored : null;
@@ -227,7 +229,7 @@ function initialBoroughs() {
 // Keep ?borough= in the address bar in step with what's shown, so the link can be shared.
 function writeBoroughsToLink(ids) {
   const url = new URL(location.href);
-  if (ids) url.searchParams.set('borough', ids.join(','));
+  if (ids) url.searchParams.set('borough', ids.length === boroughs.length ? 'all' : ids.join(','));
   else url.searchParams.delete('borough');
   history.replaceState(history.state, '', url);
 }

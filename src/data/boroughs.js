@@ -8,6 +8,8 @@
 const ealingOffers = year => ({title: 'Offers report', href: `/Documents/High_school_on_time_offers_${year}.pdf`});
 const ealingBooklet = year => ({title: `Starting High School ${year}`, href: `/Documents/Starting_High_School_${year}.pdf`});
 const hounslow = (year, title = 'Allocations report') => ({title, href: `/Documents/Hounslow/Secondary_places_allocated_${year}.pdf`});
+const hillingdon = year => ({title: 'Allocation data', href: `/Documents/Hillingdon/Secondary_allocation_data_${year}.pdf`});
+const brent = (year, title = 'How places were allocated') => ({title, href: `/Documents/Brent/Secondary_places_allocated_${year}.pdf`});
 const hf = (year, title = 'How places were offered') => ({title, href: `/Documents/Hammersmith_Fulham/Secondary_places_offered_${year}.pdf`});
 
 export default [
@@ -56,5 +58,18 @@ export default [
             {year: '2021', docs: [hf(2021)]},
             {year: '2020', docs: [hf(2020)]},
         ],
+    },
+    {
+        id: 'hillingdon',
+        name: 'Hillingdon',
+        council: 'Hillingdon Council',
+        sources: ['2026', '2025', '2024', '2023', '2022', '2021', '2020', '2019'].map(year => ({year, docs: [hillingdon(year)]})),
+    },
+    {
+        id: 'brent',
+        name: 'Brent',
+        council: 'Brent Council',
+        sources: ['2026', '2025', '2024', '2023', '2022', '2021', '2020', '2019']
+            .map(year => ({year, docs: [brent(year, year === '2021' ? 'Admissions brochure 2022, offers page' : undefined)]})),
     },
 ];
