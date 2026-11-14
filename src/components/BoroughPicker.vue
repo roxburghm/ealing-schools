@@ -49,7 +49,9 @@ const PAD = 8;
 
 // Draws one or more borough outlines in a shared flat projection (squashed
 // east–west by the latitude so shapes look right), with schools as dots.
-function drawMap(rings, schools) {
+// With `gap`, each piece shrinks slightly and moves that many units out from the
+// middle of the group, so several boroughs read as a jigsaw pulled apart.
+function drawMap(rings, schools, gap = 0) {
   const points = rings.flatMap(r => r.ring);
   const lat0 = points.length ? points.reduce((t, p) => t + p[1], 0) / points.length : 51.5;
   const k = Math.cos(lat0 * Math.PI / 180);
@@ -58,16 +60,36 @@ function drawMap(rings, schools) {
   const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
   const scale = SIZE / (Math.max(maxX - minX, maxY - minY) || 1);
   const project = (lng, lat) => [(lng * k - minX) * scale, (-lat - minY) * scale];
-  const width = (maxX - minX) * scale;
-  const height = (maxY - minY) * scale;
+
+  // Each piece shrinks a little about its own centre (so seams open even for
+  // the piece in the middle) and moves outward from the middle of the group.
+  const midX = (maxX - minX) * scale / 2, midY = (maxY - minY) * scale / 2;
+  const moves = {};
+  for (const r of rings) {
+    if (!gap || !r.ring.length) continue;
+    const pts = r.ring.map(([lng, lat]) => project(lng, lat));
+    const cx = pts.reduce((t, p) => t + p[0], 0) / pts.length;
+    const cy = pts.reduce((t, p) => t + p[1], 0) / pts.length;
+    const len = Math.hypot(cx - midX, cy - midY) || 1;
+    moves[r.id] = {cx, cy, dx: (cx - midX) / len * gap, dy: (cy - midY) / len * gap};
+  }
+  const SHRINK = 0.9;
+  const place = (id, lng, lat) => {
+    const [x, y] = project(lng, lat);
+    const m = moves[id];
+    if (!m) return [x, y];
+    return [m.cx + (x - m.cx) * SHRINK + m.dx, m.cy + (y - m.cy) * SHRINK + m.dy];
+  };
+
+  const pieces = rings.filter(r => r.ring.length).map(r => ({id: r.id, pts: r.ring.map(([lng, lat]) => place(r.id, lng, lat))}));
+  const all = pieces.flatMap(p => p.pts);
+  const left = Math.min(...all.map(p => p[0])), right = Math.max(...all.map(p => p[0]));
+  const top = Math.min(...all.map(p => p[1])), bottom = Math.max(...all.map(p => p[1]));
   return {
-    viewBox: `${-PAD} ${-PAD} ${width + PAD * 2} ${height + PAD * 2}`,
-    pieces: rings.filter(r => r.ring.length).map(r => ({
-      id: r.id,
-      d: 'M' + r.ring.map(([lng, lat]) => project(lng, lat).map(n => n.toFixed(1)).join(' ')).join('L') + 'Z',
-    })),
+    viewBox: `${left - PAD} ${top - PAD} ${right - left + PAD * 2} ${bottom - top + PAD * 2}`,
+    pieces: pieces.map(p => ({id: p.id, d: 'M' + p.pts.map(pt => pt.map(n => n.toFixed(1)).join(' ')).join('L') + 'Z'})),
     dots: schools.map(s => {
-      const [x, y] = project(s.centre.lng, s.centre.lat);
+      const [x, y] = place(s.borough, s.centre.lng, s.centre.lat);
       return {name: s.name, x: x.toFixed(1), y: y.toFixed(1), colour: s.colour};
     }),
   };
@@ -109,7 +131,7 @@ export default {
         source: `Figures from all ${this.boroughs.length} councils`,
         count: this.schools.length,
         years: yearRange(this.schools),
-        ...drawMap(this.boroughs.map(b => ({id: b.id, ring: outlines[b.id] || []})), this.schools),
+        ...drawMap(this.boroughs.map(b => ({id: b.id, ring: outlines[b.id] || []})), this.schools, 8),
       }];
     },
   },
@@ -192,9 +214,9 @@ export default {
 .card:hover .card__shape { fill: #E6EEFE; stroke: #9DB5EE; }
 .card__dot { stroke: #fff; stroke-width: 1.5; }
 
-/* The jigsaw: every borough as one piece, white seams between them */
-.card--all .card__shape { fill: #E3E8EF; stroke: #fff; stroke-width: 1.75; }
-.card--all:hover .card__shape { fill: #DCE6FB; stroke: #fff; }
+/* The jigsaw: every borough as its own piece, pulled slightly apart */
+.card--all .card__shape { fill: #E3E8EF; stroke: var(--line-strong); stroke-width: 1; }
+.card--all:hover .card__shape { fill: #DCE6FB; stroke: #9DB5EE; }
 .card--all .card__dot { stroke-width: 1; }
 
 .card__text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
