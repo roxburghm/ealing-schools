@@ -16,14 +16,14 @@
 </template>
 
 <script>
-// One advert space. What fills it is set in src/data/adverts.js: with several adverts
+// One advert space. What fills it is set in src/adverts/adverts.js: with several adverts
 // it starts on a random one and moves through the rest in a shuffled order; with none,
 // nothing is drawn and no room is taken.
 //
 // An advert with a film plays it once each time it comes up, and the film rests on its
 // last frame (the same as the picture). Nothing plays or moves on while the space is
 // off screen, so the film starts when someone can see it.
-import adverts from '@/data/adverts';
+import adverts from '@/adverts/adverts';
 
 const EVERY = 12000; // ms each advert stays up, its film included
 
